@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: stable
+          sdk: dev
       - name: Get Dependencies
         working-directory: ${{ env.TEST_DIR }}
         run: dart pub get
@@ -63,7 +63,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: stable
+          sdk: dev
       - name: Get Dependencies
         working-directory: ${{ env.TEST_DIR }}
         run: dart pub get
@@ -89,7 +89,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: dart-lang/setup-dart@v1
         with:
-          sdk: stable
+          sdk: dev
       - name: Prep Packages
         run: |
           dart pub global activate melos
