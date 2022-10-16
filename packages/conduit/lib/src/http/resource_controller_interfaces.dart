@@ -148,13 +148,13 @@ class ResourceControllerParameter {
   String get locationName {
     switch (location) {
       case BindingType.query:
-        return "query";
+        return 'query';
       case BindingType.body:
-        return "body";
+        return 'body';
       case BindingType.header:
-        return "header";
+        return 'header';
       case BindingType.path:
-        return "path";
+        return 'path';
     }
   }
 

@@ -31,7 +31,7 @@ abstract class PersistentStore {
       {PersistentStoreQueryReturnType? returnType});
 
   Future<T?> transaction<T>(ManagedContext transactionContext,
-      Future<T?> transactionBlock(ManagedContext transaction));
+      Future<T?> Function(ManagedContext transaction) transactionBlock);
 
   /// Closes the underlying database connection.
   Future close();

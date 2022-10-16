@@ -9,7 +9,7 @@ void main() {
   const port = 8888;
   const urlPrefix = 'ws://localhost:$port';
 
-  group("Upgrade to WebSocket", () {
+  group('Upgrade to WebSocket', () {
     var app = Application<TestChannel>();
     app.options.port = port;
 
@@ -21,7 +21,7 @@ void main() {
       return await app.stop();
     });
 
-    test("Single message, use broadcast stream", () async {
+    test('Single message, use broadcast stream', () async {
       final url = Uri.parse('$urlPrefix/test');
       final socket = WebSocketChannel.connect(url);
       final incoming = socket.stream.asBroadcastStream();
@@ -39,7 +39,7 @@ void main() {
       expect(socket.closeReason, 'stop acknowledged');
     });
 
-    test("Send single message. Await single subscription stream", () async {
+    test('Send single message. Await single subscription stream', () async {
       final url = Uri.parse('$urlPrefix/test');
       final socket = WebSocketChannel.connect(url);
       const msg = 'this message is transfered over WebSocket connection';
@@ -63,7 +63,7 @@ void main() {
       await socket.sink.close();
     });
 
-    test("Send stream of messages", () async {
+    test('Send stream of messages', () async {
       final url = Uri.parse('$urlPrefix/test');
       final socket = WebSocketChannel.connect(url);
 
@@ -89,7 +89,7 @@ void main() {
       expect(socket.closeReason, 'stop acknowledged');
     });
 
-    test("chat", () async {
+    test('chat', () async {
       final url1 = Uri.parse('$urlPrefix/chat?user=user1');
       final url2 = Uri.parse('$urlPrefix/chat?user=user2');
       final user1 = WebSocketChannel.connect(url1);
@@ -97,14 +97,14 @@ void main() {
       final rxUser1 = user1.stream.asBroadcastStream();
       final rxUser2 = user2.stream.asBroadcastStream();
 
-      const sentMsg1 = "hello user 2";
+      const sentMsg1 = 'hello user 2';
       const send1 = '{"to": "user2", "msg": "$sentMsg1"}';
 
       user1.sink.add(send1);
       final msg = await rxUser2.first;
       expect(msg, sentMsg1);
 
-      const sentMsg2 = "hello user 1";
+      const sentMsg2 = 'hello user 1';
       const send2 = '{"to": "user1", "msg": "$sentMsg2"}';
       user2.sink.add(send2);
       final data = await rxUser1.first;
@@ -133,7 +133,7 @@ class TestChannel extends ApplicationChannel {
   @override
   Controller get entryPoint {
     final router = Router();
-    router.route("/test").link(() => TestController());
+    router.route('/test').link(() => TestController());
     router.route('/chat').link(() => ChatController());
 
     return router;

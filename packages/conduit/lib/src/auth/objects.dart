@@ -142,18 +142,18 @@ class AuthToken {
   /// Emits this instance as a [Map] according to the OAuth 2.0 specification.
   Map<String, dynamic> asMap() {
     final map = {
-      "access_token": accessToken,
-      "token_type": type,
-      "expires_in":
+      'access_token': accessToken,
+      'token_type': type,
+      'expires_in':
           expirationDate!.difference(DateTime.now().toUtc()).inSeconds,
     };
 
     if (refreshToken != null) {
-      map["refresh_token"] = refreshToken;
+      map['refresh_token'] = refreshToken;
     }
 
     if (scopes != null) {
-      map["scope"] = scopes!.map((s) => s.toString()).join(" ");
+      map['scope'] = scopes!.map((s) => s.toString()).join(' ');
     }
 
     return map;
@@ -298,13 +298,13 @@ class AuthScope {
   factory AuthScope._parse(String scopeString) {
     if (scopeString.isEmpty) {
       throw FormatException(
-          "Invalid AuthScope. May not an empty string.", scopeString);
+          'Invalid AuthScope. May not an empty string.', scopeString);
     }
 
     for (var c in scopeString.codeUnits) {
       if (!(c == 33 || (c >= 35 && c <= 91) || (c >= 93 && c <= 126))) {
         throw FormatException(
-            "Invalid authorization scope. May only contain "
+            'Invalid authorization scope. May only contain '
             "the following characters: A-Za-z0-9!#\$%&'`()*+,./:;<=>?@[]^_{|}-",
             scopeString,
             scopeString.codeUnits.indexOf(c));
@@ -323,7 +323,7 @@ class AuthScope {
   ///
   /// See [AuthServerDelegate.getAllowedScopes] for more details.
   static const List<AuthScope> any = [
-    AuthScope._("_scope:_constant:_marker", [], null)
+    AuthScope._('_scope:_constant:_marker', [], null)
   ];
 
   /// Returns true if that [providedScopes] fulfills [requiredScopes].
@@ -365,24 +365,24 @@ class AuthScope {
   static List<_AuthScopeSegment> _parseSegments(String scopeString) {
     if (scopeString.isEmpty) {
       throw FormatException(
-          "Invalid AuthScope. May not be empty string.", scopeString);
+          'Invalid AuthScope. May not be empty string.', scopeString);
     }
 
     final elements =
-        scopeString.split(":").map((seg) => _AuthScopeSegment(seg)).toList();
+        scopeString.split(':').map((seg) => _AuthScopeSegment(seg)).toList();
 
     var scannedOffset = 0;
     for (var i = 0; i < elements.length - 1; i++) {
       if (elements[i].modifier != null) {
         throw FormatException(
-            "Invalid AuthScope. May only contain modifiers on the last segment.",
+            'Invalid AuthScope. May only contain modifiers on the last segment.',
             scopeString,
             scannedOffset);
       }
 
-      if (elements[i].name == "") {
+      if (elements[i].name == '') {
         throw FormatException(
-            "Invalid AuthScope. May not contain empty segments or, leading or trailing colons.",
+            'Invalid AuthScope. May not contain empty segments or, leading or trailing colons.',
             scopeString,
             scannedOffset);
       }
@@ -390,9 +390,9 @@ class AuthScope {
       scannedOffset += elements[i].toString().length + 1;
     }
 
-    if (elements.last.name == "") {
+    if (elements.last.name == '') {
       throw FormatException(
-          "Invalid AuthScope. May not contain empty segments.",
+          'Invalid AuthScope. May not contain empty segments.',
           scopeString,
           scannedOffset);
     }
@@ -484,7 +484,7 @@ class AuthScope {
 
 class _AuthScopeSegment {
   _AuthScopeSegment(String segment) {
-    final split = segment.split(".");
+    final split = segment.split('.');
     if (split.length == 2) {
       name = split.first;
       modifier = split.last;
@@ -501,6 +501,6 @@ class _AuthScopeSegment {
     if (modifier == null) {
       return name!;
     }
-    return "$name.$modifier";
+    return '$name.$modifier';
   }
 }

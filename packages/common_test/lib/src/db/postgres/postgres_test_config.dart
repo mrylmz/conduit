@@ -33,10 +33,10 @@ class PostgresTestConfig {
 
   PostgresTestConfig._internal();
 
-  static late final PostgresTestConfig _self = PostgresTestConfig._internal();
+  static final PostgresTestConfig _self = PostgresTestConfig._internal();
 
   String get connectionUrl =>
-      "postgres://$username:$password@$host:$port/$dbName";
+      'postgres://$username:$password@$host:$port/$dbName';
 
   /// Returns a [PostgreSQLPersistentStore] that has been initialised
   /// using the  db settings configured via .settings.yaml
@@ -95,7 +95,7 @@ class PostgresTestConfig {
     final tables = List<SchemaTable>.from(schema.tables);
     while (tables.isNotEmpty) {
       try {
-        await store.execute("DROP TABLE IF EXISTS ${tables.last.name}");
+        await store.execute('DROP TABLE IF EXISTS ${tables.last.name}');
         tables.removeLast();
       } catch (_) {
         tables.insert(0, tables.removeLast());
@@ -107,15 +107,15 @@ class PostgresTestConfig {
   int get port {
     if (_port == null) {
       /// Check for an environment variable.
-      const _key = 'POSTGRES_PORT';
-      if (Platform.environment.containsKey(_key)) {
-        final value = Platform.environment[_key];
+      const key = 'POSTGRES_PORT';
+      if (Platform.environment.containsKey(key)) {
+        final value = Platform.environment[key];
         if (value != null) {
           _port = int.tryParse(value);
         }
         if (_port == null) {
           throw ArgumentError(
-              "The Environment Variable $_key does not contain a valid integer. Found: $value");
+              'The Environment Variable $key does not contain a valid integer. Found: $value');
         }
       } else {
         _port = DbSettings.defaultPort;
@@ -152,7 +152,7 @@ class PostgresTestConfig {
       }
       if (value == null || value.isEmpty) {
         throw ArgumentError(
-            "The Environment Variable $key does not contain a valid String. Found null or an empty string.");
+            'The Environment Variable $key does not contain a valid String. Found null or an empty string.');
       }
     }
 

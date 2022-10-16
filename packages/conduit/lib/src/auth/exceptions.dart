@@ -9,30 +9,30 @@ class AuthServerException implements Exception {
   static String? errorString(AuthRequestError error) {
     switch (error) {
       case AuthRequestError.invalidRequest:
-        return "invalid_request";
+        return 'invalid_request';
       case AuthRequestError.invalidClient:
-        return "invalid_client";
+        return 'invalid_client';
       case AuthRequestError.invalidGrant:
-        return "invalid_grant";
+        return 'invalid_grant';
       case AuthRequestError.invalidScope:
-        return "invalid_scope";
+        return 'invalid_scope';
       case AuthRequestError.invalidToken:
-        return "invalid_token";
+        return 'invalid_token';
 
       case AuthRequestError.unsupportedGrantType:
-        return "unsupported_grant_type";
+        return 'unsupported_grant_type';
       case AuthRequestError.unsupportedResponseType:
-        return "unsupported_response_type";
+        return 'unsupported_response_type';
 
       case AuthRequestError.unauthorizedClient:
-        return "unauthorized_client";
+        return 'unauthorized_client';
       case AuthRequestError.accessDenied:
-        return "access_denied";
+        return 'access_denied';
 
       case AuthRequestError.serverError:
-        return "server_error";
+        return 'server_error';
       case AuthRequestError.temporarilyUnavailable:
-        return "temporarily_unavailable";
+        return 'temporarily_unavailable';
     }
   }
 
@@ -45,7 +45,7 @@ class AuthServerException implements Exception {
 
   @override
   String toString() {
-    return "AuthServerException: $reason $client";
+    return 'AuthServerException: $reason $client';
   }
 }
 

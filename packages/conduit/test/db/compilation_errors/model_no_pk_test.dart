@@ -9,7 +9,7 @@ class _NoPrimaryKey {
 }
 
 void main() {
-  test("Entity without primary key fails", () {
+  test('Entity without primary key fails', () {
     try {
       ManagedDataModel([NoPrimaryKey]);
       expect(true, false);

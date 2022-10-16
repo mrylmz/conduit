@@ -3,7 +3,7 @@ import 'package:conduit/conduit.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test("Can add resources to registry that get shut down", () async {
+  test('Can add resources to registry that get shut down', () async {
     var controller = StreamController();
     ServiceRegistry.defaultInstance
         .register<StreamController>(controller, (s) => s.close());
@@ -13,14 +13,14 @@ void main() {
       msgCompleter.complete();
     });
 
-    controller.add("whatever");
+    controller.add('whatever');
     await msgCompleter.future;
 
     await ServiceRegistry.defaultInstance.close();
     expect(controller.isClosed, true);
   });
 
-  test("Can remove resource", () async {
+  test('Can remove resource', () async {
     var controller = StreamController();
     ServiceRegistry.defaultInstance
         .register<StreamController>(controller, (s) => s.close());
@@ -30,7 +30,7 @@ void main() {
       msgCompleter.complete();
     });
 
-    controller.add("whatever");
+    controller.add('whatever');
     await msgCompleter.future;
 
     ServiceRegistry.defaultInstance.unregister(controller);

@@ -20,7 +20,7 @@ class PostgreSQLPersistentStore extends PersistentStore
   /// Creates an instance of this type from connection info.
   PostgreSQLPersistentStore(
       this.username, this.password, this.host, this.port, this.databaseName,
-      {this.timeZone = "UTC", bool useSSL = false})
+      {this.timeZone = 'UTC', bool useSSL = false})
       : isSSLConnection = useSSL {
     ServiceRegistry.defaultInstance
         .register<PostgreSQLPersistentStore>(this, (store) => store.close());
@@ -31,7 +31,7 @@ class PostgreSQLPersistentStore extends PersistentStore
   /// Kept for backwards compatability.
   PostgreSQLPersistentStore.fromConnectionInfo(
       this.username, this.password, this.host, this.port, this.databaseName,
-      {this.timeZone = "UTC", bool useSSL = false})
+      {this.timeZone = 'UTC', bool useSSL = false})
       : isSSLConnection = useSSL {
     ServiceRegistry.defaultInstance
         .register<PostgreSQLPersistentStore>(this, (store) => store.close());
@@ -52,7 +52,7 @@ class PostgreSQLPersistentStore extends PersistentStore
   }
 
   /// The logger used by instances of this class.
-  static Logger logger = Logger("conduit");
+  static Logger logger = Logger('conduit');
 
   /// The username of the database user for the database this instance connects to.
   final String? username;
@@ -120,7 +120,7 @@ class PostgreSQLPersistentStore extends PersistentStore
           _pendingConnectionCompleter = null;
         }).catchError((e) {
           _pendingConnectionCompleter!.completeError(QueryException.transport(
-              "unable to connect to database",
+              'unable to connect to database',
               underlyingException: e));
           _pendingConnectionCompleter = null;
         });
@@ -158,7 +158,7 @@ class PostgreSQLPersistentStore extends PersistentStore
 
       var mappedRows = rows.map((row) => row.toList()).toList();
       logger.finest(() =>
-          "Query:execute (${DateTime.now().toUtc().difference(now).inMilliseconds}ms) $sql -> $mappedRows");
+          'Query:execute (${DateTime.now().toUtc().difference(now).inMilliseconds}ms) $sql -> $mappedRows');
       return mappedRows;
     } on PostgreSQLException catch (e) {
       final interpreted = _interpretException(e);
@@ -178,7 +178,7 @@ class PostgreSQLPersistentStore extends PersistentStore
 
   @override
   Future<T?> transaction<T>(ManagedContext transactionContext,
-      Future<T?> transactionBlock(ManagedContext transaction)) async {
+      Future<T?> Function(ManagedContext transaction) transactionBlock) async {
     final dbConnection = await getDatabaseConnection();
 
     T? output;
@@ -221,7 +221,7 @@ class PostgreSQLPersistentStore extends PersistentStore
   Future<int> get schemaVersion async {
     try {
       var values = await execute(
-              "SELECT versionNumber, dateOfUpgrade FROM $versionTableName ORDER BY dateOfUpgrade ASC")
+              'SELECT versionNumber, dateOfUpgrade FROM $versionTableName ORDER BY dateOfUpgrade ASC')
           as List<List<dynamic>>;
       if (values.isEmpty) {
         return 0;
@@ -257,31 +257,31 @@ class PostgreSQLPersistentStore extends PersistentStore
         migration.database.store = transactionStore;
 
         var existingVersionRows = await ctx.query(
-            "SELECT versionNumber, dateOfUpgrade FROM $versionTableName WHERE versionNumber >= @v:int4",
-            substitutionValues: {"v": migration.version});
+            'SELECT versionNumber, dateOfUpgrade FROM $versionTableName WHERE versionNumber >= @v:int4',
+            substitutionValues: {'v': migration.version});
         if (existingVersionRows.isNotEmpty) {
           final date = existingVersionRows.first.last;
           throw MigrationException(
-              "Trying to upgrade database to version ${migration.version}, but that migration has already been performed on $date.");
+              'Trying to upgrade database to version ${migration.version}, but that migration has already been performed on $date.');
         }
 
-        logger.info("Applying migration version ${migration.version}...");
+        logger.info('Applying migration version ${migration.version}...');
         await migration.upgrade();
 
         for (var cmd in migration.database.commands) {
-          logger.info("\t$cmd");
+          logger.info('\t$cmd');
           await ctx.execute(cmd);
         }
 
         logger.info(
-            "Seeding data from migration version ${migration.version}...");
+            'Seeding data from migration version ${migration.version}...');
         await migration.seed();
 
         await ctx.execute(
             "INSERT INTO $versionTableName (versionNumber, dateOfUpgrade) VALUES (${migration.version}, '${DateTime.now().toUtc().toIso8601String()}')");
 
         logger
-            .info("Applied schema version ${migration.version} successfully.");
+            .info('Applied schema version ${migration.version} successfully.');
 
         schema = migration.currentSchema;
       }
@@ -315,11 +315,11 @@ class PostgreSQLPersistentStore extends PersistentStore
 
       return results;
     } on TimeoutException catch (e) {
-      throw QueryException.transport("timed out connection to database",
+      throw QueryException.transport('timed out connection to database',
           underlyingException: e);
     } on PostgreSQLException catch (e) {
       logger.fine(() =>
-          "Query (${DateTime.now().toUtc().difference(now).inMilliseconds}ms) $formatString $values");
+          'Query (${DateTime.now().toUtc().difference(now).inMilliseconds}ms) $formatString $values');
       logger.warning(e.toString);
       final interpreted = _interpretException(e);
       if (interpreted != null) {
@@ -334,16 +334,16 @@ class PostgreSQLPersistentStore extends PersistentStore
       PostgreSQLException exception) {
     switch (exception.code) {
       case PostgreSQLErrorCode.uniqueViolation:
-        return QueryException.conflict("entity_already_exists",
-            ["${exception.tableName}.${exception.columnName}"],
+        return QueryException.conflict('entity_already_exists',
+            ['${exception.tableName}.${exception.columnName}'],
             underlyingException: exception);
       case PostgreSQLErrorCode.notNullViolation:
-        return QueryException.input("non_null_violation",
-            ["${exception.tableName}.${exception.columnName}"],
+        return QueryException.input('non_null_violation',
+            ['${exception.tableName}.${exception.columnName}'],
             underlyingException: exception);
       case PostgreSQLErrorCode.foreignKeyViolation:
-        return QueryException.input("foreign_key_violation",
-            ["${exception.tableName}.${exception.columnName}"],
+        return QueryException.input('foreign_key_violation',
+            ['${exception.tableName}.${exception.columnName}'],
             underlyingException: exception);
     }
 
@@ -354,22 +354,22 @@ class PostgreSQLPersistentStore extends PersistentStore
       PostgreSQLExecutionContext context, bool temporary) async {
     final table = versionTable;
     final commands = createTable(table, isTemporary: temporary);
-    final exists = await context.query("SELECT to_regclass(@tableName:text)",
-        substitutionValues: {"tableName": table.name});
+    final exists = await context.query('SELECT to_regclass(@tableName:text)',
+        substitutionValues: {'tableName': table.name});
 
     if (exists.first.first != null) {
       return;
     }
 
-    logger.info("Initializating database...");
+    logger.info('Initializating database...');
     for (var cmd in commands) {
-      logger.info("\t$cmd");
+      logger.info('\t$cmd');
       await context.execute(cmd);
     }
   }
 
   Future<PostgreSQLConnection> _connect() async {
-    logger.info("PostgreSQL connecting, $username@$host:$port/$databaseName.");
+    logger.info('PostgreSQL connecting, $username@$host:$port/$databaseName.');
     final connection = PostgreSQLConnection(host!, port!, databaseName!,
         username: username,
         password: password,
@@ -391,12 +391,12 @@ class PostgreSQLPersistentStore extends PersistentStore
 /// When a [QueryException.underlyingException] is a [PostgreSQLException], this [PostgreSQLException.code]
 /// value may be one of the static properties declared in this class.
 class PostgreSQLErrorCode {
-  static const String duplicateTable = "42P07";
-  static const String undefinedTable = "42P01";
-  static const String undefinedColumn = "42703";
-  static const String uniqueViolation = "23505";
-  static const String notNullViolation = "23502";
-  static const String foreignKeyViolation = "23503";
+  static const String duplicateTable = '42P07';
+  static const String undefinedTable = '42P01';
+  static const String undefinedColumn = '42703';
+  static const String uniqueViolation = '23505';
+  static const String notNullViolation = '23502';
+  static const String foreignKeyViolation = '23503';
 }
 
 class _TransactionProxy extends PostgreSQLPersistentStore {

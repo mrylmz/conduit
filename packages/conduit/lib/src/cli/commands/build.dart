@@ -11,27 +11,27 @@ import 'package:conduit/src/cli/mixins/project.dart';
 import 'package:conduit_runtime/runtime.dart';
 
 class CLIBuild extends CLICommand with CLIProject {
-  @Flag("retain-build-artifacts",
+  @Flag('retain-build-artifacts',
       help:
           "Whether or not the 'build' directory should be left intact after the application is compiled.",
       defaultsTo: false)
-  bool get retainBuildArtifacts => decode<bool>("retain-build-artifacts");
+  bool get retainBuildArtifacts => decode<bool>('retain-build-artifacts');
 
-  @Option("build-directory",
+  @Option('build-directory',
       help:
           "The directory to store build artifacts during compilation. By default, this directory is deleted when this command completes. See 'retain-build-artifacts' flag.",
-      defaultsTo: "build")
+      defaultsTo: 'build')
   Directory get buildDirectory =>
-      Directory(decode<String>("build-directory")).absolute;
+      Directory(decode<String>('build-directory')).absolute;
 
   @override
   Future<int> handle() async {
     final root = projectDirectory!.uri;
-    final libraryUri = root.resolve("lib/").resolve("$libraryName.dart");
+    final libraryUri = root.resolve('lib/').resolve('$libraryName.dart');
     final ctx = BuildContext(
         libraryUri,
         buildDirectory.uri,
-        root.resolve("$packageName.aot"),
+        root.resolve('$packageName.aot'),
         getScriptSource(await getChannelName()),
         forTests: false);
 
@@ -52,12 +52,12 @@ class CLIBuild extends CLICommand with CLIProject {
 
   @override
   String get name {
-    return "build";
+    return 'build';
   }
 
   @override
   String get description {
-    return "Creates an executable of a Conduit application.";
+    return 'Creates an executable of a Conduit application.';
   }
 
   String getScriptSource(String channelName) {
@@ -78,39 +78,39 @@ ${method.source!.replaceFirst("Application<ApplicationChannel>", "Application<$c
 
 Future _runnerFunc(List<String> args, dynamic sendPort) async {
   final argParser = arg_package.ArgParser()
-    ..addOption("address",
-        abbr: "a",
-        help: "The address to listen on. See HttpServer.bind for more details."
-            " Using the default will listen on any address.")
-    ..addOption("config-path",
-        abbr: "c",
+    ..addOption('address',
+        abbr: 'a',
+        help: 'The address to listen on. See HttpServer.bind for more details.'
+            ' Using the default will listen on any address.')
+    ..addOption('config-path',
+        abbr: 'c',
         help:
-            "The path to a configuration file. This File is available in the ApplicationOptions"
-            "for a ApplicationChannel to use to read application-specific configuration values. Relative paths are relative to [directory].",
-        defaultsTo: "config.yaml")
-    ..addOption("isolates",
-        abbr: "n", help: "Number of isolates handling requests.")
-    ..addOption("port",
-        abbr: "p",
-        help: "The port number to listen for HTTP requests on.",
-        defaultsTo: "8888")
-    ..addFlag("ipv6-only",
-        help: "Limits listening to IPv6 connections only.",
+            'The path to a configuration file. This File is available in the ApplicationOptions'
+            'for a ApplicationChannel to use to read application-specific configuration values. Relative paths are relative to [directory].',
+        defaultsTo: 'config.yaml')
+    ..addOption('isolates',
+        abbr: 'n', help: 'Number of isolates handling requests.')
+    ..addOption('port',
+        abbr: 'p',
+        help: 'The port number to listen for HTTP requests on.',
+        defaultsTo: '8888')
+    ..addFlag('ipv6-only',
+        help: 'Limits listening to IPv6 connections only.',
         negatable: false,
         defaultsTo: false)
-    ..addOption("ssl-certificate-path",
+    ..addOption('ssl-certificate-path',
         help:
-            "The path to an SSL certicate file. If provided along with --ssl-certificate-path, the application will be HTTPS-enabled.")
-    ..addOption("ssl-key-path",
+            'The path to an SSL certicate file. If provided along with --ssl-certificate-path, the application will be HTTPS-enabled.')
+    ..addOption('ssl-key-path',
         help:
-            "The path to an SSL private key file. If provided along with --ssl-certificate-path, the application will be HTTPS-enabled.")
-    ..addOption("timeout",
-        help: "Number of seconds to wait to ensure startup succeeded.",
-        defaultsTo: "45")
-    ..addFlag("help");
+            'The path to an SSL private key file. If provided along with --ssl-certificate-path, the application will be HTTPS-enabled.')
+    ..addOption('timeout',
+        help: 'Number of seconds to wait to ensure startup succeeded.',
+        defaultsTo: '45')
+    ..addFlag('help');
 
   final values = argParser.parse(args);
-  if (values["help"] == true) {
+  if (values['help'] == true) {
     print(argParser.usage);
     return 0;
   }

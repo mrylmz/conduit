@@ -1,5 +1,5 @@
 // ignore: unnecessary_const
-@Tags(["cli"])
+@Tags(['cli'])
 import 'package:conduit/conduit.dart';
 import 'package:conduit/managed_auth.dart';
 import 'package:conduit_common_test/conduit_common_test.dart';
@@ -19,23 +19,23 @@ void main() {
   setUpAll(() async {
     final project = normalize(absolute(join('.')));
 
-    cli = CLIClient(DartProjectAgent("application_test", dependencies: {
-      "conduit": {"path": project},
+    cli = CLIClient(DartProjectAgent('application_test', dependencies: {
+      'conduit': {'path': project},
     }, dependencyOverrides: {
-      'conduit_runtime': {'path': '${join(project, '..', 'runtime')}'},
+      'conduit_runtime': {'path': join(project, '..', 'runtime')},
       'conduit_isolate_exec': {
-        'path': '${join(project, '..', 'isolate_exec')}'
+        'path': join(project, '..', 'isolate_exec')
       },
       'conduit_password_hash': {
-        'path': '${join(project, '..', 'password_hash')}'
+        'path': join(project, '..', 'password_hash')
       },
-      'conduit_open_api': {'path': '${join(project, '..', 'open_api')}'},
-      'conduit_codable': {'path': '${join(project, '..', 'codable')}'},
-      'conduit_config': {'path': '${join(project, '..', 'config')}'},
-      'conduit_common': {'path': '${join(project, '..', 'common')}'},
-      'fs_test_agent': {'path': '${join(project, '..', 'fs_test_agent')}'}
+      'conduit_open_api': {'path': join(project, '..', 'open_api')},
+      'conduit_codable': {'path': join(project, '..', 'codable')},
+      'conduit_config': {'path': join(project, '..', 'config')},
+      'conduit_common': {'path': join(project, '..', 'common')},
+      'fs_test_agent': {'path': join(project, '..', 'fs_test_agent')}
     }))
-      ..defaultArgs = ["--connect", PostgresTestConfig().connectionUrl];
+      ..defaultArgs = ['--connect', PostgresTestConfig().connectionUrl];
     await cli.agent.getDependencies();
   });
 
@@ -59,180 +59,180 @@ void main() {
 
   const timeout = Timeout(Duration(seconds: 10));
 
-  group("Success cases", () {
-    test("Can create public client", () async {
-      await cli.run("auth", ["add-client", "--id", "a.b.c"]);
+  group('Success cases', () {
+    test('Can create public client', () async {
+      await cli.run('auth', ['add-client', '--id', 'a.b.c']);
 
       final q = Query<ManagedAuthClient>(context);
       final results = await q.fetch();
       expect(results.length, 1);
-      expect(results.first.id, "a.b.c");
+      expect(results.first.id, 'a.b.c');
       expect(results.first.allowedScope, isNull);
       expect(results.first.hashedSecret, isNull);
       expect(results.first.salt, isNull);
       expect(results.first.redirectURI, isNull);
     }, timeout: timeout);
 
-    test("Can create confidential client", () async {
-      await cli.run("auth", ["add-client", "--id", "a.b.c", "--secret", "abc"]);
+    test('Can create confidential client', () async {
+      await cli.run('auth', ['add-client', '--id', 'a.b.c', '--secret', 'abc']);
 
       final q = Query<ManagedAuthClient>(context);
       final results = await q.fetch();
       expect(results.length, 1);
-      expect(results.first.id, "a.b.c");
+      expect(results.first.id, 'a.b.c');
       expect(results.first.allowedScope, isNull);
       expect(results.first.redirectURI, isNull);
 
       final salt = results.first.salt!;
       final secret = results.first.hashedSecret;
-      expect(AuthUtility.generatePasswordHash("abc", salt), secret);
+      expect(AuthUtility.generatePasswordHash('abc', salt), secret);
     }, timeout: timeout);
 
-    test("Can create confidential client with redirect uri", () async {
+    test('Can create confidential client with redirect uri', () async {
       await cli.run(
-        "auth",
+        'auth',
         [
-          "add-client",
-          "--id",
-          "a.b.c",
-          "--secret",
-          "abc",
-          "--redirect-uri",
-          "http://foobar.com",
+          'add-client',
+          '--id',
+          'a.b.c',
+          '--secret',
+          'abc',
+          '--redirect-uri',
+          'http://foobar.com',
         ],
       );
 
       final q = Query<ManagedAuthClient>(context);
       final results = await q.fetch();
       expect(results.length, 1);
-      expect(results.first.id, "a.b.c");
+      expect(results.first.id, 'a.b.c');
       expect(results.first.allowedScope, isNull);
-      expect(results.first.redirectURI, "http://foobar.com");
+      expect(results.first.redirectURI, 'http://foobar.com');
 
       final salt = results.first.salt!;
       final secret = results.first.hashedSecret;
-      expect(AuthUtility.generatePasswordHash("abc", salt), secret);
+      expect(AuthUtility.generatePasswordHash('abc', salt), secret);
     }, timeout: timeout);
 
-    test("Can create public client with redirect uri", () async {
+    test('Can create public client with redirect uri', () async {
       await cli.run(
-        "auth",
+        'auth',
         [
-          "add-client",
-          "--id",
-          "foobar",
-          "--redirect-uri",
-          "http://xyz.com",
+          'add-client',
+          '--id',
+          'foobar',
+          '--redirect-uri',
+          'http://xyz.com',
         ],
       );
       final q = Query<ManagedAuthClient>(context);
       final results = await q.fetch();
 
       expect(results.length, 1);
-      expect(results.first.id, "foobar");
+      expect(results.first.id, 'foobar');
       expect(results.first.allowedScope, isNull);
-      expect(results.first.redirectURI, "http://xyz.com");
+      expect(results.first.redirectURI, 'http://xyz.com');
       expect(results.first.hashedSecret, isNull);
     }, timeout: timeout);
 
-    test("Can create client with scope", () async {
+    test('Can create client with scope', () async {
       await cli.run(
-        "auth",
+        'auth',
         [
-          "add-client",
-          "--id",
-          "a.b.c",
-          "--allowed-scopes",
-          "xyz",
+          'add-client',
+          '--id',
+          'a.b.c',
+          '--allowed-scopes',
+          'xyz',
         ],
       );
 
       final q = Query<ManagedAuthClient>(context);
       final results = await q.fetch();
       expect(results.length, 1);
-      expect(results.first.id, "a.b.c");
-      expect(results.first.allowedScope, "xyz");
+      expect(results.first.id, 'a.b.c');
+      expect(results.first.allowedScope, 'xyz');
       expect(results.first.redirectURI, isNull);
       expect(results.first.hashedSecret, isNull);
       expect(results.first.salt, isNull);
     }, timeout: timeout);
 
-    test("Can create client with multiple scopes", () async {
+    test('Can create client with multiple scopes', () async {
       await cli.run(
-        "auth",
+        'auth',
         [
-          "add-client",
-          "--allowed-scopes",
-          "xyz.f abc def",
-          "--id",
-          "a.b.c",
+          'add-client',
+          '--allowed-scopes',
+          'xyz.f abc def',
+          '--id',
+          'a.b.c',
         ],
       );
 
       final q = Query<ManagedAuthClient>(context);
       final results = await q.fetch();
       expect(results.length, 1);
-      expect(results.first.id, "a.b.c");
-      expect(results.first.allowedScope, "xyz.f abc def");
+      expect(results.first.id, 'a.b.c');
+      expect(results.first.allowedScope, 'xyz.f abc def');
       expect(results.first.redirectURI, isNull);
       expect(results.first.hashedSecret, isNull);
       expect(results.first.salt, isNull);
     }, timeout: timeout);
 
-    test("Scope gets collapsed", () async {
+    test('Scope gets collapsed', () async {
       await cli.run(
-        "auth",
+        'auth',
         [
-          "add-client",
-          "--allowed-scopes",
-          "xyz:a xyz xyz:a.f xyz.f",
-          "--id",
-          "a.b.c"
+          'add-client',
+          '--allowed-scopes',
+          'xyz:a xyz xyz:a.f xyz.f',
+          '--id',
+          'a.b.c'
         ],
       );
 
       final q = Query<ManagedAuthClient>(context);
       final results = await q.fetch();
       expect(results.length, 1);
-      expect(results.first.id, "a.b.c");
-      expect(results.first.allowedScope, "xyz");
+      expect(results.first.id, 'a.b.c');
+      expect(results.first.allowedScope, 'xyz');
       expect(results.first.redirectURI, isNull);
       expect(results.first.hashedSecret, isNull);
       expect(results.first.salt, isNull);
     }, timeout: timeout);
 
-    test("Can set scope on client", () async {
-      await cli.run("auth", ["add-client", "--id", "a.b.c"]);
+    test('Can set scope on client', () async {
+      await cli.run('auth', ['add-client', '--id', 'a.b.c']);
       await cli.run(
-        "auth",
+        'auth',
         [
-          "set-scope",
-          "--id",
-          "a.b.c",
-          "--scopes",
-          "abc efg",
+          'set-scope',
+          '--id',
+          'a.b.c',
+          '--scopes',
+          'abc efg',
         ],
       );
 
       final q = Query<ManagedAuthClient>(context);
       final results = await q.fetch();
       expect(results.length, 1);
-      expect(results.first.id, "a.b.c");
-      expect(results.first.allowedScope, "abc efg");
+      expect(results.first.id, 'a.b.c');
+      expect(results.first.allowedScope, 'abc efg');
       expect(results.first.redirectURI, isNull);
       expect(results.first.hashedSecret, isNull);
       expect(results.first.salt, isNull);
     });
   }, timeout: timeout);
 
-  group("Failure cases", () {
-    test("Without id fails", () async {
+  group('Failure cases', () {
+    test('Without id fails', () async {
       final processResult = await cli.run(
-        "auth",
+        'auth',
         [
-          "add-client",
-          "--secret",
-          "abcdef",
+          'add-client',
+          '--secret',
+          'abcdef',
         ],
       );
       final q = Query<ManagedAuthClient>(context);
@@ -240,18 +240,18 @@ void main() {
       expect(results.length, 0);
 
       expect(processResult, isNot(0));
-      expect(cli.output, contains("id required"));
+      expect(cli.output, contains('id required'));
     }, timeout: timeout);
 
-    test("Malformed scope fails", () async {
+    test('Malformed scope fails', () async {
       final processResult = await cli.run(
-        "auth",
+        'auth',
         [
-          "add-client",
-          "--id",
-          "foobar",
-          "--allowed-scopes",
-          "x\"x",
+          'add-client',
+          '--id',
+          'foobar',
+          '--allowed-scopes',
+          'x"x',
         ],
       );
       final q = Query<ManagedAuthClient>(context);
@@ -259,14 +259,14 @@ void main() {
       expect(results.length, 0);
 
       expect(processResult, isNot(0));
-      expect(cli.output, contains("Invalid authorization scope"));
+      expect(cli.output, contains('Invalid authorization scope'));
     }, timeout: timeout);
 
-    test("Update scope of invalid client id fails", () async {
+    test('Update scope of invalid client id fails', () async {
       final result = await cli
-          .run("auth", ["set-scope", "--id", "a.b.c", "--scopes", "abc efg"]);
+          .run('auth', ['set-scope', '--id', 'a.b.c', '--scopes', 'abc efg']);
       expect(result, isNot(0));
-      expect(cli.output, contains("does not exist"));
+      expect(cli.output, contains('does not exist'));
     }, timeout: timeout);
   });
 }

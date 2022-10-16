@@ -1,5 +1,4 @@
 import 'package:test/test.dart';
-import 'package:matcher/matcher.dart';
 
 import 'agent.dart';
 import 'body_matcher.dart';

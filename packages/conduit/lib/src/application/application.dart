@@ -40,7 +40,7 @@ class Application<T extends ApplicationChannel?> {
   /// The logger that this application will write messages to.
   ///
   /// This logger's name will appear as 'conduit'.
-  Logger logger = Logger("conduit");
+  Logger logger = Logger('conduit');
 
   /// The options used to configure this application.
   ///
@@ -100,11 +100,13 @@ class Application<T extends ApplicationChannel?> {
         await supervisor.resume();
       }
     } catch (e, st) {
-      logger.severe("$e", this, st);
+      logger.severe('$e', this, st);
       await stop().timeout(const Duration(seconds: 5));
       rethrow;
     }
-    supervisors.forEach((sup) => sup.sendPendingMessages());
+    for (var sup in supervisors) {
+      sup.sendPendingMessages();
+    }
     _hasFinishedLaunching = true;
   }
 
@@ -128,7 +130,7 @@ class Application<T extends ApplicationChannel?> {
       await server!.start();
       _hasFinishedLaunching = true;
     } catch (e, st) {
-      logger.severe("$e", this, st);
+      logger.severe('$e', this, st);
       await stop().timeout(const Duration(seconds: 5));
       rethrow;
     }

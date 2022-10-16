@@ -1,5 +1,5 @@
 // ignore: unnecessary_const
-@Tags(["cli"])
+@Tags(['cli'])
 import 'dart:io';
 
 import 'package:fs_test_agent/dart_project_agent.dart';
@@ -33,134 +33,134 @@ void main() {
     CLIClient.deactivateCLI();
   });
 
-  group("Project naming", () {
-    test("Appropriately named project gets created correctly", () async {
+  group('Project naming', () {
+    test('Appropriately named project gets created correctly', () async {
       final res = await cli.run(
-        "create",
+        'create',
         [
-          "test_project",
-          "--offline",
-          "--stacktrace",
+          'test_project',
+          '--offline',
+          '--stacktrace',
         ],
       );
       expect(res, 0);
 
       expect(
         Directory(
-          join(cli.agent.workingDirectory.path, "test_project"),
+          join(cli.agent.workingDirectory.path, 'test_project'),
         ).existsSync(),
         isTrue,
       );
     });
 
-    test("Project name with bad characters fails immediately", () async {
-      final res = await cli.run("create", ["!@", "--offline"]);
+    test('Project name with bad characters fails immediately', () async {
+      final res = await cli.run('create', ['!@', '--offline']);
       expect(res, isNot(0));
-      expect(cli.output, contains("Invalid project name"));
-      expect(cli.output, contains("snake_case"));
+      expect(cli.output, contains('Invalid project name'));
+      expect(cli.output, contains('snake_case'));
 
       expect(DartProjectAgent.projectsDirectory.listSync().isEmpty, isTrue);
     });
 
-    test("Project name with uppercase characters fails immediately", () async {
-      final res = await cli.run("create", ["ANeatApp", "--offline"]);
+    test('Project name with uppercase characters fails immediately', () async {
+      final res = await cli.run('create', ['ANeatApp', '--offline']);
       expect(res, isNot(0));
-      expect(cli.output, contains("Invalid project name"));
-      expect(cli.output, contains("snake_case"));
+      expect(cli.output, contains('Invalid project name'));
+      expect(cli.output, contains('snake_case'));
 
       expect(
         Directory(
-          join(cli.agent.workingDirectory.path, "test_project/"),
+          join(cli.agent.workingDirectory.path, 'test_project/'),
         ).existsSync(),
         isFalse,
       );
     });
 
-    test("Project name with dashes fails immediately", () async {
-      final res = await cli.run("create", ["a-neat-app", "--offline"]);
+    test('Project name with dashes fails immediately', () async {
+      final res = await cli.run('create', ['a-neat-app', '--offline']);
       expect(res, isNot(0));
-      expect(cli.output, contains("Invalid project name"));
-      expect(cli.output, contains("snake_case"));
+      expect(cli.output, contains('Invalid project name'));
+      expect(cli.output, contains('snake_case'));
 
       expect(
         Directory(
-          join(cli.agent.workingDirectory.path, "test_project"),
+          join(cli.agent.workingDirectory.path, 'test_project'),
         ).existsSync(),
         isFalse,
       );
     });
 
-    test("Not providing name returns error", () async {
-      final res = await cli.run("create");
+    test('Not providing name returns error', () async {
+      final res = await cli.run('create');
       expect(res, isNot(0));
     });
   });
 
-  group("Templates", () {
-    test("Listed templates are accurate", () async {
+  group('Templates', () {
+    test('Listed templates are accurate', () async {
       // This test will fail if you add or change the name of a template.
       // If you are adding a template, just add it to this list. If you are renaming/deleting a template,
       // make sure there is still a 'default' template.
-      await cli.run("create", ["list-templates"]);
-      var names = ["db", "db_and_auth", "default"];
-      var lines = cli.output.split("\n");
+      await cli.run('create', ['list-templates']);
+      var names = ['db', 'db_and_auth', 'default'];
+      var lines = cli.output.split('\n');
 
       expect(lines.length, names.length + 4);
       for (var n in names) {
-        expect(lines.any((l) => l.startsWith("\x1B[0m    $n ")), isTrue);
+        expect(lines.any((l) => l.startsWith('\x1B[0m    $n ')), isTrue);
       }
     });
 
-    test("Template gets generated from local path, project points to it",
+    test('Template gets generated from local path, project points to it',
         () async {
-      var res = await cli.run("create", ["test_project", "--offline"]);
+      var res = await cli.run('create', ['test_project', '--offline']);
       expect(res, 0);
 
       var conduitLocationString = File(join(cli.agent.workingDirectory.path,
-              "test_project", ".dart_tool/package_config.json"))
+              'test_project', '.dart_tool/package_config.json'))
           .readAsStringSync()
-          .split("\n")
-          .firstWhere((p) => p.startsWith("conduit:"))
-          .split("conduit:")
+          .split('\n')
+          .firstWhere((p) => p.startsWith('conduit:'))
+          .split('conduit:')
           .last;
 
       var path = path_lib.normalize(path_lib.fromUri(conduitLocationString));
-      expect(path, path_lib.join(Directory.current.path, "lib"));
+      expect(path, path_lib.join(Directory.current.path, 'lib'));
     });
 
     /* for every template */
-    final templates = Directory("templates")
+    final templates = Directory('templates')
         .listSync()
         .whereType<Directory>()
         .map((fse) => fse.uri.pathSegments[fse.uri.pathSegments.length - 2])
         .toList();
-    final conduitPubspec = loadYaml(File("pubspec.yaml").readAsStringSync());
+    final conduitPubspec = loadYaml(File('pubspec.yaml').readAsStringSync());
     final conduitVersion = Version.parse("${conduitPubspec["version"]}");
 
     for (var template in templates) {
       test(
         "Templates can use 'this' version of Conduit in their dependencies",
         () {
-          var projectDir = Directory(join("templates", template));
-          var pubspec = File(join(projectDir.path, "pubspec.yaml"));
+          var projectDir = Directory(join('templates', template));
+          var pubspec = File(join(projectDir.path, 'pubspec.yaml'));
           var contents = loadYaml(pubspec.readAsStringSync());
           final projectVersionConstraint = VersionConstraint.parse(
-            contents["dependencies"]["conduit"] as String,
+            contents['dependencies']['conduit'] as String,
           );
           print(projectVersionConstraint);
           expect(projectVersionConstraint.allows(conduitVersion), isTrue);
         },
       );
 
-      test("Tests run on template generated from local path", () async {
+      test('Tests run on template generated from local path', () async {
         expect(
           await cli.run(
-            "create",
+            'create',
             [
-              "test_project",
-              "-t",
+              'test_project',
+              '-t',
               template,
-              "--offline",
+              '--offline',
             ],
           ),
           isZero,
@@ -169,16 +169,16 @@ void main() {
         const String cmd = 'dart';
         var res = Process.runSync(
           cmd,
-          ["pub", "run", "test", "-j", "1"],
+          ['pub', 'run', 'test', '-j', '1'],
           runInShell: true,
           workingDirectory: cli.agent.workingDirectory.uri
-              .resolve("test_project")
+              .resolve('test_project')
               .toFilePath(windows: Platform.isWindows),
         );
 
         print(res.stderr);
 
-        expect(res.stdout, contains("All tests passed"));
+        expect(res.stdout, contains('All tests passed'));
         expect(res.exitCode, 0);
       });
     }

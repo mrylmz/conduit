@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:conduit/conduit.dart';
 import 'package:conduit_runtime/runtime.dart';
-import "package:test/test.dart";
+import 'package:test/test.dart';
 
 void main() {
-  test("Cannot bind dynamic to header", () {
+  test('Cannot bind dynamic to header', () {
     try {
       // ignore: unnecessary_statements
       RuntimeContext.current;
@@ -21,7 +21,7 @@ void main() {
 
 class ErrorListPath extends ResourceController {
   @Operation.get('id')
-  Future<Response> get1(@Bind.path("id") List<String> x) async {
+  Future<Response> get1(@Bind.path('id') List<String> x) async {
     return Response.ok(null);
   }
 }

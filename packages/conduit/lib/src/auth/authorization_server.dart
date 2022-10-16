@@ -95,7 +95,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
   final APISecuritySchemeOAuth2Flow documentedImplicitFlow =
       APISecuritySchemeOAuth2Flow.empty()..scopes = {};
 
-  static const String tokenTypeBearer = "bearer";
+  static const String tokenTypeBearer = 'bearer';
 
   /// Hashes a [password] with [salt] using PBKDF2 algorithm.
   ///
@@ -114,7 +114,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
   Future addClient(AuthClient client) async {
     if (client.redirectURI != null && client.hashedSecret == null) {
       throw ArgumentError(
-          "A client with a redirectURI must have a client secret.");
+          'A client with a redirectURI must have a client secret.');
     }
 
     return delegate.addClient(this, client);
@@ -145,7 +145,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
   /// will be revoked.
   Future revokeAllGrantsForResourceOwner(int? identifier) async {
     if (identifier == null) {
-      throw ArgumentError.notNull("identifier");
+      throw ArgumentError.notNull('identifier');
     }
 
     await delegate.removeTokens(this, identifier);
@@ -175,7 +175,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
     }
 
     if (client.isPublic) {
-      if (!(clientSecret == null || clientSecret == "")) {
+      if (!(clientSecret == null || clientSecret == '')) {
         throw AuthServerException(AuthRequestError.invalidClient, client);
       }
     } else {
@@ -424,31 +424,31 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
   //////
   @override
   void documentComponents(APIDocumentContext context) {
-    final basic = APISecurityScheme.http("basic")
+    final basic = APISecurityScheme.http('basic')
       ..description =
-          "This endpoint requires an OAuth2 Client ID and Secret as the Basic Authentication username and password. "
+          'This endpoint requires an OAuth2 Client ID and Secret as the Basic Authentication username and password. '
               "If the client ID does not have a secret (public client), the password is the empty string (retain the separating colon, e.g. 'com.conduit.app:').";
-    context.securitySchemes.register("oauth2-client-authentication", basic);
+    context.securitySchemes.register('oauth2-client-authentication', basic);
 
     final oauth2 = APISecurityScheme.oauth2({
-      "authorizationCode": documentedAuthorizationCodeFlow,
-      "password": documentedPasswordFlow
+      'authorizationCode': documentedAuthorizationCodeFlow,
+      'password': documentedPasswordFlow
     })
-      ..description = "Standard OAuth 2.0";
+      ..description = 'Standard OAuth 2.0';
 
-    context.securitySchemes.register("oauth2", oauth2);
+    context.securitySchemes.register('oauth2', oauth2);
 
     context.defer(() {
       if (documentedAuthorizationCodeFlow.authorizationURL == null) {
-        oauth2.flows!.remove("authorizationCode");
+        oauth2.flows!.remove('authorizationCode');
       }
 
       if (documentedAuthorizationCodeFlow.tokenURL == null) {
-        oauth2.flows!.remove("authorizationCode");
+        oauth2.flows!.remove('authorizationCode');
       }
 
       if (documentedPasswordFlow.tokenURL == null) {
-        oauth2.flows!.remove("password");
+        oauth2.flows!.remove('password');
       }
     });
   }
@@ -462,12 +462,12 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
       {List<AuthScope>? scopes}) {
     if (authorizer.parser is AuthorizationBasicParser) {
       return [
-        APISecurityRequirement({"oauth2-client-authentication": []})
+        APISecurityRequirement({'oauth2-client-authentication': []})
       ];
     } else if (authorizer.parser is AuthorizationBearerParser) {
       return [
         APISecurityRequirement(
-            {"oauth2": scopes?.map((s) => s.toString()).toList() ?? []})
+            {'oauth2': scopes?.map((s) => s.toString()).toList() ?? []})
       ];
     }
 
@@ -501,7 +501,7 @@ class AuthServer implements AuthValidator, APIComponentDocumenter {
     }
 
     if (client.hashedSecret == null) {
-      if (password == "") {
+      if (password == '') {
         return Authorization(client.id, null, this, credentials: credentials);
       }
 

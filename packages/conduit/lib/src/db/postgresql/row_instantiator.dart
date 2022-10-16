@@ -21,7 +21,7 @@ class RowInstantiator {
           .map((wrapper) => wrapper!.instance as U)
           .toList();
     } on ValidationException catch (e) {
-      throw StateError("Database error when retrieving value. ${e.toString()}");
+      throw StateError('Database error when retrieving value. ${e.toString()}');
     }
   }
 

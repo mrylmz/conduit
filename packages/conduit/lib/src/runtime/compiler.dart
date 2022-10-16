@@ -46,10 +46,10 @@ class ConduitCompiler extends Compiler {
   @override
   void deflectPackage(Directory destinationDirectory) {
     final libFile = File.fromUri(
-        destinationDirectory.uri.resolve("lib/").resolve("conduit.dart"));
+        destinationDirectory.uri.resolve('lib/').resolve('conduit.dart'));
     final contents = libFile.readAsStringSync();
     libFile.writeAsStringSync(contents.replaceFirst(
-        "export 'package:conduit/src/runtime/compiler.dart';", ""));
+        "export 'package:conduit/src/runtime/compiler.dart';", ''));
   }
 
   @override
@@ -61,21 +61,21 @@ class ConduitCompiler extends Compiler {
         {'name': 'fs_test_agent', 'path': 'fs_test_agent'},
       ];
       final targetPubspecFile =
-          File.fromUri(context.buildDirectoryUri.resolve("pubspec.yaml"));
+          File.fromUri(context.buildDirectoryUri.resolve('pubspec.yaml'));
       final pubspecContents = json.decode(targetPubspecFile.readAsStringSync());
       for (final package in devPackages) {
-        pubspecContents["dev_dependencies"]
-            [package['name']!] = {"path": "packages/${package['path']!}"};
+        pubspecContents['dev_dependencies']
+            [package['name']!] = {'path': "packages/${package['path']!}"};
 
         copyDirectory(
             src: context.sourceApplicationDirectory.uri
-                .resolve("../")
+                .resolve('../')
                 .resolve(package['path']!),
             dst: context.buildPackagesDirectory.uri.resolve(package['path']!));
       }
 
-      pubspecContents["dependency_overrides"]["conduit"] =
-          pubspecContents["dependencies"]["conduit"];
+      pubspecContents['dependency_overrides']['conduit'] =
+          pubspecContents['dependencies']['conduit'];
       targetPubspecFile.writeAsStringSync(json.encode(pubspecContents));
 
       final conduitPackages = [
@@ -114,16 +114,16 @@ class ConduitCompiler extends Compiler {
       List<Map<String, String>> packages) {
     final pubspecFile = File.fromUri(context.buildDirectoryUri
         .resolve('packages/')
-        .resolve('${packageName}/')
-        .resolve("pubspec.yaml"));
+        .resolve('$packageName/')
+        .resolve('pubspec.yaml'));
     final pubspecContents = loadYaml(pubspecFile.readAsStringSync());
     final jsonContents = json.decode(json.encode(pubspecContents));
     for (final package in packages) {
-      jsonContents["dependencies"]
-          [package['name']!] = {"path": "../${package['path']!}"};
+      jsonContents['dependencies']
+          [package['name']!] = {'path': "../${package['path']!}"};
       copyDirectory(
           src: context.sourceApplicationDirectory.uri
-              .resolve("../")
+              .resolve('../')
               .resolve(package['path']!),
           dst: context.buildPackagesDirectory.uri.resolve(package['path']!));
     }

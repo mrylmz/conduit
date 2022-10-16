@@ -3,12 +3,12 @@ import 'route_specification.dart';
 
 class RouteSegment {
   RouteSegment(String segment) {
-    if (segment == "*") {
+    if (segment == '*') {
       isRemainingMatcher = true;
       return;
     }
 
-    var regexIndex = segment.indexOf("(");
+    var regexIndex = segment.indexOf('(');
     if (regexIndex != -1) {
       var regexText = segment.substring(regexIndex + 1, segment.length - 1);
       matcher = RegExp(regexText);
@@ -16,7 +16,7 @@ class RouteSegment {
       segment = segment.substring(0, regexIndex);
     }
 
-    if (segment.startsWith(":")) {
+    if (segment.startsWith(':')) {
       variableName = segment.substring(1, segment.length);
     } else if (regexIndex == -1) {
       literal = segment;
@@ -62,18 +62,18 @@ class RouteSegment {
   @override
   String toString() {
     if (isLiteralMatcher) {
-      return literal ?? "";
+      return literal ?? '';
     }
 
     if (isVariable) {
-      return variableName ?? "";
+      return variableName ?? '';
     }
 
     if (hasRegularExpression) {
-      return "(${matcher!.pattern})";
+      return '(${matcher!.pattern})';
     }
 
-    return "*";
+    return '*';
   }
 }
 
@@ -85,7 +85,7 @@ class RouteNode {
         specs.where((spec) => spec?.segments.length == depth).toList();
     if (terminatedAtThisDepth.length > 1) {
       throw ArgumentError(
-          "Router compilation failed. Cannot disambiguate from the following routes: $terminatedAtThisDepth.");
+          'Router compilation failed. Cannot disambiguate from the following routes: $terminatedAtThisDepth.');
     } else if (terminatedAtThisDepth.length == 1) {
       specification = terminatedAtThisDepth.first;
     }
@@ -97,7 +97,7 @@ class RouteNode {
         .where((spec) => spec?.segments[depth].isLiteralMatcher ?? false)
         .map((spec) => spec!.segments[depth].literal));
 
-    childEqualitySegments.forEach((childSegment) {
+    for (var childSegment in childEqualitySegments) {
       final childrenBeginningWithThisSegment = remainingSpecifications
           .where((spec) => spec?.segments[depth].literal == childSegment)
           .toList();
@@ -105,7 +105,7 @@ class RouteNode {
           RouteNode(childrenBeginningWithThisSegment, depth: depth + 1);
       remainingSpecifications
           .removeWhere(childrenBeginningWithThisSegment.contains);
-    });
+    }
 
     var takeAllSegment = remainingSpecifications.firstWhere(
         (spec) => spec?.segments[depth].isRemainingMatcher ?? false,
@@ -129,7 +129,7 @@ class RouteNode {
           childrenWithThisPattern
               .any((spec) => spec?.segments[depth].matcher != null)) {
         throw ArgumentError(
-            "Router compilation failed. Cannot disambiguate from the following routes, as one of them will match anything: $childrenWithThisPattern.");
+            'Router compilation failed. Cannot disambiguate from the following routes, as one of them will match anything: $childrenWithThisPattern.');
       }
 
       return RouteNode(childrenWithThisPattern,
@@ -188,21 +188,21 @@ class RouteNode {
   String toString({int depth = 0}) {
     var buf = StringBuffer();
     for (var i = 0; i < depth; i++) {
-      buf.write("\t");
+      buf.write('\t');
     }
 
     if (patternMatcher != null) {
-      buf.write("(match: ${patternMatcher!.pattern})");
+      buf.write('(match: ${patternMatcher!.pattern})');
     }
 
     buf.writeln(
-        "Controller: ${specification?.controller?.nextController?.runtimeType}");
+        'Controller: ${specification?.controller?.nextController?.runtimeType}');
     equalityChildren.forEach((seg, spec) {
       for (var i = 0; i < depth; i++) {
-        buf.write("\t");
+        buf.write('\t');
       }
 
-      buf.writeln("/$seg");
+      buf.writeln('/$seg');
       buf.writeln(spec.toString(depth: depth + 1));
     });
 

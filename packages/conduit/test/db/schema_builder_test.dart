@@ -3,7 +3,7 @@ import 'package:conduit/conduit.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group("Alterations", () {
+  group('Alterations', () {
     late SchemaBuilder builder;
     setUp(() {
       var dataModel = ManagedDataModel([
@@ -17,206 +17,206 @@ void main() {
       builder = SchemaBuilder(null, baseSchema);
     });
 
-    test("Adding a table", () {
-      builder.createTable(SchemaTable("foobar", []));
-      expect(builder.schema!.tables.firstWhere((st) => st.name == "foobar"),
+    test('Adding a table', () {
+      builder.createTable(SchemaTable('foobar', []));
+      expect(builder.schema!.tables.firstWhere((st) => st.name == 'foobar'),
           isNotNull);
 
       try {
-        builder.createTable(SchemaTable("foobar", []));
+        builder.createTable(SchemaTable('foobar', []));
         expect(true, false);
       } on SchemaException catch (e) {
-        expect(e.message, contains("already exists"));
+        expect(e.message, contains('already exists'));
       }
 
       try {
-        builder.createTable(SchemaTable("_defaultITEM", []));
+        builder.createTable(SchemaTable('_defaultITEM', []));
         expect(true, false);
       } on SchemaException catch (e) {
-        expect(e.message, contains("already exists"));
+        expect(e.message, contains('already exists'));
       }
     });
 
-    test("Removing a table", () {
+    test('Removing a table', () {
       try {
-        builder.deleteTable("foobar");
+        builder.deleteTable('foobar');
         expect(true, false);
       } on SchemaException catch (e) {
-        expect(e.message, contains("does not exist"));
+        expect(e.message, contains('does not exist'));
       }
 
-      builder.deleteTable("_DefaultItem");
+      builder.deleteTable('_DefaultItem');
       expect(
           builder.schema!.tables
-              .firstWhereOrNull((st) => st.name == "_DefaultItem"),
+              .firstWhereOrNull((st) => st.name == '_DefaultItem'),
           isNull);
 
-      builder.deleteTable("_cONTAINER");
+      builder.deleteTable('_cONTAINER');
       expect(
           builder.schema!.tables
-              .firstWhereOrNull((st) => st.name == "_Container"),
+              .firstWhereOrNull((st) => st.name == '_Container'),
           isNull);
     });
 
-    test("Adding a unique set", () {
-      builder.alterTable("_ExtensiveModel", (t) {
-        t.uniqueColumnSet = ["startDate", "indexedValue"];
+    test('Adding a unique set', () {
+      builder.alterTable('_ExtensiveModel', (t) {
+        t.uniqueColumnSet = ['startDate', 'indexedValue'];
       });
 
-      expect(builder.schema!.tableForName("_ExtensiveModel")!.uniqueColumnSet,
-          ["indexedValue", "startDate"]);
+      expect(builder.schema!.tableForName('_ExtensiveModel')!.uniqueColumnSet,
+          ['indexedValue', 'startDate']);
     });
 
-    test("Removing a unique set", () {
-      builder.alterTable("_ExtensiveModel", (t) {
-        t.uniqueColumnSet = ["startDate", "indexedValue"];
+    test('Removing a unique set', () {
+      builder.alterTable('_ExtensiveModel', (t) {
+        t.uniqueColumnSet = ['startDate', 'indexedValue'];
       });
-      builder.alterTable("_ExtensiveModel", (t) {
+      builder.alterTable('_ExtensiveModel', (t) {
         t.uniqueColumnSet = null;
       });
 
-      expect(builder.schema!.tableForName("_ExtensiveModel")!.uniqueColumnSet,
+      expect(builder.schema!.tableForName('_ExtensiveModel')!.uniqueColumnSet,
           isNull);
     });
 
-    test("Modifying a unique set", () {
-      builder.alterTable("_ExtensiveModel", (t) {
-        t.uniqueColumnSet = ["startDate", "indexedValue"];
+    test('Modifying a unique set', () {
+      builder.alterTable('_ExtensiveModel', (t) {
+        t.uniqueColumnSet = ['startDate', 'indexedValue'];
       });
-      builder.alterTable("_ExtensiveModel", (t) {
-        t.uniqueColumnSet = ["startDate", "autoincrementValue"];
-      });
-
-      expect(builder.schema!.tableForName("_ExtensiveModel")!.uniqueColumnSet,
-          ["autoincrementValue", "startDate"]);
-
-      builder.alterTable("_ExtensiveModel", (t) {
-        t.uniqueColumnSet = ["startDate", "autoincrementValue", "indexedValue"];
+      builder.alterTable('_ExtensiveModel', (t) {
+        t.uniqueColumnSet = ['startDate', 'autoincrementValue'];
       });
 
-      expect(builder.schema!.tableForName("_ExtensiveModel")!.uniqueColumnSet,
-          ["autoincrementValue", "indexedValue", "startDate"]);
+      expect(builder.schema!.tableForName('_ExtensiveModel')!.uniqueColumnSet,
+          ['autoincrementValue', 'startDate']);
+
+      builder.alterTable('_ExtensiveModel', (t) {
+        t.uniqueColumnSet = ['startDate', 'autoincrementValue', 'indexedValue'];
+      });
+
+      expect(builder.schema!.tableForName('_ExtensiveModel')!.uniqueColumnSet,
+          ['autoincrementValue', 'indexedValue', 'startDate']);
     });
 
-    test("Adding column", () {
+    test('Adding column', () {
       builder.addColumn(
-          "_DefaultItem", SchemaColumn("col1", ManagedPropertyType.integer));
+          '_DefaultItem', SchemaColumn('col1', ManagedPropertyType.integer));
       builder.addColumn(
-          "_defaultITEM", SchemaColumn("col2", ManagedPropertyType.integer));
+          '_defaultITEM', SchemaColumn('col2', ManagedPropertyType.integer));
       expect(
           builder.schema!
-              .tableForName("_DefaultItem")!
+              .tableForName('_DefaultItem')!
               .columns
-              .firstWhere((sc) => sc.name == "col1"),
+              .firstWhere((sc) => sc.name == 'col1'),
           isNotNull);
       expect(
           builder.schema!
-              .tableForName("_DefaultItem")!
+              .tableForName('_DefaultItem')!
               .columns
-              .firstWhere((sc) => sc.name == "col2"),
+              .firstWhere((sc) => sc.name == 'col2'),
           isNotNull);
 
       try {
         builder.addColumn(
-            "_DefaultItem", SchemaColumn("col1", ManagedPropertyType.integer));
+            '_DefaultItem', SchemaColumn('col1', ManagedPropertyType.integer));
         expect(true, false);
       } on SchemaException catch (e) {
-        expect(e.message, contains("already exists"));
+        expect(e.message, contains('already exists'));
       }
 
       try {
         builder.addColumn(
-            "foobar", SchemaColumn("col3", ManagedPropertyType.integer));
+            'foobar', SchemaColumn('col3', ManagedPropertyType.integer));
         expect(true, false);
       } on SchemaException catch (e) {
-        expect(e.message, contains("does not exist"));
+        expect(e.message, contains('does not exist'));
       }
     });
 
-    test("Deleting column", () {
-      builder.deleteColumn("_DefaultItem", "id");
+    test('Deleting column', () {
+      builder.deleteColumn('_DefaultItem', 'id');
       expect(
           builder.schema!
-              .tableForName("_DefaultItem")!
+              .tableForName('_DefaultItem')!
               .columns
-              .firstWhereOrNull((sc) => sc.name == "id"),
+              .firstWhereOrNull((sc) => sc.name == 'id'),
           isNull);
 
       try {
-        builder.deleteColumn("_DefaultItem", "col1");
+        builder.deleteColumn('_DefaultItem', 'col1');
         expect(true, false);
       } on SchemaException catch (e) {
-        expect(e.message, contains("does not exist"));
+        expect(e.message, contains('does not exist'));
       }
 
       try {
-        builder.deleteColumn("foobar", "id");
+        builder.deleteColumn('foobar', 'id');
         expect(true, false);
       } on SchemaException catch (e) {
-        expect(e.message, contains("does not exist"));
+        expect(e.message, contains('does not exist'));
       }
     });
 
-    test("Altering column", () {
+    test('Altering column', () {
       try {
-        builder.alterColumn("_Container", "defaultItem", (c) {});
+        builder.alterColumn('_Container', 'defaultItem', (c) {});
         expect(true, false);
       } on SchemaException catch (e) {
-        expect(e.message, contains("does not exist"));
+        expect(e.message, contains('does not exist'));
       }
 
       try {
-        builder.alterColumn("_DefaultItem", "foo", (c) {});
+        builder.alterColumn('_DefaultItem', 'foo', (c) {});
         expect(true, false);
       } on SchemaException catch (e) {
-        expect(e.message, contains("does not exist"));
+        expect(e.message, contains('does not exist'));
       }
 
       try {
-        builder.alterColumn("foobar", "id", (c) {});
+        builder.alterColumn('foobar', 'id', (c) {});
         expect(true, false);
       } on SchemaException catch (e) {
-        expect(e.message, contains("does not exist"));
+        expect(e.message, contains('does not exist'));
       }
 
       // This also tests case sensitivity
       try {
-        builder.alterColumn("_defaultITEM", "id", (c) {
+        builder.alterColumn('_defaultITEM', 'id', (c) {
           c.type = ManagedPropertyType.boolean;
         });
         expect(true, false);
       } on SchemaException catch (e) {
-        expect(e.message, contains("May not change"));
+        expect(e.message, contains('May not change'));
       }
 
       try {
-        builder.alterColumn("_defaultItem", "id", (c) {
+        builder.alterColumn('_defaultItem', 'id', (c) {
           c.autoincrement = !c.autoincrement!;
         });
         expect(true, false);
       } on SchemaException catch (e) {
-        expect(e.message, contains("May not change"));
+        expect(e.message, contains('May not change'));
       }
 
       try {
-        builder.alterColumn("_defaultItem", "id", (c) {
-          c.relatedTableName = "foo";
+        builder.alterColumn('_defaultItem', 'id', (c) {
+          c.relatedTableName = 'foo';
         });
         expect(true, false);
       } on SchemaException catch (e) {
-        expect(e.message, contains("May not change"));
+        expect(e.message, contains('May not change'));
       }
 
       try {
-        builder.alterColumn("_defaultItem", "id", (c) {
-          c.relatedColumnName = "foo";
+        builder.alterColumn('_defaultItem', 'id', (c) {
+          c.relatedColumnName = 'foo';
         });
         expect(true, false);
       } on SchemaException catch (e) {
-        expect(e.message, contains("May not change"));
+        expect(e.message, contains('May not change'));
       }
 
-      builder.alterColumn("_LoadedItem", "someIndexedThing", (c) {
+      builder.alterColumn('_LoadedItem', 'someIndexedThing', (c) {
         c.isIndexed = false;
         c.isNullable = true;
         c.isUnique = true;
@@ -226,32 +226,32 @@ void main() {
 
       expect(
           builder.schema!
-              .tableForName("_LoadedItem")!
-              .columnForName("someIndexedThing")!
+              .tableForName('_LoadedItem')!
+              .columnForName('someIndexedThing')!
               .isIndexed,
           false);
       expect(
           builder.schema!
-              .tableForName("_LoadedItem")!
-              .columnForName("someIndexedThing")!
+              .tableForName('_LoadedItem')!
+              .columnForName('someIndexedThing')!
               .isNullable,
           true);
       expect(
           builder.schema!
-              .tableForName("_LoadedItem")!
-              .columnForName("someIndexedThing")!
+              .tableForName('_LoadedItem')!
+              .columnForName('someIndexedThing')!
               .isUnique,
           true);
       expect(
           builder.schema!
-              .tableForName("_LoadedItem")!
-              .columnForName("someIndexedThing")!
+              .tableForName('_LoadedItem')!
+              .columnForName('someIndexedThing')!
               .defaultValue,
           "'bar'");
       expect(
           builder.schema!
-              .tableForName("_LoadedItem")!
-              .columnForName("someIndexedThing")!
+              .tableForName('_LoadedItem')!
+              .columnForName('someIndexedThing')!
               .deleteRule,
           DeleteRule.setDefault);
     });
@@ -342,7 +342,7 @@ class _ExtensiveModel {
   @Column(
       databaseType: ManagedPropertyType.bigInteger,
       nullable: true,
-      defaultValue: "7",
+      defaultValue: '7',
       unique: true,
       indexed: true)
   int? loadedValue;

@@ -1,5 +1,5 @@
 // ignore: unnecessary_const
-@Tags(["cli"])
+@Tags(['cli'])
 import 'dart:async';
 import 'dart:io';
 
@@ -11,7 +11,7 @@ import 'package:conduit_common_test/conduit_common_test.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group("Cooperation", () {
+  group('Cooperation', () {
     late PersistentStore store;
 
     setUp(() {
@@ -23,19 +23,19 @@ void main() {
     });
 
     test(
-        "Migration subclasses can be executed and commands are generated and executed on the DB, schema is udpated",
+        'Migration subclasses can be executed and commands are generated and executed on the DB, schema is udpated',
         () async {
       // Note that the permutations of operations are covered in different tests, this is just to ensure that
       // executing a migration/upgrade all work together.
       var schema = Schema([
-        SchemaTable("tableToKeep", [
-          SchemaColumn("columnToEdit", ManagedPropertyType.string),
-          SchemaColumn("columnToDelete", ManagedPropertyType.integer)
+        SchemaTable('tableToKeep', [
+          SchemaColumn('columnToEdit', ManagedPropertyType.string),
+          SchemaColumn('columnToDelete', ManagedPropertyType.integer)
         ]),
-        SchemaTable("tableToDelete",
-            [SchemaColumn("whocares", ManagedPropertyType.integer)]),
-        SchemaTable("tableToRename",
-            [SchemaColumn("whocares", ManagedPropertyType.integer)])
+        SchemaTable('tableToDelete',
+            [SchemaColumn('whocares', ManagedPropertyType.integer)]),
+        SchemaTable('tableToRename',
+            [SchemaColumn('whocares', ManagedPropertyType.integer)])
       ]);
 
       var initialBuilder =
@@ -53,17 +53,17 @@ void main() {
       expect(outSchema, isNotNull);
 
       // 'Sync up' that schema to compare it
-      final tableToKeep = schema.tableForName("tableToKeep")!;
+      final tableToKeep = schema.tableForName('tableToKeep')!;
       tableToKeep.addColumn(SchemaColumn(
-          "addedColumn", ManagedPropertyType.integer,
-          defaultValue: "2"));
-      tableToKeep.removeColumn(tableToKeep.columnForName("columnToDelete")!);
-      tableToKeep.columnForName("columnToEdit")!.defaultValue = "'foo'";
+          'addedColumn', ManagedPropertyType.integer,
+          defaultValue: '2'));
+      tableToKeep.removeColumn(tableToKeep.columnForName('columnToDelete')!);
+      tableToKeep.columnForName('columnToEdit')!.defaultValue = "'foo'";
 
-      schema.removeTable(schema.tableForName("tableToDelete")!);
+      schema.removeTable(schema.tableForName('tableToDelete')!);
 
-      schema.addTable(SchemaTable("foo", [
-        SchemaColumn("foobar", ManagedPropertyType.integer, isIndexed: true)
+      schema.addTable(SchemaTable('foo', [
+        SchemaColumn('foobar', ManagedPropertyType.integer, isIndexed: true)
       ]));
 
       expect(outSchema!.differenceFrom(schema).hasDifferences, false);
@@ -76,24 +76,24 @@ void main() {
     });
   });
 
-  group("Scanning for migration files", () {
-    final temporaryDirectory = Directory("migration_tmp");
+  group('Scanning for migration files', () {
+    final temporaryDirectory = Directory('migration_tmp');
     final migrationsDirectory =
-        Directory.fromUri(temporaryDirectory.uri.resolve("migrations"));
-    final addFiles = (List<String> filenames) {
-      filenames.forEach((name) {
+        Directory.fromUri(temporaryDirectory.uri.resolve('migrations'));
+    addFiles(List<String> filenames) {
+      for (var name in filenames) {
         File.fromUri(migrationsDirectory.uri.resolve(name))
-            .writeAsStringSync(" ");
-      });
-    };
-    final addValidMigrationFile = (List<String> filenames) {
-      filenames.forEach((name) {
+            .writeAsStringSync(' ');
+      }
+    }
+    addValidMigrationFile(List<String> filenames) {
+      for (var name in filenames) {
         File.fromUri(migrationsDirectory.uri.resolve(name))
-            .writeAsStringSync("""
+            .writeAsStringSync('''
 class Migration1 extends Migration { @override Future upgrade() async {} @override Future downgrade() async {} @override Future seed() async {} }
-        """);
-      });
-    };
+        ''');
+      }
+    }
 
     setUp(() {
       temporaryDirectory.createSync();
@@ -104,36 +104,36 @@ class Migration1 extends Migration { @override Future upgrade() async {} @overri
       temporaryDirectory.deleteSync(recursive: true);
     });
 
-    test("Ignores not .migration.dart files", () async {
+    test('Ignores not .migration.dart files', () async {
       addValidMigrationFile(
-          ["00000001.migration.dart", "a_foo.migration.dart"]);
-      addFiles(["foobar.txt", ".DS_Store", "a.dart", "migration.dart"]);
+          ['00000001.migration.dart', 'a_foo.migration.dart']);
+      addFiles(['foobar.txt', '.DS_Store', 'a.dart', 'migration.dart']);
       expect(migrationsDirectory.listSync().length, 6);
 
       var mock = MockMigratable(temporaryDirectory);
       var files = mock.projectMigrations;
       expect(files.length, 1);
-      expect(files.first.uri!.pathSegments.last, "00000001.migration.dart");
+      expect(files.first.uri!.pathSegments.last, '00000001.migration.dart');
     });
 
-    test("Migration files are ordered correctly", () async {
+    test('Migration files are ordered correctly', () async {
       addValidMigrationFile([
-        "00000001.migration.dart",
-        "2.migration.dart",
-        "03_Foo.migration.dart",
-        "10001_.migration.dart",
-        "000001001.migration.dart"
+        '00000001.migration.dart',
+        '2.migration.dart',
+        '03_Foo.migration.dart',
+        '10001_.migration.dart',
+        '000001001.migration.dart'
       ]);
       expect(migrationsDirectory.listSync().length, 5);
 
       var mock = MockMigratable(temporaryDirectory);
       var files = mock.projectMigrations;
       expect(files.length, 5);
-      expect(files[0].uri!.pathSegments.last, "00000001.migration.dart");
-      expect(files[1].uri!.pathSegments.last, "2.migration.dart");
-      expect(files[2].uri!.pathSegments.last, "03_Foo.migration.dart");
-      expect(files[3].uri!.pathSegments.last, "000001001.migration.dart");
-      expect(files[4].uri!.pathSegments.last, "10001_.migration.dart");
+      expect(files[0].uri!.pathSegments.last, '00000001.migration.dart');
+      expect(files[1].uri!.pathSegments.last, '2.migration.dart');
+      expect(files[2].uri!.pathSegments.last, '03_Foo.migration.dart');
+      expect(files[3].uri!.pathSegments.last, '000001001.migration.dart');
+      expect(files[4].uri!.pathSegments.last, '10001_.migration.dart');
     });
   });
 }
@@ -141,20 +141,20 @@ class Migration1 extends Migration { @override Future upgrade() async {} @overri
 class Migration1 extends Migration {
   @override
   Future upgrade() async {
-    database.createTable(SchemaTable("foo", [
-      SchemaColumn("foobar", ManagedPropertyType.integer, isIndexed: true)
+    database.createTable(SchemaTable('foo', [
+      SchemaColumn('foobar', ManagedPropertyType.integer, isIndexed: true)
     ]));
 
     //database.renameTable(currentSchema["tableToRename"], "renamedTable");
-    database.deleteTable("tableToDelete");
+    database.deleteTable('tableToDelete');
 
     database.addColumn(
-        "tableToKeep",
-        SchemaColumn("addedColumn", ManagedPropertyType.integer,
-            defaultValue: "2"));
-    database.deleteColumn("tableToKeep", "columnToDelete");
+        'tableToKeep',
+        SchemaColumn('addedColumn', ManagedPropertyType.integer,
+            defaultValue: '2'));
+    database.deleteColumn('tableToKeep', 'columnToDelete');
     //database.renameColumn()
-    database.alterColumn("tableToKeep", "columnToEdit", (col) {
+    database.alterColumn('tableToKeep', 'columnToEdit', (col) {
       col.defaultValue = "'foo'";
     });
   }
@@ -170,7 +170,7 @@ class MockMigratable extends CLICommand
     with CLIDatabaseManagingCommand, CLIProject {
   MockMigratable(this.projectDirectory) {
     migrationDirectory =
-        Directory.fromUri(projectDirectory.uri.resolve("migrations"));
+        Directory.fromUri(projectDirectory.uri.resolve('migrations'));
   }
 
   @override
@@ -183,8 +183,8 @@ class MockMigratable extends CLICommand
   Future<int> handle() async => 0;
 
   @override
-  String get description => "";
+  String get description => '';
 
   @override
-  String get name => "";
+  String get name => '';
 }

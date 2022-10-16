@@ -24,7 +24,7 @@ class QueryPredicate {
   ///
   /// The format string is the empty string and parameters is the empty map.
   QueryPredicate.empty()
-      : format = "",
+      : format = '',
         parameters = {};
 
   /// Combines [predicates] with 'AND' keyword.
@@ -67,12 +67,12 @@ class QueryPredicate {
       if (duplicateKeys.isNotEmpty) {
         var fmt = predicate.format;
         Map<String?, String> dupeMap = {};
-        duplicateKeys.forEach((key) {
-          final replacementKey = "$key$dupeCounter";
-          fmt = fmt.replaceAll("@$key", "@$replacementKey");
+        for (var key in duplicateKeys) {
+          final replacementKey = '$key$dupeCounter';
+          fmt = fmt.replaceAll('@$key', '@$replacementKey');
           dupeMap[key] = replacementKey;
           dupeCounter++;
-        });
+        }
 
         allFormatStrings.add(fmt);
         predicate.parameters?.forEach((key, value) {

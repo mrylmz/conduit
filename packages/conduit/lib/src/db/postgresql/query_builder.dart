@@ -8,9 +8,9 @@ import '../db.dart';
 import 'row_instantiator.dart';
 
 class PostgresQueryBuilder extends TableBuilder {
-  PostgresQueryBuilder(PostgresQuery query, [String prefixIndex = ""])
-      : valueKeyPrefix = "v${prefixIndex}_",
-        placeholderKeyPrefix = "@v${prefixIndex}_",
+  PostgresQueryBuilder(PostgresQuery query, [String prefixIndex = ''])
+      : valueKeyPrefix = 'v${prefixIndex}_',
+        placeholderKeyPrefix = '@v${prefixIndex}_',
         super(query) {
     (query.valueMap ?? query.values.backing.contents)!
         .forEach(addColumnValueBuilder);
@@ -91,25 +91,25 @@ class PostgresQueryBuilder extends TableBuilder {
         withPrefix: placeholderKeyPrefix,
         withTypeSuffix: true,
       );
-      return "$columnName=$variableName";
-    }).join(",");
+      return '$columnName=$variableName';
+    }).join(',');
   }
 
-  String get sqlColumnsToInsert => columnValueKeys.join(",");
+  String get sqlColumnsToInsert => columnValueKeys.join(',');
 
   String get sqlValuesToInsert => valuesToInsert(columnValueKeys);
 
   String valuesToInsert(Iterable<String?> forKeys) {
     if (forKeys.isEmpty) {
-      return "DEFAULT";
+      return 'DEFAULT';
     }
-    return forKeys.map(_valueToInsert).join(",");
+    return forKeys.map(_valueToInsert).join(',');
   }
 
   String? _valueToInsert(String? key) {
     final builder = columnValueBuildersByKey[key];
     if (builder == null) {
-      return "DEFAULT";
+      return 'DEFAULT';
     }
 
     return builder.sqlColumnName(
@@ -121,7 +121,7 @@ class PostgresQueryBuilder extends TableBuilder {
   String get sqlColumnsToReturn {
     return flattenedColumnsToReturn
         .map((p) => p.sqlColumnName(withTableNamespace: containsJoins))
-        .join(",");
+        .join(',');
   }
 
   String get sqlOrderBy {
@@ -132,7 +132,7 @@ class PostgresQueryBuilder extends TableBuilder {
     allSorts.addAll(nestedSorts);
 
     if (allSorts.isEmpty) {
-      return "";
+      return '';
     }
 
     return "ORDER BY ${allSorts.map((s) => s.sqlOrderBy).join(",")}";

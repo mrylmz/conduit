@@ -44,10 +44,10 @@ abstract class Recyclable<T> implements Controller {
 /// All [Controller]s implement this interface.
 abstract class Linkable {
   /// See [Controller.link].
-  Linkable? link(Controller instantiator());
+  Linkable? link(Controller Function() instantiator);
 
   /// See [Controller.linkFunction].
-  Linkable? linkFunction(FutureOr<RequestOrResponse?> handle(Request request));
+  Linkable? linkFunction(FutureOr<RequestOrResponse?> Function(Request request) handle);
 }
 
 /// Base class for request handling objects.
@@ -84,7 +84,7 @@ abstract class Controller
   Controller? get nextController => _nextController;
 
   /// An instance of the 'conduit' logger.
-  Logger get logger => Logger("conduit");
+  Logger get logger => Logger('conduit');
 
   /// The CORS policy of this controller.
   CORSPolicy? policy = CORSPolicy();
@@ -106,7 +106,7 @@ abstract class Controller
   ///
   /// See [linkFunction] for a variant of this method that takes a closure instead of an object.
   @override
-  Linkable? link(Controller instantiator()) {
+  Linkable? link(Controller Function() instantiator) {
     final instance = instantiator();
     if (instance is Recyclable) {
       _nextController = _ControllerRecycler(instantiator, instance);
@@ -123,7 +123,7 @@ abstract class Controller
   ///
   /// See [link] for a variant of this method that takes an object instead of a closure.
   @override
-  Linkable? linkFunction(FutureOr<RequestOrResponse?> handle(Request request)) {
+  Linkable? linkFunction(FutureOr<RequestOrResponse?> Function(Request request) handle) {
     return _nextController = _FunctionController(handle);
   }
 
@@ -226,7 +226,7 @@ abstract class Controller
   Future handleError(
       Request request, dynamic caughtValue, StackTrace trace) async {
     if (caughtValue is HTTPStreamingException) {
-      logger.severe("${request.toDebugString(includeHeaders: true)}",
+      logger.severe(request.toDebugString(includeHeaders: true),
           caughtValue.underlyingException, caughtValue.trace);
 
       // ignore: unawaited_futures
@@ -238,9 +238,9 @@ abstract class Controller
     try {
       final body = includeErrorDetailsInServerErrorResponses
           ? {
-              "controller": "$runtimeType",
-              "error": "$caughtValue.",
-              "stacktrace": trace.toString()
+              'controller': '$runtimeType',
+              'error': '$caughtValue.',
+              'stacktrace': trace.toString()
             }
           : null;
 
@@ -250,9 +250,9 @@ abstract class Controller
       await _sendResponse(request, response, includeCORSHeaders: true);
 
       logger.severe(
-          "${request.toDebugString(includeHeaders: true)}", caughtValue, trace);
+          request.toDebugString(includeHeaders: true), caughtValue, trace);
     } catch (e) {
-      logger.severe("Failed to send response, draining request. Reason: $e");
+      logger.severe('Failed to send response, draining request. Reason: $e');
       // ignore: unawaited_futures
       request.raw.drain().catchError((_) => null);
     }
@@ -373,14 +373,14 @@ class _ControllerRecycler<T> extends Controller {
   }
 
   @override
-  Linkable? link(Controller instantiator()) {
+  Linkable? link(Controller Function() instantiator) {
     final c = super.link(instantiator);
     nextInstanceToReceive?._nextController = c as Controller;
     return c;
   }
 
   @override
-  Linkable? linkFunction(FutureOr<RequestOrResponse?> handle(Request request)) {
+  Linkable? linkFunction(FutureOr<RequestOrResponse?> Function(Request request) handle) {
     final c = super.linkFunction(handle);
     nextInstanceToReceive?._nextController = c as Controller;
     return c;
@@ -395,7 +395,7 @@ class _ControllerRecycler<T> extends Controller {
 
   @override
   FutureOr<RequestOrResponse> handle(Request request) {
-    throw StateError("_ControllerRecycler invoked handle. This is a bug.");
+    throw StateError('_ControllerRecycler invoked handle. This is a bug.');
   }
 
   @override

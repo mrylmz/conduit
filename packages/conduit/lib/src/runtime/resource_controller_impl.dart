@@ -33,18 +33,18 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
         .toList();
 
     if (conflictingOperations.isNotEmpty) {
-      final opNames = conflictingOperations.map((s) => "'$s'").join(", ");
+      final opNames = conflictingOperations.map((s) => "'$s'").join(', ');
       throw StateError(
           "Invalid controller. Controller '${type.reflectedType.toString()}' has "
-          "ambiguous operations. Offending operating methods: $opNames.");
+          'ambiguous operations. Offending operating methods: $opNames.');
     }
 
     if (unsatisfiableOperations.isNotEmpty) {
-      final opNames = unsatisfiableOperations.map((s) => "'$s'").join(", ");
+      final opNames = unsatisfiableOperations.map((s) => "'$s'").join(', ');
       throw StateError(
           "Invalid controller. Controller '${type.reflectedType.toString()}' has operations where "
-          "parameter is bound with @Bind.path(), but path variable is not declared in "
-          "@Operation(). Offending operation methods: $opNames");
+          'parameter is bound with @Bind.path(), but path variable is not declared in '
+          '@Operation(). Offending operation methods: $opNames');
     }
 
     documenter = ResourceControllerDocumenterImpl(this);
@@ -132,7 +132,7 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
         .reflectee as Bind;
 
     if (mirror.type is! ClassMirror) {
-      throw _makeError(mirror, "Cannot bind dynamic parameters.");
+      throw _makeError(mirror, 'Cannot bind dynamic parameters.');
     }
 
     final boundType = mirror.type as ClassMirror;
@@ -151,7 +151,7 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
               metadata.accept != null) {
             if (!(isDecodingSerializable || isDecodingListOfSerializable)) {
               throw _makeError(mirror,
-                  "Filters can only be used on Serializable or List<Serializable>.");
+                  'Filters can only be used on Serializable or List<Serializable>.');
             }
           }
 
@@ -272,8 +272,8 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
     if (parametersWithoutMetadata.isNotEmpty) {
       final names = parametersWithoutMetadata
           .map((p) => "'${MirrorSystem.getName(p.simpleName)}'")
-          .join(", ");
-      throw StateError("Invalid operation method parameter(s) $names on "
+          .join(', ');
+      throw StateError('Invalid operation method parameter(s) $names on '
           "'${getMethodAndClassName(parametersWithoutMetadata.first)}': Must have @Bind annotation.");
     }
 
@@ -346,7 +346,7 @@ dynamic _convertParameterListWithMirror(
       print('wtf');
     }
     if (parameterValues!.length > 1) {
-      throw ArgumentError("multiple values not expected");
+      throw ArgumentError('multiple values not expected');
     }
     return _convertParameterWithMirror(parameterValues.first, typeMirror);
   }
@@ -367,6 +367,6 @@ dynamic _convertParameterWithMirror(
   try {
     return classMirror.invoke(parseDecl.simpleName, [parameterValue]).reflectee;
   } catch (_) {
-    throw ArgumentError("invalid value");
+    throw ArgumentError('invalid value');
   }
 }

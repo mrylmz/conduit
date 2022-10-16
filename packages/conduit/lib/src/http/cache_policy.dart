@@ -41,25 +41,25 @@ class CachePolicy {
   /// This value is used for the 'Cache-Control' header.
   String get headerValue {
     if (preventCaching) {
-      return "no-cache, no-store";
+      return 'no-cache, no-store';
     }
 
     var items = [];
 
     if (preventIntermediateProxyCaching) {
-      items.add("private");
+      items.add('private');
     } else {
-      items.add("public");
+      items.add('public');
     }
 
     if (expirationFromNow != null) {
-      items.add("max-age=${expirationFromNow!.inSeconds}");
+      items.add('max-age=${expirationFromNow!.inSeconds}');
     }
 
     if (requireConditionalRequest) {
-      items.add("no-cache");
+      items.add('no-cache');
     }
 
-    return items.join(", ");
+    return items.join(', ');
   }
 }

@@ -5,10 +5,10 @@ import 'managed.dart';
 
 final ArgumentError _invalidValueConstruction = ArgumentError(
     "Invalid property access when building 'Query.values'. "
-    "May only assign values to properties backed by a column of the table being inserted into. "
+    'May only assign values to properties backed by a column of the table being inserted into. '
     "This prohibits 'ManagedObject' and 'ManagedSet' properties, except for 'ManagedObject' "
     "properties with a 'Relate' annotation. For 'Relate' properties, you may only set their "
-    "primary key property.");
+    'primary key property.');
 
 class ManagedValueBacking extends ManagedBacking {
   @override

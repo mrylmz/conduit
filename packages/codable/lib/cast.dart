@@ -39,16 +39,16 @@ class FailedCast implements core.Exception {
   @override
   core.String toString() {
     if (key == null) {
-      return "Failed cast at $context: $message";
+      return 'Failed cast at $context: $message';
     }
-    return "Failed cast at $context $key: $message";
+    return 'Failed cast at $context $key: $message';
   }
 }
 
 abstract class Cast<T> {
   const Cast();
   T _cast(dynamic from, core.String context, dynamic key);
-  T cast(dynamic from) => _cast(from, "toplevel", null);
+  T cast(dynamic from) => _cast(from, 'toplevel', null);
 }
 
 class AnyCast extends Cast<dynamic> {
@@ -63,7 +63,7 @@ class IntCast extends Cast<core.int> {
   core.int _cast(dynamic from, core.String context, dynamic key) =>
       from is core.int
           ? from
-          : throw FailedCast(context, key, "$from is not an int");
+          : throw FailedCast(context, key, '$from is not an int');
 }
 
 class DoubleCast extends Cast<core.double> {
@@ -72,7 +72,7 @@ class DoubleCast extends Cast<core.double> {
   core.double _cast(dynamic from, core.String context, dynamic key) =>
       from is core.double
           ? from
-          : throw FailedCast(context, key, "$from is not an double");
+          : throw FailedCast(context, key, '$from is not an double');
 }
 
 class StringCast extends Cast<core.String> {
@@ -81,7 +81,7 @@ class StringCast extends Cast<core.String> {
   core.String _cast(dynamic from, core.String context, dynamic key) =>
       from is core.String
           ? from
-          : throw FailedCast(context, key, "$from is not a String");
+          : throw FailedCast(context, key, '$from is not a String');
 }
 
 class BoolCast extends Cast<core.bool> {
@@ -90,7 +90,7 @@ class BoolCast extends Cast<core.bool> {
   core.bool _cast(dynamic from, core.String context, dynamic key) =>
       from is core.bool
           ? from
-          : throw FailedCast(context, key, "$from is not a bool");
+          : throw FailedCast(context, key, '$from is not a bool');
 }
 
 class Map<K, V> extends Cast<core.Map<K, V>> {
@@ -104,12 +104,12 @@ class Map<K, V> extends Cast<core.Map<K, V>> {
     if (from is core.Map) {
       final result = <K, V>{};
       for (final key in from.keys) {
-        final newKey = _key._cast(key, "map entry", key);
-        result[newKey] = _value._cast(from[key], "map entry", key);
+        final newKey = _key._cast(key, 'map entry', key);
+        result[newKey] = _value._cast(from[key], 'map entry', key);
       }
       return result;
     }
-    return throw FailedCast(context, key, "not a map");
+    return throw FailedCast(context, key, 'not a map');
   }
 }
 
@@ -125,11 +125,11 @@ class StringMap<V> extends Cast<core.Map<core.String, V>> {
     if (from is core.Map) {
       final result = <core.String, V>{};
       for (final core.String key in from.keys as core.Iterable<core.String>) {
-        result[key] = _value._cast(from[key], "map entry", key);
+        result[key] = _value._cast(from[key], 'map entry', key);
       }
       return result;
     }
-    return throw FailedCast(context, key, "not a map");
+    return throw FailedCast(context, key, 'not a map');
   }
 }
 
@@ -143,14 +143,14 @@ class List<E> extends Cast<core.List<E?>> {
       final result = core.List<E?>.filled(length, null);
       for (core.int i = 0; i < length; ++i) {
         if (from[i] != null) {
-          result[i] = _entry._cast(from[i], "list entry", i);
+          result[i] = _entry._cast(from[i], 'list entry', i);
         } else {
           result[i] = null;
         }
       }
       return result;
     }
-    return throw FailedCast(context, key, "not a list");
+    return throw FailedCast(context, key, 'not a list');
   }
 }
 
@@ -164,14 +164,14 @@ class Keyed<K, V> extends Cast<core.Map<K, V?>> {
     if (from is core.Map) {
       for (final K key in from.keys as core.Iterable<K>) {
         if (_map.containsKey(key)) {
-          result[key] = _map[key]!._cast(from[key], "map entry", key);
+          result[key] = _map[key]!._cast(from[key], 'map entry', key);
         } else {
           result[key] = from[key] as V?;
         }
       }
       return result;
     }
-    return throw FailedCast(context, key, "not a map");
+    return throw FailedCast(context, key, 'not a map');
   }
 }
 
@@ -210,7 +210,7 @@ class Future<E> extends Cast<async.Future<E>> {
     if (from is async.Future) {
       return from.then(_value.cast);
     }
-    return throw FailedCast(context, key, "not a Future");
+    return throw FailedCast(context, key, 'not a Future');
   }
 }
 

@@ -34,7 +34,7 @@ ManagedType getManagedTypeFromType(TypeMirror type) {
     kind = ManagedPropertyType.string;
     final enumeratedCases = type.getField(#values).reflectee as List<dynamic>;
     for (final v in enumeratedCases) {
-      enumerationMap[v.toString().split(".").last] = v;
+      enumerationMap[v.toString().split('.').last] = v;
     }
   } else {
     throw UnsupportedError(

@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 
 void main() {
   test(
-      "Add Table to table definition with only single element in unique list throws exception, warns to use Table",
+      'Add Table to table definition with only single element in unique list throws exception, warns to use Table',
       () {
     try {
       ManagedDataModel([MultiUniqueFailureSingleElement]);

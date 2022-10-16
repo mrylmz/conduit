@@ -11,65 +11,65 @@ import 'package:conduit/src/cli/running_process.dart';
 class CLIServer extends CLICommand with CLIProject {
   late String derivedChannelType;
 
-  @Option("timeout",
-      help: "Number of seconds to wait to ensure startup succeeded.",
-      defaultsTo: "45")
-  int get startupTimeout => decode<int>("timeout");
+  @Option('timeout',
+      help: 'Number of seconds to wait to ensure startup succeeded.',
+      defaultsTo: '45')
+  int get startupTimeout => decode<int>('timeout');
 
-  @Option("ssl-key-path",
+  @Option('ssl-key-path',
       help:
-          "The path to an SSL private key file. If provided along with --ssl-certificate-path, the application will be HTTPS-enabled.")
-  String? get keyPath => decodeOptional("ssl-key-path");
+          'The path to an SSL private key file. If provided along with --ssl-certificate-path, the application will be HTTPS-enabled.')
+  String? get keyPath => decodeOptional('ssl-key-path');
 
-  @Option("ssl-certificate-path",
+  @Option('ssl-certificate-path',
       help:
-          "The path to an SSL certicate file. If provided along with --ssl-certificate-path, the application will be HTTPS-enabled.")
-  String? get certificatePath => decodeOptional("ssl-certificate-path");
+          'The path to an SSL certicate file. If provided along with --ssl-certificate-path, the application will be HTTPS-enabled.')
+  String? get certificatePath => decodeOptional('ssl-certificate-path');
 
-  @Flag("observe", help: "Enables Dart Observatory", defaultsTo: false)
-  bool get shouldRunObservatory => decode("observe");
+  @Flag('observe', help: 'Enables Dart Observatory', defaultsTo: false)
+  bool get shouldRunObservatory => decode('observe');
 
-  @Flag("ipv6-only",
-      help: "Limits listening to IPv6 connections only.",
+  @Flag('ipv6-only',
+      help: 'Limits listening to IPv6 connections only.',
       negatable: false,
       defaultsTo: false)
-  bool get ipv6Only => decode("ipv6-only");
+  bool get ipv6Only => decode('ipv6-only');
 
-  @Option("port",
-      abbr: "p",
-      help: "The port number to listen for HTTP requests on.",
-      defaultsTo: "8888")
-  int get port => decode<int>("port");
+  @Option('port',
+      abbr: 'p',
+      help: 'The port number to listen for HTTP requests on.',
+      defaultsTo: '8888')
+  int get port => decode<int>('port');
 
-  @Option("isolates",
-      abbr: "n",
-      help: "Number of isolates processing requests",
-      defaultsTo: "0")
-  int get numberOfIsolates => decode("isolates");
+  @Option('isolates',
+      abbr: 'n',
+      help: 'Number of isolates processing requests',
+      defaultsTo: '0')
+  int get numberOfIsolates => decode('isolates');
 
-  @Option("address",
-      abbr: "a",
+  @Option('address',
+      abbr: 'a',
       help:
-          "The address to listen on. See HttpServer.bind for more details; this value is used as the String passed to InternetAddress.lookup."
-          " Using the default will listen on any address.",
+          'The address to listen on. See HttpServer.bind for more details; this value is used as the String passed to InternetAddress.lookup.'
+          ' Using the default will listen on any address.',
       defaultsTo: '0.0.0.0')
-  String get address => decode("address");
+  String get address => decode('address');
 
-  @Option("channel",
-      abbr: "s",
+  @Option('channel',
+      abbr: 's',
       help:
-          "The name of the ApplicationChannel subclass to be instantiated to serve requests. "
-          "By default, this subclass is determined by reflecting on the application library in the [directory] being served.")
+          'The name of the ApplicationChannel subclass to be instantiated to serve requests. '
+          'By default, this subclass is determined by reflecting on the application library in the [directory] being served.')
   String get channelType =>
-      decodeOptional("channel", orElse: () => derivedChannelType)!;
+      decodeOptional('channel', orElse: () => derivedChannelType)!;
 
-  @Option("config-path",
-      abbr: "c",
+  @Option('config-path',
+      abbr: 'c',
       help:
-          "The path to a configuration file. This File is available in the ApplicationOptions"
-          "for a ApplicationChannel to use to read application-specific configuration values. Relative paths are relative to [directory].",
-      defaultsTo: "config.yaml")
-  File get configurationFile => File(decode("config-path")).absolute;
+          'The path to a configuration file. This File is available in the ApplicationOptions'
+          'for a ApplicationChannel to use to read application-specific configuration values. Relative paths are relative to [directory].',
+      defaultsTo: 'config.yaml')
+  File get configurationFile => File(decode('config-path')).absolute;
 
   ReceivePort? messagePort;
   ReceivePort? errorPort;
@@ -85,7 +85,7 @@ class CLIServer extends CLICommand with CLIProject {
     try {
       runningProcess = await _start();
     } catch (e, st) {
-      displayError("Application failed to start.");
+      displayError('Application failed to start.');
       exitCode.completeError(e, st);
     }
 
@@ -102,36 +102,36 @@ class CLIServer extends CLICommand with CLIProject {
 
   Future<StoppableProcess> _start() async {
     var replacements = {
-      "PACKAGE_NAME": packageName,
-      "LIBRARY_NAME": libraryName,
-      "CHANNEL_TYPE": channelType,
-      "PORT": port,
-      "ADDRESS": address,
-      "IPV6_ONLY": ipv6Only,
-      "CONFIGURATION_FILE_PATH": configurationFile.path,
-      "SSL_KEY_PATH": keyPath,
-      "SSL_CERTIFICATE_PATH": certificatePath,
-      "NUMBER_OF_ISOLATES": numberOfIsolates
+      'PACKAGE_NAME': packageName,
+      'LIBRARY_NAME': libraryName,
+      'CHANNEL_TYPE': channelType,
+      'PORT': port,
+      'ADDRESS': address,
+      'IPV6_ONLY': ipv6Only,
+      'CONFIGURATION_FILE_PATH': configurationFile.path,
+      'SSL_KEY_PATH': keyPath,
+      'SSL_CERTIFICATE_PATH': certificatePath,
+      'NUMBER_OF_ISOLATES': numberOfIsolates
     };
 
     displayInfo("Starting application '$packageName/$libraryName'");
-    displayProgress("Channel: $channelType");
-    displayProgress("Config: ${configurationFile.path}");
-    displayProgress("Port: $port");
+    displayProgress('Channel: $channelType');
+    displayProgress('Config: ${configurationFile.path}');
+    displayProgress('Port: $port');
 
     errorPort = ReceivePort();
     messagePort = ReceivePort();
 
     final generatedStartScript = createScriptSource(replacements);
     final dataUri = Uri.parse(
-        "data:application/dart;charset=utf-8,${Uri.encodeComponent(generatedStartScript)}");
+        'data:application/dart;charset=utf-8,${Uri.encodeComponent(generatedStartScript)}');
     final startupCompleter = Completer<SendPort>();
 
     final isolate = await Isolate.spawnUri(dataUri, [], messagePort!.sendPort,
         errorsAreFatal: true,
         onError: errorPort!.sendPort,
         packageConfig:
-            fileInProjectDirectory(".dart_tool/package_config.json").uri,
+            fileInProjectDirectory('.dart_tool/package_config.json').uri,
         paused: true);
 
     errorPort!.listen((msg) {
@@ -143,13 +143,13 @@ class CLIServer extends CLICommand with CLIProject {
 
     messagePort!.listen((msg) {
       final message = msg as Map<dynamic, dynamic>;
-      switch (message["status"] as String?) {
-        case "ok":
+      switch (message['status'] as String?) {
+        case 'ok':
           {
-            startupCompleter.complete(message["port"] as SendPort?);
+            startupCompleter.complete(message['port'] as SendPort?);
           }
           break;
-        case "stopped":
+        case 'stopped':
           {
             exitCode.complete(0);
           }
@@ -168,9 +168,9 @@ class CLIServer extends CLICommand with CLIProject {
     final sendPort = await startupCompleter.future
         .timeout(Duration(seconds: startupTimeout));
     final process = StoppableProcess((reason) async {
-      displayInfo("Stopping application.");
-      displayProgress("Reason: $reason");
-      sendPort.send({"command": "stop"});
+      displayInfo('Stopping application.');
+      displayProgress('Reason: $reason');
+      sendPort.send({'command': 'stop'});
     });
 
     return process;
@@ -179,34 +179,34 @@ class CLIServer extends CLICommand with CLIProject {
   Future<void> _prepare() async {
     if (keyPath != null && certificatePath == null) {
       throw CLIException(
-          "Configuration error: --ssl-key-path was specified, but --ssl-certificate-path was not.");
+          'Configuration error: --ssl-key-path was specified, but --ssl-certificate-path was not.');
     }
     if (keyPath == null && certificatePath != null) {
       throw CLIException(
-          "Configuration error: --ssl-certificate-path was specified, but --ssl-key-path was not.");
+          'Configuration error: --ssl-certificate-path was specified, but --ssl-key-path was not.');
     }
 
     derivedChannelType = await getChannelName();
   }
 
   String createScriptSource(Map<String, dynamic> values) {
-    var addressString = "..address = \"___ADDRESS___\"";
-    if (values["ADDRESS"] == null) {
-      addressString = "";
+    var addressString = '..address = "___ADDRESS___"';
+    if (values['ADDRESS'] == null) {
+      addressString = '';
     }
     var configString =
-        "..configurationFilePath = r\"___CONFIGURATION_FILE_PATH___\"";
-    if (values["CONFIGURATION_FILE_PATH"] == null) {
-      configString = "";
+        '..configurationFilePath = r"___CONFIGURATION_FILE_PATH___"';
+    if (values['CONFIGURATION_FILE_PATH'] == null) {
+      configString = '';
     }
     var certificateString =
-        "..certificateFilePath = r\"___SSL_CERTIFICATE_PATH___\"";
-    if (values["SSL_CERTIFICATE_PATH"] == null) {
-      certificateString = "";
+        '..certificateFilePath = r"___SSL_CERTIFICATE_PATH___"';
+    if (values['SSL_CERTIFICATE_PATH'] == null) {
+      certificateString = '';
     }
-    var keyString = "..privateKeyFilePath = r\"___SSL_KEY_PATH___\"";
-    if (values["SSL_KEY_PATH"] == null) {
-      keyString = "";
+    var keyString = '..privateKeyFilePath = r"___SSL_KEY_PATH___"';
+    if (values['SSL_KEY_PATH'] == null) {
+      keyString = '';
     }
 
     var contents = """
@@ -233,29 +233,29 @@ Future main(List<String> args, dynamic sendPort) async {
 }
     """;
 
-    return contents.replaceAllMapped(RegExp("___([A-Za-z0-9_-]+)___"), (match) {
+    return contents.replaceAllMapped(RegExp('___([A-Za-z0-9_-]+)___'), (match) {
       return values[match.group(1)!].toString();
     });
   }
 
   @override
   String get name {
-    return "serve";
+    return 'serve';
   }
 
   @override
   String get description {
-    return "Runs Conduit applications.";
+    return 'Runs Conduit applications.';
   }
 }
 
 Future<bool> supportsLaunchObservatory() async {
-  String locator = Platform.isWindows ? "where" : "which";
-  var result = await Process.run(locator, ["open"]);
+  String locator = Platform.isWindows ? 'where' : 'which';
+  var result = await Process.run(locator, ['open']);
 
   return result.exitCode == 0;
 }
 
 Future launchObservatory(String url) {
-  return Process.run("open", [url]);
+  return Process.run('open', [url]);
 }

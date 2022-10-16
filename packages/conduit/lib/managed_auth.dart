@@ -49,15 +49,15 @@ class ManagedAuthToken extends ManagedObject<_ManagedAuthToken>
   /// Instance from an [AuthToken].
   ManagedAuthToken.fromToken(AuthToken t) : super() {
     final tokenResourceOwner =
-        entity.relationships!["resourceOwner"]!.destinationEntity.instanceOf();
-    tokenResourceOwner["id"] = t.resourceOwnerIdentifier;
+        entity.relationships!['resourceOwner']!.destinationEntity.instanceOf();
+    tokenResourceOwner['id'] = t.resourceOwnerIdentifier;
     this
       ..accessToken = t.accessToken
       ..refreshToken = t.refreshToken
       ..issueDate = t.issueDate
       ..expirationDate = t.expirationDate
       ..type = t.type
-      ..scope = t.scopes?.map((s) => s.toString()).join(" ")
+      ..scope = t.scopes?.map((s) => s.toString()).join(' ')
       ..resourceOwner = tokenResourceOwner as ResourceOwnerTableDefinition
       ..client = (ManagedAuthClient()..id = t.clientID);
   }
@@ -65,15 +65,15 @@ class ManagedAuthToken extends ManagedObject<_ManagedAuthToken>
   /// Instance from an [AuthCode].
   ManagedAuthToken.fromCode(AuthCode code) : super() {
     final tokenResourceOwner =
-        entity.relationships!["resourceOwner"]!.destinationEntity.instanceOf();
-    tokenResourceOwner["id"] = code.resourceOwnerIdentifier;
+        entity.relationships!['resourceOwner']!.destinationEntity.instanceOf();
+    tokenResourceOwner['id'] = code.resourceOwnerIdentifier;
 
     this
       ..code = code.code
       ..resourceOwner = tokenResourceOwner as ResourceOwnerTableDefinition
       ..issueDate = code.issueDate
       ..expirationDate = code.expirationDate
-      ..scope = code.requestedScopes?.map((s) => s.toString()).join(" ")
+      ..scope = code.requestedScopes?.map((s) => s.toString()).join(' ')
       ..client = (ManagedAuthClient()..id = code.clientID);
   }
 
@@ -86,7 +86,7 @@ class ManagedAuthToken extends ManagedObject<_ManagedAuthToken>
       ..expirationDate = expirationDate
       ..type = type
       ..resourceOwnerIdentifier = resourceOwner!.id
-      ..scopes = scope?.split(" ").map((s) => AuthScope(s)).toList()
+      ..scopes = scope?.split(' ').map((s) => AuthScope(s)).toList()
       ..clientID = client.id;
   }
 
@@ -97,13 +97,13 @@ class ManagedAuthToken extends ManagedObject<_ManagedAuthToken>
       ..code = code
       ..resourceOwnerIdentifier = resourceOwner!.id
       ..issueDate = issueDate
-      ..requestedScopes = scope?.split(" ").map((s) => AuthScope(s)).toList()
+      ..requestedScopes = scope?.split(' ').map((s) => AuthScope(s)).toList()
       ..expirationDate = expirationDate
       ..clientID = client.id;
   }
 }
 
-@Table(name: "_authtoken")
+@Table(name: '_authtoken')
 class _ManagedAuthToken {
   /// A primary key identifier.
   @primaryKey
@@ -179,19 +179,19 @@ class ManagedAuthClient extends ManagedObject<_ManagedAuthClient>
     hashedSecret = client.hashedSecret;
     salt = client.salt;
     redirectURI = client.redirectURI;
-    allowedScope = client.allowedScopes?.map((s) => s.toString()).join(" ");
+    allowedScope = client.allowedScopes?.map((s) => s.toString()).join(' ');
   }
 
   /// As an [AuthClient].
   AuthClient asClient() {
-    final scopes = allowedScope?.split(" ").map((s) => AuthScope(s)).toList();
+    final scopes = allowedScope?.split(' ').map((s) => AuthScope(s)).toList();
 
     return AuthClient.withRedirectURI(id, hashedSecret, salt, redirectURI,
         allowedScopes: scopes);
   }
 }
 
-@Table(name: "_authclient")
+@Table(name: '_authclient')
 class _ManagedAuthClient {
   /// The client identifier of this client.
   ///

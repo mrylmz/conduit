@@ -89,27 +89,27 @@ class Request implements RequestOrResponse {
     if (_cachedAcceptableTypes == null) {
       try {
         var contentTypes = raw.headers[HttpHeaders.acceptHeader]
-                ?.expand((h) => h.split(",").map((s) => s.trim()))
+                ?.expand((h) => h.split(',').map((s) => s.trim()))
                 .where((h) => h.isNotEmpty)
                 .map(ContentType.parse)
                 .toList() ??
             [];
 
         contentTypes.sort((c1, c2) {
-          num q1 = num.parse(c1.parameters["q"] ?? "1.0");
-          num q2 = num.parse(c2.parameters["q"] ?? "1.0");
+          num q1 = num.parse(c1.parameters['q'] ?? '1.0');
+          num q2 = num.parse(c2.parameters['q'] ?? '1.0');
 
           var comparison = q1.compareTo(q2);
           if (comparison == 0) {
-            if (c1.primaryType == "*" && c2.primaryType != "*") {
+            if (c1.primaryType == '*' && c2.primaryType != '*') {
               return 1;
-            } else if (c1.primaryType != "*" && c2.primaryType == "*") {
+            } else if (c1.primaryType != '*' && c2.primaryType == '*') {
               return -1;
             }
 
-            if (c1.subType == "*" && c2.subType != "*") {
+            if (c1.subType == '*' && c2.subType != '*') {
               return 1;
-            } else if (c1.subType != "*" && c2.subType == "*") {
+            } else if (c1.subType != '*' && c2.subType == '*') {
               return -1;
             }
           }
@@ -120,7 +120,7 @@ class Request implements RequestOrResponse {
         _cachedAcceptableTypes = contentTypes;
       } catch (_) {
         throw Response.badRequest(
-            body: {"error": "accept header is malformed"});
+            body: {'error': 'accept header is malformed'});
       }
     }
     return _cachedAcceptableTypes!;
@@ -140,12 +140,12 @@ class Request implements RequestOrResponse {
     }
 
     return acceptableContentTypes.any((acceptable) {
-      if (acceptable.primaryType == "*") {
+      if (acceptable.primaryType == '*') {
         return true;
       }
 
       if (acceptable.primaryType == contentType.primaryType) {
-        if (acceptable.subType == "*") {
+        if (acceptable.subType == '*') {
           return true;
         }
 
@@ -161,15 +161,15 @@ class Request implements RequestOrResponse {
   /// Whether or not this request is a CORS request.
   ///
   /// This is true if there is an Origin header.
-  bool get isCORSRequest => raw.headers.value("origin") != null;
+  bool get isCORSRequest => raw.headers.value('origin') != null;
 
   /// Whether or not this is a CORS preflight request.
   ///
   /// This is true if the request HTTP method is OPTIONS and the headers contains Access-Control-Request-Method.
   bool get isPreflightRequest {
     return isCORSRequest &&
-        raw.method == "OPTIONS" &&
-        raw.headers.value("access-control-request-method") != null;
+        raw.method == 'OPTIONS' &&
+        raw.headers.value('access-control-request-method') != null;
   }
 
   /// Container for any data a [Controller] wants to attach to this request for the purpose of being used by a later [Controller].
@@ -201,18 +201,18 @@ class Request implements RequestOrResponse {
   ///           });
   ///           return request;
   ///         }
-  void addResponseModifier(void modifier(Response response)) {
+  void addResponseModifier(void Function(Response response) modifier) {
     _responseModifiers ??= [];
     _responseModifiers!.add(modifier);
   }
 
   String get _sanitizedHeaders {
-    StringBuffer buf = StringBuffer("{");
+    StringBuffer buf = StringBuffer('{');
 
     raw.headers.forEach((k, v) {
       buf.write("${_truncatedString(k)} : ${_truncatedString(v.join(","))}\\n");
     });
-    buf.write("}");
+    buf.write('}');
 
     return buf.toString();
   }
@@ -221,7 +221,7 @@ class Request implements RequestOrResponse {
     if (originalString.length <= charSize) {
       return originalString;
     }
-    return "${originalString.substring(0, charSize)} ... (${originalString.length - charSize} truncated bytes)";
+    return '${originalString.substring(0, charSize)} ... (${originalString.length - charSize} truncated bytes)';
   }
 
   /// Sends a [Response] to this [Request]'s client.
@@ -286,7 +286,7 @@ class Request implements RequestOrResponse {
         response.headers
             .add(HttpHeaders.contentEncodingHeader, compressionType.value!);
       }
-      response.headers.add(HttpHeaders.transferEncodingHeader, "chunked");
+      response.headers.add(HttpHeaders.transferEncodingHeader, 'chunked');
       response.bufferOutput = conduitResponse.bufferOutput;
 
       return response.addStream(bodyStream).then((_) {
@@ -296,7 +296,7 @@ class Request implements RequestOrResponse {
       });
     }
 
-    throw StateError("Invalid response body. Could not encode.");
+    throw StateError('Invalid response body. Could not encode.');
   }
 
   List<int>? _responseBodyBytes(
@@ -326,14 +326,14 @@ class Request implements RequestOrResponse {
 
       final bytes = resp.body as List<int>;
       if (canGzip) {
-        compressionType.value = "gzip";
+        compressionType.value = 'gzip';
         return gzip.encode(bytes);
       }
       return bytes;
     }
 
     if (canGzip) {
-      compressionType.value = "gzip";
+      compressionType.value = 'gzip';
       codec = codec.fuse(gzip);
     }
 
@@ -359,7 +359,7 @@ class Request implements RequestOrResponse {
 
       final stream = resp.body as Stream<List<int>>;
       if (canGzip) {
-        compressionType.value = "gzip";
+        compressionType.value = 'gzip';
         return gzip.encoder.bind(stream);
       }
 
@@ -367,7 +367,7 @@ class Request implements RequestOrResponse {
     }
 
     if (canGzip) {
-      compressionType.value = "gzip";
+      compressionType.value = 'gzip';
       codec = codec.fuse(gzip);
     }
 
@@ -376,13 +376,13 @@ class Request implements RequestOrResponse {
 
   bool get _acceptsGzipResponseBody {
     return raw.headers[HttpHeaders.acceptEncodingHeader]
-            ?.any((v) => v.split(",").any((s) => s.trim() == "gzip")) ??
+            ?.any((v) => v.split(',').any((s) => s.trim() == 'gzip')) ??
         false;
   }
 
   @override
   String toString() {
-    return "${raw.method} ${raw.uri} (${receivedDate.millisecondsSinceEpoch})";
+    return '${raw.method} ${raw.uri} (${receivedDate.millisecondsSinceEpoch})';
   }
 
   /// A string that represents more details about the request, typically used for logging.
@@ -398,26 +398,26 @@ class Request implements RequestOrResponse {
       bool includeHeaders = false}) {
     var builder = StringBuffer();
     if (includeRequestIP) {
-      builder.write("${raw.connectionInfo?.remoteAddress.address} ");
+      builder.write('${raw.connectionInfo?.remoteAddress.address} ');
     }
     if (includeMethod) {
-      builder.write("${raw.method} ");
+      builder.write('${raw.method} ');
     }
     if (includeResource) {
-      builder.write("${raw.uri} ");
+      builder.write('${raw.uri} ');
     }
     if (includeElapsedTime && respondDate != null) {
       builder
-          .write("${respondDate!.difference(receivedDate).inMilliseconds}ms ");
+          .write('${respondDate!.difference(receivedDate).inMilliseconds}ms ');
     }
     if (includeStatusCode) {
-      builder.write("${raw.response.statusCode} ");
+      builder.write('${raw.response.statusCode} ');
     }
     if (includeContentSize) {
-      builder.write("${raw.response.contentLength} ");
+      builder.write('${raw.response.contentLength} ');
     }
     if (includeHeaders) {
-      builder.write("$_sanitizedHeaders ");
+      builder.write('$_sanitizedHeaders ');
     }
 
     return builder.toString();

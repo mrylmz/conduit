@@ -313,15 +313,15 @@ Future<List<RootObject>> populateModelGraph(ManagedContext? ctx) async {
 }
 
 Map fullObjectMap(Type t, dynamic v, {Map<String, dynamic>? and}) {
-  var idName = "id";
+  var idName = 'id';
   if (t == RootObject) {
-    idName = "rid";
+    idName = 'rid';
   } else if (t == ChildObject) {
-    idName = "cid";
+    idName = 'cid';
   } else if (t == GrandChildObject) {
-    idName = "gid";
+    idName = 'gid';
   }
-  var m = {idName: v, "value1": v, "value2": v};
+  var m = {idName: v, 'value1': v, 'value2': v};
   if (and != null) {
     m.addAll(and);
   }

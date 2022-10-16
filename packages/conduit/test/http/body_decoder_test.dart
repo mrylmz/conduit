@@ -6,7 +6,6 @@ import 'package:conduit/conduit.dart';
 import 'package:conduit/src/dev/helpers.dart';
 import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
-import 'package:pedantic/pedantic.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -16,7 +15,7 @@ void main() {
     RequestBody.maxSize = defaultSize;
   });
 
-  group("Default decoders", () {
+  group('Default decoders', () {
     late HttpServer server;
     Request? request;
 
@@ -32,7 +31,7 @@ void main() {
       await server.close(force: true);
     });
 
-    group("Content vs. empty", () {
+    group('Content vs. empty', () {
       late HttpClient client;
       setUp(() {
         client = HttpClient();
@@ -42,9 +41,9 @@ void main() {
         client.close(force: true);
       });
 
-      test("Empty body shows as isEmpty", () async {
+      test('Empty body shows as isEmpty', () async {
         unawaited(http
-            .get(Uri.parse("http://localhost:8123"))
+            .get(Uri.parse('http://localhost:8123'))
             .catchError((err) => Future.value(http.Response.bytes([], 500))));
         print('get completed');
         var request = await server.first;
@@ -52,10 +51,10 @@ void main() {
         expect(body.isEmpty, true);
       });
 
-      test("Request with content-length header shows is not empty", () async {
-        var bytes = utf8.encode(json.encode({"k": "v"}));
+      test('Request with content-length header shows is not empty', () async {
+        var bytes = utf8.encode(json.encode({'k': 'v'}));
         var req =
-            await client.openUrl("POST", Uri.parse("http://localhost:8123"));
+            await client.openUrl('POST', Uri.parse('http://localhost:8123'));
         req.headers
             .add(HttpHeaders.contentTypeHeader, ContentType.json.toString());
         req.headers.add(HttpHeaders.contentLengthHeader, bytes.length);
@@ -64,7 +63,7 @@ void main() {
 
         var request = await server.first;
         expect(request.headers.value(HttpHeaders.contentLengthHeader),
-            "${bytes.length}");
+            '${bytes.length}');
         var body = RequestBody(request);
         expect(body.isEmpty, false);
 
@@ -73,10 +72,10 @@ void main() {
         await f;
       });
 
-      test("Request with chunked transfer encoding shows not empty", () async {
-        var bytes = utf8.encode(json.encode({"k": "v"}));
+      test('Request with chunked transfer encoding shows not empty', () async {
+        var bytes = utf8.encode(json.encode({'k': 'v'}));
         var req =
-            await client.openUrl("POST", Uri.parse("http://localhost:8123"));
+            await client.openUrl('POST', Uri.parse('http://localhost:8123'));
         req.headers
             .add(HttpHeaders.contentTypeHeader, ContentType.json.toString());
         req.add(bytes);
@@ -85,7 +84,7 @@ void main() {
         var request = await server.first;
         expect(request.headers.value(HttpHeaders.contentLengthHeader), isNull);
         expect(request.headers.value(HttpHeaders.transferEncodingHeader),
-            "chunked");
+            'chunked');
         var body = RequestBody(request);
         expect(body.isEmpty, false);
 
@@ -95,25 +94,25 @@ void main() {
       });
     });
 
-    test("application/json decoder works on valid json", () async {
+    test('application/json decoder works on valid json', () async {
       // ignore: unawaited_futures
       http
-          .post(Uri.parse("http://localhost:8123"),
-              headers: {"Content-Type": "application/json"},
-              body: json.encode({"a": "val"}))
+          .post(Uri.parse('http://localhost:8123'),
+              headers: {'Content-Type': 'application/json'},
+              body: json.encode({'a': 'val'}))
           .catchError((err) => Future.value(http.Response.bytes([], 500)));
 
       request = Request(await server.first);
       Map<String, dynamic> body = await request!.body.decode();
-      expect(body, {"a": "val"});
+      expect(body, {'a': 'val'});
     });
 
-    test("Omit charset from known decoder defaults to charset added if exists",
+    test('Omit charset from known decoder defaults to charset added if exists',
         () async {
       var client = HttpClient();
-      var req = await client.postUrl(Uri.parse("http://localhost:8123"));
-      req.headers.add(HttpHeaders.contentTypeHeader, "application/json");
-      req.add(utf8.encode(json.encode({"a": "val"})));
+      var req = await client.postUrl(Uri.parse('http://localhost:8123'));
+      req.headers.add(HttpHeaders.contentTypeHeader, 'application/json');
+      req.add(utf8.encode(json.encode({'a': 'val'})));
       // ignore: unawaited_futures
       req.close().catchError((err) => Future.value(MockHttpClientResponse()));
 
@@ -121,58 +120,58 @@ void main() {
       expect(request!.raw.headers.contentType!.charset, null);
 
       Map<String, dynamic> body = await request!.body.decode();
-      expect(body, {"a": "val"});
+      expect(body, {'a': 'val'});
     });
 
-    test("application/x-form-url-encoded decoder works on valid form data",
+    test('application/x-form-url-encoded decoder works on valid form data',
         () async {
       // ignore: unawaited_futures
       http
-          .post(Uri.parse("http://localhost:8123"),
-              headers: {"Content-Type": "application/x-www-form-urlencoded"},
-              body: "a=b&c=2%2F4")
+          .post(Uri.parse('http://localhost:8123'),
+              headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+              body: 'a=b&c=2%2F4')
           .catchError((err) => Future.value(http.Response.bytes([], 500)));
       var request = Request(await server.first);
       request.body.retainOriginalBytes = true;
       Map<String, dynamic> body = await request.body.decode();
       expect(body, {
-        "a": ["b"],
-        "c": ["2/4"]
+        'a': ['b'],
+        'c': ['2/4']
       });
 
-      expect(utf8.decode(request.body.originalBytes!), "a=b&c=2%2F4");
+      expect(utf8.decode(request.body.originalBytes!), 'a=b&c=2%2F4');
     });
 
-    test("Any text decoder works on text with charset", () async {
+    test('Any text decoder works on text with charset', () async {
       // ignore: unawaited_futures
       http
-          .post(Uri.parse("http://localhost:8123"),
-              headers: {"Content-Type": "text/plain; charset=utf-8"},
-              body: "foobar")
+          .post(Uri.parse('http://localhost:8123'),
+              headers: {'Content-Type': 'text/plain; charset=utf-8'},
+              body: 'foobar')
           .catchError((err) => Future.value(http.Response.bytes([], 500)));
 
       var request = Request(await server.first);
       String body = await request.body.decode();
-      expect(body, "foobar");
+      expect(body, 'foobar');
     });
 
-    test("No found decoder for primary type returns binary", () async {
+    test('No found decoder for primary type returns binary', () async {
       // ignore: unawaited_futures
       http
-          .post(Uri.parse("http://localhost:8123"),
-              headers: {"Content-Type": "notarealthing/nothing"},
-              body: "foobar".codeUnits)
+          .post(Uri.parse('http://localhost:8123'),
+              headers: {'Content-Type': 'notarealthing/nothing'},
+              body: 'foobar'.codeUnits)
           .catchError((err) => Future.value(http.Response.bytes([], 500)));
 
       var request = Request(await server.first);
       List<int> body = await request.body.decode();
-      expect(body, "foobar".codeUnits);
+      expect(body, 'foobar'.codeUnits);
     });
 
-    test("No content-type returns binary", () async {
+    test('No content-type returns binary', () async {
       var req = await HttpClient()
-          .openUrl("POST", Uri.parse("http://localhost:8123"));
-      req.add("foobar".codeUnits);
+          .openUrl('POST', Uri.parse('http://localhost:8123'));
+      req.add('foobar'.codeUnits);
       // ignore: unawaited_futures
       req.close().catchError((err) => Future.value(MockHttpClientResponse()));
 
@@ -180,14 +179,14 @@ void main() {
       List<int> body = await request.body.decode();
 
       expect(request.raw.headers.contentType, isNull);
-      expect(body, "foobar".codeUnits);
+      expect(body, 'foobar'.codeUnits);
     });
 
-    test("Failed decoding throws exception", () async {
+    test('Failed decoding throws exception', () async {
       // ignore: unawaited_futures
       http
-          .post(Uri.parse("http://localhost:8123"),
-              headers: {"Content-Type": "application/json"}, body: "{a=b&c=2")
+          .post(Uri.parse('http://localhost:8123'),
+              headers: {'Content-Type': 'application/json'}, body: '{a=b&c=2')
           .catchError((err) => Future.value(http.Response.bytes([], 500)));
       var request = Request(await server.first);
 
@@ -200,16 +199,16 @@ void main() {
     });
   });
 
-  group("Non-default decoders", () {
+  group('Non-default decoders', () {
     late HttpServer server;
 
     setUpAll(() {
       // We'll just use JSON here so we don't have to write a separate codec
       // to test whether or not this content-type gets paired to a codec.
       CodecRegistry.defaultInstance
-          .add(ContentType("application", "thingy"), const JsonCodec());
+          .add(ContentType('application', 'thingy'), const JsonCodec());
       CodecRegistry.defaultInstance.add(
-          ContentType("somethingelse", "*", charset: "utf-8"),
+          ContentType('somethingelse', '*', charset: 'utf-8'),
           const JsonCodec());
     });
 
@@ -221,38 +220,38 @@ void main() {
       await server.close(force: true);
     });
 
-    test("Added decoder works when content-type matches", () async {
+    test('Added decoder works when content-type matches', () async {
       // ignore: unawaited_futures
       http
-          .post(Uri.parse("http://localhost:8123"),
-              headers: {"Content-Type": "application/thingy"},
-              body: json.encode({"key": "value"}))
+          .post(Uri.parse('http://localhost:8123'),
+              headers: {'Content-Type': 'application/thingy'},
+              body: json.encode({'key': 'value'}))
           .catchError((err) => Future.value(http.Response.bytes([], 500)));
       var request = Request(await server.first);
       Map<String, dynamic> body = await request.body.decode();
-      expect(body, {"key": "value"});
+      expect(body, {'key': 'value'});
     });
 
-    test("Added decoder that matches any subtype works", () async {
+    test('Added decoder that matches any subtype works', () async {
       // ignore: unawaited_futures
       http
-          .post(Uri.parse("http://localhost:8123"),
-              headers: {"Content-Type": "somethingelse/whatever"},
-              body: json.encode({"key": "value"}))
+          .post(Uri.parse('http://localhost:8123'),
+              headers: {'Content-Type': 'somethingelse/whatever'},
+              body: json.encode({'key': 'value'}))
           .catchError((err) => Future.value(http.Response.bytes([], 500)));
 
       var request = Request(await server.first);
       Map<String, dynamic> body = await request.body.decode();
-      expect(body, {"key": "value"});
+      expect(body, {'key': 'value'});
     });
 
     test(
-        "Omit charset from added decoder with default charset and match-all subtype",
+        'Omit charset from added decoder with default charset and match-all subtype',
         () async {
       var client = HttpClient();
-      var req = await client.postUrl(Uri.parse("http://localhost:8123"));
-      req.headers.add(HttpHeaders.contentTypeHeader, "somethingelse/foobar");
-      req.add(utf8.encode(json.encode({"a": "val"})));
+      var req = await client.postUrl(Uri.parse('http://localhost:8123'));
+      req.headers.add(HttpHeaders.contentTypeHeader, 'somethingelse/foobar');
+      req.add(utf8.encode(json.encode({'a': 'val'})));
       // ignore: unawaited_futures
       req.close().catchError((err) => Future.value(MockHttpClientResponse()));
 
@@ -260,16 +259,16 @@ void main() {
       expect(request.raw.headers.contentType!.charset, null);
 
       Map<String, dynamic> body = await request.body.decode();
-      expect(body, {"a": "val"});
+      expect(body, {'a': 'val'});
     });
 
     test(
-        "Omit charset from added decoder does not add charset decoded if not specified",
+        'Omit charset from added decoder does not add charset decoded if not specified',
         () async {
       var client = HttpClient();
-      var req = await client.postUrl(Uri.parse("http://localhost:8123"));
-      req.headers.add(HttpHeaders.contentTypeHeader, "application/thingy");
-      req.add(utf8.encode(json.encode({"a": "val"})));
+      var req = await client.postUrl(Uri.parse('http://localhost:8123'));
+      req.headers.add(HttpHeaders.contentTypeHeader, 'application/thingy');
+      req.add(utf8.encode(json.encode({'a': 'val'})));
       // ignore: unawaited_futures
       req.close().catchError((err) => Future.value(MockHttpClientResponse()));
 
@@ -289,7 +288,7 @@ void main() {
     });
   });
 
-  group("Casting methods - map", () {
+  group('Casting methods - map', () {
     late HttpServer server;
 
     setUp(() async {
@@ -300,26 +299,26 @@ void main() {
       await server.close(force: true);
     });
 
-    test("Decode valid decodeAsMap", () async {
+    test('Decode valid decodeAsMap', () async {
       // ignore: unawaited_futures
-      postJSON({"a": "val"});
+      postJSON({'a': 'val'});
       var body = RequestBody(await server.first);
-      expect(await body.decode<Map<String, dynamic>>(), {"a": "val"});
+      expect(await body.decode<Map<String, dynamic>>(), {'a': 'val'});
     });
 
-    test("Return valid asMap from already decoded body", () async {
+    test('Return valid asMap from already decoded body', () async {
       // ignore: unawaited_futures
-      postJSON({"a": "val"});
+      postJSON({'a': 'val'});
       var body = RequestBody(await server.first);
       await body.decode();
-      expect(body.as<Map<String, dynamic>>(), {"a": "val"});
+      expect(body.as<Map<String, dynamic>>(), {'a': 'val'});
 
-      expect(body.as(), {"a": "val"});
+      expect(body.as(), {'a': 'val'});
     });
 
-    test("Call asMap prior to decode throws error", () async {
+    test('Call asMap prior to decode throws error', () async {
       // ignore: unawaited_futures
-      postJSON({"a": "val"});
+      postJSON({'a': 'val'});
       var body = RequestBody(await server.first);
 
       try {
@@ -329,9 +328,9 @@ void main() {
       } on StateError {}
     });
 
-    test("decodeAsMap with non-map returns 400", () async {
+    test('decodeAsMap with non-map returns 400', () async {
       // ignore: unawaited_futures
-      postJSON("a");
+      postJSON('a');
       var body = RequestBody(await server.first);
 
       try {
@@ -342,10 +341,10 @@ void main() {
       }
     });
 
-    test("decodeAsMap with no data returns null", () async {
+    test('decodeAsMap with no data returns null', () async {
       // ignore: unawaited_futures
-      http.post(Uri.parse("http://localhost:8123"), headers: {
-        "Content-Type": "application/json"
+      http.post(Uri.parse('http://localhost:8123'), headers: {
+        'Content-Type': 'application/json'
       }).catchError((err) => Future.value(http.Response.bytes([], 500)));
       var body = RequestBody(await server.first);
 
@@ -353,10 +352,10 @@ void main() {
       expect(body.hasBeenDecoded, true);
     });
 
-    test("asMap with no data returns null", () async {
+    test('asMap with no data returns null', () async {
       // ignore: unawaited_futures
-      http.post(Uri.parse("http://localhost:8123"), headers: {
-        "Content-Type": "application/json"
+      http.post(Uri.parse('http://localhost:8123'), headers: {
+        'Content-Type': 'application/json'
       }).catchError((err) => Future.value(http.Response.bytes([], 500)));
 
       var body = RequestBody(await server.first);
@@ -365,7 +364,7 @@ void main() {
     });
   });
 
-  group("Casting methods - list", () {
+  group('Casting methods - list', () {
     late HttpServer server;
 
     setUp(() async {
@@ -376,33 +375,33 @@ void main() {
       await server.close(force: true);
     });
 
-    test("Decode valid decodeAsList", () async {
+    test('Decode valid decodeAsList', () async {
       // ignore: unawaited_futures
       postJSON([
-        {"a": "val"}
+        {'a': 'val'}
       ]);
       var body = RequestBody(await server.first);
       expect(await body.decode<List<Map<String, dynamic>>>(), [
-        {"a": "val"}
+        {'a': 'val'}
       ]);
     });
 
-    test("Return valid asList from already decoded body", () async {
+    test('Return valid asList from already decoded body', () async {
       // ignore: unawaited_futures
       postJSON([
-        {"a": "val"}
+        {'a': 'val'}
       ]);
       var body = RequestBody(await server.first);
       await body.decode();
       expect(body.as<List<Map<String, dynamic>>>(), [
-        {"a": "val"}
+        {'a': 'val'}
       ]);
     });
 
-    test("Call asList prior to decode throws exception", () async {
+    test('Call asList prior to decode throws exception', () async {
       // ignore: unawaited_futures
       postJSON([
-        {"a": "val"}
+        {'a': 'val'}
       ]);
       var body = RequestBody(await server.first);
 
@@ -413,9 +412,9 @@ void main() {
       } on StateError {}
     });
 
-    test("decodeAsList with non-list returns HTTPBodyException", () async {
+    test('decodeAsList with non-list returns HTTPBodyException', () async {
       // ignore: unawaited_futures
-      postJSON("a");
+      postJSON('a');
       var body = RequestBody(await server.first);
 
       try {
@@ -426,10 +425,10 @@ void main() {
       }
     });
 
-    test("decodeAsList with no data returns null", () async {
+    test('decodeAsList with no data returns null', () async {
       // ignore: unawaited_futures
-      http.post(Uri.parse("http://localhost:8123"), headers: {
-        "Content-Type": "application/json"
+      http.post(Uri.parse('http://localhost:8123'), headers: {
+        'Content-Type': 'application/json'
       }).catchError((err) => Future.value(http.Response.bytes([], 500)));
       var body = RequestBody(await server.first);
 
@@ -437,10 +436,10 @@ void main() {
       expect(body.hasBeenDecoded, true);
     });
 
-    test("asList with no data returns null", () async {
+    test('asList with no data returns null', () async {
       // ignore: unawaited_futures
-      http.post(Uri.parse("http://localhost:8123"), headers: {
-        "Content-Type": "application/json"
+      http.post(Uri.parse('http://localhost:8123'), headers: {
+        'Content-Type': 'application/json'
       }).catchError((err) => Future.value(http.Response.bytes([], 500)));
 
       var body = RequestBody(await server.first);
@@ -449,7 +448,7 @@ void main() {
     });
   });
 
-  group("Casting methods - String", () {
+  group('Casting methods - String', () {
     late HttpServer server;
 
     setUp(() async {
@@ -460,17 +459,17 @@ void main() {
       await server.close(force: true);
     });
 
-    test("Decode valid decodeAsString", () async {
+    test('Decode valid decodeAsString', () async {
       // ignore: unawaited_futures
-      postString("abcdef");
+      postString('abcdef');
       var body = RequestBody(await server.first);
-      expect(await body.decode<String>(), "abcdef");
+      expect(await body.decode<String>(), 'abcdef');
     });
 
-    test("Decode large string", () async {
+    test('Decode large string', () async {
       var largeString =
-          List.generate(1024 * 1024, (c) => "${c % 10 + 48}".codeUnitAt(0))
-              .join("");
+          List.generate(1024 * 1024, (c) => '${c % 10 + 48}'.codeUnitAt(0))
+              .join('');
 
       // ignore: unawaited_futures
       postString(largeString);
@@ -478,17 +477,17 @@ void main() {
       expect(await body.decode<String>(), largeString);
     });
 
-    test("Return valid asString from already decoded body", () async {
+    test('Return valid asString from already decoded body', () async {
       // ignore: unawaited_futures
-      postString("abcdef");
+      postString('abcdef');
       var body = RequestBody(await server.first);
       await body.decode();
-      expect(body.as<String>(), "abcdef");
+      expect(body.as<String>(), 'abcdef');
     });
 
-    test("Call asString prior to decode throws exception", () async {
+    test('Call asString prior to decode throws exception', () async {
       // ignore: unawaited_futures
-      postString("abcdef");
+      postString('abcdef');
       var body = RequestBody(await server.first);
 
       try {
@@ -498,9 +497,9 @@ void main() {
       } on StateError {}
     });
 
-    test("Call asString with non-string data throws exception", () async {
+    test('Call asString with non-string data throws exception', () async {
       // ignore: unawaited_futures
-      postJSON({"k": "v"});
+      postJSON({'k': 'v'});
       var body = RequestBody(await server.first);
 
       try {
@@ -511,10 +510,10 @@ void main() {
       }
     });
 
-    test("decodeAsString with no data returns null", () async {
+    test('decodeAsString with no data returns null', () async {
       // ignore: unawaited_futures
-      http.post(Uri.parse("http://localhost:8123"), headers: {
-        "Content-Type": "text/plain; charset=utf-8"
+      http.post(Uri.parse('http://localhost:8123'), headers: {
+        'Content-Type': 'text/plain; charset=utf-8'
       }).catchError((err) => Future.value(http.Response.bytes([], 500)));
       var body = RequestBody(await server.first);
 
@@ -522,10 +521,10 @@ void main() {
       expect(body.hasBeenDecoded, true);
     });
 
-    test("asString with no data returns null", () async {
+    test('asString with no data returns null', () async {
       // ignore: unawaited_futures
-      http.post(Uri.parse("http://localhost:8123"), headers: {
-        "Content-Type": "text/plain; charset=utf-8"
+      http.post(Uri.parse('http://localhost:8123'), headers: {
+        'Content-Type': 'text/plain; charset=utf-8'
       }).catchError((err) => Future.value(http.Response.bytes([], 500)));
 
       var body = RequestBody(await server.first);
@@ -534,7 +533,7 @@ void main() {
     });
   });
 
-  group("Casting methods - bytes", () {
+  group('Casting methods - bytes', () {
     late HttpServer server;
 
     setUp(() async {
@@ -545,14 +544,14 @@ void main() {
       await server.close(force: true);
     });
 
-    test("Decode valid decodeAsBytes", () async {
+    test('Decode valid decodeAsBytes', () async {
       // ignore: unawaited_futures
       postBytes([1, 2, 3, 4]);
       var body = RequestBody(await server.first);
       expect(await body.decode<List<int>>(), [1, 2, 3, 4]);
     });
 
-    test("Return valid asBytes from already decoded body", () async {
+    test('Return valid asBytes from already decoded body', () async {
       // ignore: unawaited_futures
       postBytes([1, 2, 3, 4]);
       var body = RequestBody(await server.first);
@@ -560,7 +559,7 @@ void main() {
       expect(body.as<List<int>>(), [1, 2, 3, 4]);
     });
 
-    test("Call asBytes prior to decode throws error", () async {
+    test('Call asBytes prior to decode throws error', () async {
       // ignore: unawaited_futures
       postBytes([1, 2, 3, 4]);
 
@@ -572,10 +571,10 @@ void main() {
       } on StateError {}
     });
 
-    test("decodeAsBytes with no data returns null", () async {
+    test('decodeAsBytes with no data returns null', () async {
       // ignore: unawaited_futures
-      http.post(Uri.parse("http://localhost:8123"), headers: {
-        "Content-Type": "application/octet-stream"
+      http.post(Uri.parse('http://localhost:8123'), headers: {
+        'Content-Type': 'application/octet-stream'
       }).catchError((err) => Future.value(http.Response.bytes([], 500)));
       var body = RequestBody(await server.first);
 
@@ -583,10 +582,10 @@ void main() {
       expect(body.hasBeenDecoded, true);
     });
 
-    test("asBytes with no data returns null", () async {
+    test('asBytes with no data returns null', () async {
       // ignore: unawaited_futures
-      http.post(Uri.parse("http://localhost:8123"), headers: {
-        "Content-Type": "application/octet-stream"
+      http.post(Uri.parse('http://localhost:8123'), headers: {
+        'Content-Type': 'application/octet-stream'
       }).catchError((err) => Future.value(http.Response.bytes([], 500)));
 
       var body = RequestBody(await server.first);
@@ -594,10 +593,10 @@ void main() {
       expect(body.as<List<int>?>(), null);
     });
 
-    test("Throw exception if not retaining bytes and body was decoded",
+    test('Throw exception if not retaining bytes and body was decoded',
         () async {
       // ignore: unawaited_futures
-      postJSON({"k": "v"});
+      postJSON({'k': 'v'});
       var body = RequestBody(await server.first);
       try {
         body.originalBytes;
@@ -606,17 +605,17 @@ void main() {
       } on StateError {}
     });
 
-    test("Retain bytes when codec is used", () async {
+    test('Retain bytes when codec is used', () async {
       // ignore: unawaited_futures
-      postJSON({"k": "v"});
+      postJSON({'k': 'v'});
 
       var body = RequestBody(await server.first)..retainOriginalBytes = true;
       await body.decode();
-      expect(body.as<Map<String, dynamic>>(), {"k": "v"});
-      expect(body.originalBytes, utf8.encode(json.encode({"k": "v"})));
+      expect(body.as<Map<String, dynamic>>(), {'k': 'v'});
+      expect(body.originalBytes, utf8.encode(json.encode({'k': 'v'})));
     });
 
-    test("Retain bytes when no codec is used", () async {
+    test('Retain bytes when no codec is used', () async {
       // ignore: unawaited_futures
       postBytes([1, 2, 3, 4]);
 
@@ -626,7 +625,7 @@ void main() {
     });
   });
 
-  group("Request decoding behavior", () {
+  group('Request decoding behavior', () {
     late HttpServer server;
 
     setUp(() async {
@@ -637,12 +636,12 @@ void main() {
       await server.close(force: true);
     });
 
-    test("Subsequent decodes do not re-process body", () async {
+    test('Subsequent decodes do not re-process body', () async {
       // ignore: unawaited_futures
       http
-          .post(Uri.parse("http://localhost:8123"),
-              headers: {"Content-Type": "application/json"},
-              body: json.encode({"a": "val"}))
+          .post(Uri.parse('http://localhost:8123'),
+              headers: {'Content-Type': 'application/json'},
+              body: json.encode({'a': 'val'}))
           .catchError((err) => Future.value(http.Response.bytes([], 500)));
 
       var request = Request(await server.first);
@@ -654,7 +653,7 @@ void main() {
       expect(identical(b1, b2), true);
     });
 
-    test("Failed decoding yields 500 from Controller", () async {
+    test('Failed decoding yields 500 from Controller', () async {
       // If body decoding fails, we need to return 500 but also ensure we have closed the request
       // body stream
       server.map((req) => Request(req)).listen((req) async {
@@ -668,33 +667,33 @@ void main() {
         await next.receive(req);
       });
 
-      var result = await http.post(Uri.parse("http://localhost:8123"),
-          headers: {"Content-Type": "application/json"},
+      var result = await http.post(Uri.parse('http://localhost:8123'),
+          headers: {'Content-Type': 'application/json'},
           body: utf8.encode('{"key":'));
       expect(result.statusCode, 400);
 
       // Send it again just to make sure things have recovered.
-      result = await http.post(Uri.parse("http://localhost:8123"),
-          headers: {"Content-Type": "application/json"},
+      result = await http.post(Uri.parse('http://localhost:8123'),
+          headers: {'Content-Type': 'application/json'},
           body: utf8.encode('{"key":'));
       expect(result.statusCode, 400);
     });
   });
 
-  group("Form codec", () {
-    test("Convert list of bytes with form codec", () {
+  group('Form codec', () {
+    test('Convert list of bytes with form codec', () {
       var codec = CodecRegistry.defaultInstance.codecForContentType(
-          ContentType("application", "x-www-form-urlencoded"))!;
-      var bytes = utf8.encode("a=b&c=d");
+          ContentType('application', 'x-www-form-urlencoded'))!;
+      var bytes = utf8.encode('a=b&c=d');
 
       expect(codec.decode(bytes), {
-        "a": ["b"],
-        "c": ["d"]
+        'a': ['b'],
+        'c': ['d']
       });
     });
   });
 
-  group("Entity too large", () {
+  group('Entity too large', () {
     late HttpServer server;
     late HttpClient client;
 
@@ -709,7 +708,7 @@ void main() {
     });
 
     test(
-        "Entity with known content-type that is too large is rejected, specified length",
+        'Entity with known content-type that is too large is rejected, specified length',
         () async {
       RequestBody.maxSize = 8193;
 
@@ -722,10 +721,10 @@ void main() {
         controller.receive(Request(req));
       });
 
-      var req = await client.postUrl(Uri.parse("http://localhost:8123"));
+      var req = await client.postUrl(Uri.parse('http://localhost:8123'));
       req.headers.add(
-          HttpHeaders.contentTypeHeader, "application/json; charset=utf-8");
-      var body = {"key": List.generate(8192 * 50, (_) => "a").join(" ")};
+          HttpHeaders.contentTypeHeader, 'application/json; charset=utf-8');
+      var body = {'key': List.generate(8192 * 50, (_) => 'a').join(' ')};
       var bytes = utf8.encode(json.encode(body));
       req.headers.add(HttpHeaders.contentLengthHeader, bytes.length);
       req.add(bytes);
@@ -735,17 +734,17 @@ void main() {
           .catchError((err) => Future.value(MockHttpClientResponse()));
       expect(response.statusCode, 413);
 
-      req = await client.postUrl(Uri.parse("http://localhost:8123"));
+      req = await client.postUrl(Uri.parse('http://localhost:8123'));
       req.headers.add(
-          HttpHeaders.contentTypeHeader, "application/json; charset=utf-8");
-      body = {"key": "a"};
+          HttpHeaders.contentTypeHeader, 'application/json; charset=utf-8');
+      body = {'key': 'a'};
       req.add(utf8.encode(json.encode(body)));
       response = await req.close();
-      expect(json.decode(utf8.decode(await response.first)), {"key": "a"});
+      expect(json.decode(utf8.decode(await response.first)), {'key': 'a'});
     });
 
     test(
-        "Entity with unknown content-type that is too large is rejected, specified length",
+        'Entity with unknown content-type that is too large is rejected, specified length',
         () async {
       RequestBody.maxSize = 8193;
 
@@ -753,16 +752,16 @@ void main() {
         ..linkFunction((req) async {
           var body = await req.body.decode();
           return Response.ok(body)
-            ..contentType = ContentType("application", "octet-stream");
+            ..contentType = ContentType('application', 'octet-stream');
         });
       server.listen((req) {
         controller.receive(Request(req));
       });
 
-      var req = await client.postUrl(Uri.parse("http://localhost:8123"));
+      var req = await client.postUrl(Uri.parse('http://localhost:8123'));
       var bytes = List.generate(8192 * 100, (_) => 1);
       req.headers
-          .add(HttpHeaders.contentTypeHeader, "application/octet-stream");
+          .add(HttpHeaders.contentTypeHeader, 'application/octet-stream');
       req.headers.add(HttpHeaders.contentLengthHeader, bytes.length);
       req.add(bytes);
 
@@ -771,9 +770,9 @@ void main() {
           .catchError((err) => Future.value(MockHttpClientResponse()));
       expect(response.statusCode, 413);
 
-      req = await client.postUrl(Uri.parse("http://localhost:8123"));
+      req = await client.postUrl(Uri.parse('http://localhost:8123'));
       req.headers
-          .add(HttpHeaders.contentTypeHeader, "application/octet-stream");
+          .add(HttpHeaders.contentTypeHeader, 'application/octet-stream');
       req.add([1, 2, 3, 4]);
       response = await req.close();
       expect(await response.toList(), [
@@ -785,23 +784,23 @@ void main() {
 
 Future postJSON(dynamic body) {
   return http
-      .post(Uri.parse("http://localhost:8123"),
-          headers: {"Content-Type": "application/json"},
+      .post(Uri.parse('http://localhost:8123'),
+          headers: {'Content-Type': 'application/json'},
           body: json.encode(body))
       .catchError((err) => Future.value(http.Response.bytes([], 500)));
 }
 
 Future postString(String data) {
   return http
-      .post(Uri.parse("http://localhost:8123"),
-          headers: {"Content-Type": "text/html; charset=utf-8"}, body: data)
+      .post(Uri.parse('http://localhost:8123'),
+          headers: {'Content-Type': 'text/html; charset=utf-8'}, body: data)
       .catchError((err) => Future.value(http.Response.bytes([], 500)));
 }
 
 Future postBytes(List<int> bytes) {
   return http
-      .post(Uri.parse("http://localhost:8123"),
-          headers: {"Content-Type": "application/octet-stream"}, body: bytes)
+      .post(Uri.parse('http://localhost:8123'),
+          headers: {'Content-Type': 'application/octet-stream'}, body: bytes)
       .catchError((err) => Future.value(http.Response.bytes([], 500)));
 }
 

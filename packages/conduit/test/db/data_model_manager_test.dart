@@ -9,7 +9,7 @@ void main() {
     await ctx?.close();
   });
 
-  test("Throws exception if no context has been created", () {
+  test('Throws exception if no context has been created', () {
     try {
       T();
       fail('unreachable');
@@ -19,7 +19,7 @@ void main() {
     }
   });
 
-  test("Can find entity creating managedobject", () {
+  test('Can find entity creating managedobject', () {
     ctx = ManagedContext(
         ManagedDataModel.fromCurrentMirrorSystem(), DefaultPersistentStore());
     final o = T();
@@ -27,7 +27,7 @@ void main() {
     expect(o.id, 1);
   });
 
-  test("Close context destroys data model", () async {
+  test('Close context destroys data model', () async {
     ctx = ManagedContext(
         ManagedDataModel.fromCurrentMirrorSystem(), DefaultPersistentStore());
 
@@ -47,7 +47,7 @@ void main() {
     }
   });
 
-  test("Retained data model allows instantiation of ManagedObject", () async {
+  test('Retained data model allows instantiation of ManagedObject', () async {
     final dm = ManagedDataModel.fromCurrentMirrorSystem();
     ctx = ManagedContext(dm, DefaultPersistentStore());
     final retainedCtx = ManagedContext(dm, DefaultPersistentStore());

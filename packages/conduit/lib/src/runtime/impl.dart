@@ -70,8 +70,8 @@ class ChannelRuntimeImpl extends ChannelRuntime implements SourceCompiler {
     final className = MirrorSystem.getName(type!.simpleName);
     final originalFileUri = type!.location!.sourceUri.toString();
     final globalInitBody = hasGlobalInitializationMethod
-        ? "await $className.initializeApplication(config);"
-        : "";
+        ? 'await $className.initializeApplication(config);'
+        : '';
 
     return """
 import 'dart:async';    
@@ -188,7 +188,7 @@ class ControllerRuntimeImpl extends ControllerRuntime {
   }
   
   @override
-  bool get isMutable => ${isMutable};
+  bool get isMutable => $isMutable;
 
   ResourceControllerRuntime get resourceController => _resourceController;
   late ResourceControllerRuntime _resourceController;
@@ -244,7 +244,7 @@ class SerializableRuntimeImpl extends SerializableRuntime {
     } else if (type.isAssignableTo(reflectType(bool))) {
       return APISchemaObject.boolean();
     } else if (type.isAssignableTo(reflectType(DateTime))) {
-      return APISchemaObject.string(format: "date-time");
+      return APISchemaObject.string(format: 'date-time');
     } else if (type.isAssignableTo(reflectType(List))) {
       return APISchemaObject.array(
           ofSchema: documentType(context, type.typeArguments.first));

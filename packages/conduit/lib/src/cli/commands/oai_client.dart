@@ -14,7 +14,7 @@ class CLIDocumentClient extends CLICommand with CLIProject, CLIDocumentOptions {
     final doc = await documentProject(this, this);
 
     final source = _getHtmlSource(json.encode(doc));
-    final file = File("client.html");
+    final file = File('client.html');
     file.writeAsStringSync(source);
 
     displayInfo(
@@ -75,16 +75,16 @@ class CLIDocumentClient extends CLICommand with CLIProject, CLIDocumentOptions {
 
   @override
   String get name {
-    return "client";
+    return 'client';
   }
 
   @override
   String get description {
-    return "Generates an OpenAPI client web page.";
+    return 'Generates an OpenAPI client web page.';
   }
 
   @override
   String get detailedDescription {
-    return "The generated web page can be opened in a browser to execute requests against your application.";
+    return 'The generated web page can be opened in a browser to execute requests against your application.';
   }
 }

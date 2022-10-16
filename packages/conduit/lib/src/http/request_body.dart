@@ -41,7 +41,7 @@ class RequestBody extends BodyDecoder {
     if (_hasContentLength) {
       if (_request.headers.contentLength > maxSize) {
         throw Response(HttpStatus.requestEntityTooLarge, null,
-            {"error": "entity length exceeds maximum"});
+            {'error': 'entity length exceeds maximum'});
       }
 
       return _originalByteStream;
@@ -59,7 +59,7 @@ class RequestBody extends BodyDecoder {
           _bufferingController!.addError(Response(
               HttpStatus.requestEntityTooLarge,
               null,
-              {"error": "entity length exceeds maximum"}));
+              {'error': 'entity length exceeds maximum'}));
           _bufferingController!.close();
           return;
         }
@@ -86,8 +86,8 @@ class RequestBody extends BodyDecoder {
 
   bool get isFormData =>
       contentType != null &&
-      contentType!.primaryType == "application" &&
-      contentType!.subType == "x-www-form-urlencoded";
+      contentType!.primaryType == 'application' &&
+      contentType!.subType == 'x-www-form-urlencoded';
 
   final Stream<List<int>> _originalByteStream;
   // ignore: close_sinks

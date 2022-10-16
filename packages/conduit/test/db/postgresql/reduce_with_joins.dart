@@ -8,7 +8,7 @@ late ManagedContext ctx;
 late Company emptyCompany;
 late Company company1;
 late Company company2;
-late List<Employee> employees = [];
+List<Employee> employees = [];
 
 void main() {
   setUpAll(() async {
@@ -23,8 +23,8 @@ void main() {
   tearDownAll(() async {
     await ctx.close();
   });
-  group("Implicit", () {
-    group("valid", () {
+  group('Implicit', () {
+    group('valid', () {
       test("join using 'belongs to' in one to many relation.", () async {
         final q = Query<Employee>(ctx)
           ..where((e) => e.worksIn!.budget).greaterThan(200001);
@@ -52,7 +52,7 @@ void main() {
         expect(avg, 18.0);
       });
 
-      test("join chinning relation.", () async {
+      test('join chinning relation.', () async {
         final q = Query<Record>(ctx)
           ..where((r) => r.employee!.worksIn!.budget).greaterThan(200001);
         final count = await q.reduce.count();
@@ -63,8 +63,8 @@ void main() {
     });
   });
 
-  group("Explicit", () {
-    group("valid", () {
+  group('Explicit', () {
+    group('valid', () {
       test("join using 'belongs to' in one to many relation.", () async {
         final q = Query<Employee>(ctx)
           ..join(object: (e) => e.worksIn)
@@ -95,7 +95,7 @@ void main() {
         expect(avg, 15.0);
       });
 
-      test("join chinning relation.", () async {
+      test('join chinning relation.', () async {
         final q = Query<Record>(ctx)
           ..join(object: (r) => r.employee).join(object: (e) => e.worksIn)
           ..where((r) => r.payedLeaveLeft).greaterThan(10);
@@ -106,8 +106,8 @@ void main() {
       });
     });
 
-    group("invalid", () {
-      test("join using has many relation directly.", () async {
+    group('invalid', () {
+      test('join using has many relation directly.', () async {
         final q = Query<Company>(ctx)..join(set: (c) => c.employs);
         try {
           await q.reduce.count();
@@ -121,7 +121,7 @@ void main() {
         fail('Should raise and exception.');
       });
 
-      test("join using has many relation indirectly.", () async {
+      test('join using has many relation indirectly.', () async {
         final q = Query<Employee>(ctx)
           ..join(object: (e) => e.worksIn).join(set: (c) => c.quarterlyReports);
         try {

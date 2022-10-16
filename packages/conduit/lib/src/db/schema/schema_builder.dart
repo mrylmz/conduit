@@ -82,7 +82,7 @@ class SchemaBuilder {
   void renameTable(String currentTableName, String newName) {
     var table = schema!.tableForName(currentTableName);
     if (table == null) {
-      throw SchemaException("Table $currentTableName does not exist.");
+      throw SchemaException('Table $currentTableName does not exist.');
     }
 
     schema!.renameTable(table, newName);
@@ -97,7 +97,7 @@ class SchemaBuilder {
   void deleteTable(String tableName) {
     var table = schema!.tableForName(tableName);
     if (table == null) {
-      throw SchemaException("Table $tableName does not exist.");
+      throw SchemaException('Table $tableName does not exist.');
     }
 
     schema!.removeTable(table);
@@ -105,15 +105,15 @@ class SchemaBuilder {
     if (store != null) {
       commands.addAll(store!.deleteTable(table));
     } else {
-      commands.add('database.deleteTable("${tableName}");');
+      commands.add('database.deleteTable("$tableName");');
     }
   }
 
   /// Alters a table in [schema].
-  void alterTable(String tableName, void modify(SchemaTable targetTable)) {
+  void alterTable(String tableName, void Function(SchemaTable targetTable) modify) {
     var existingTable = schema!.tableForName(tableName);
     if (existingTable == null) {
-      throw SchemaException("Table $tableName does not exist.");
+      throw SchemaException('Table $tableName does not exist.');
     }
 
     var newTable = SchemaTable.from(existingTable);
@@ -137,7 +137,7 @@ class SchemaBuilder {
       if (store != null) {
         commands.addAll(store!.deleteTableUniqueColumnSet(newTable));
       } else {
-        innerCommands.add("t.uniqueColumnSet = null");
+        innerCommands.add('t.uniqueColumnSet = null');
       }
     } else {
       final haveSameLength = existingTable.uniqueColumnSet!.length ==
@@ -167,7 +167,7 @@ class SchemaBuilder {
       {String? unencodedInitialValue}) {
     var table = schema!.tableForName(tableName);
     if (table == null) {
-      throw SchemaException("Table $tableName does not exist.");
+      throw SchemaException('Table $tableName does not exist.');
     }
 
     table.addColumn(column);
@@ -184,12 +184,12 @@ class SchemaBuilder {
   void deleteColumn(String tableName, String columnName) {
     var table = schema!.tableForName(tableName);
     if (table == null) {
-      throw SchemaException("Table $tableName does not exist.");
+      throw SchemaException('Table $tableName does not exist.');
     }
 
     var column = table.columnForName(columnName);
     if (column == null) {
-      throw SchemaException("Column $columnName does not exists.");
+      throw SchemaException('Column $columnName does not exists.');
     }
 
     table.removeColumn(column);
@@ -197,7 +197,7 @@ class SchemaBuilder {
     if (store != null) {
       commands.addAll(store!.deleteColumn(table, column));
     } else {
-      commands.add('database.deleteColumn("${tableName}", "${columnName}");');
+      commands.add('database.deleteColumn("$tableName", "$columnName");');
     }
   }
 
@@ -205,12 +205,12 @@ class SchemaBuilder {
   void renameColumn(String tableName, String columnName, String newName) {
     var table = schema!.tableForName(tableName);
     if (table == null) {
-      throw SchemaException("Table $tableName does not exist.");
+      throw SchemaException('Table $tableName does not exist.');
     }
 
     var column = table.columnForName(columnName);
     if (column == null) {
-      throw SchemaException("Column $columnName does not exists.");
+      throw SchemaException('Column $columnName does not exists.');
     }
 
     table.renameColumn(column, newName);
@@ -236,16 +236,16 @@ class SchemaBuilder {
   ///           c.isNullable = false;
   ///         }), unencodedInitialValue: "0");
   void alterColumn(String tableName, String columnName,
-      void modify(SchemaColumn targetColumn),
+      void Function(SchemaColumn targetColumn) modify,
       {String? unencodedInitialValue}) {
     var table = schema!.tableForName(tableName);
     if (table == null) {
-      throw SchemaException("Table $tableName does not exist.");
+      throw SchemaException('Table $tableName does not exist.');
     }
 
     var existingColumn = table[columnName];
     if (existingColumn == null) {
-      throw SchemaException("Column $columnName does not exist.");
+      throw SchemaException('Column $columnName does not exist.');
     }
 
     var newColumn = SchemaColumn.from(existingColumn);
@@ -291,7 +291,7 @@ class SchemaBuilder {
           commands.addAll(store!.deleteIndexFromColumn(table, newColumn));
         }
       } else {
-        innerCommands.add("c.isIndexed = ${newColumn.isIndexed}");
+        innerCommands.add('c.isIndexed = ${newColumn.isIndexed}');
       }
     }
 
@@ -346,7 +346,7 @@ class SchemaBuilder {
     // of commands and run the difference afterwards
     final fkDifferences = <SchemaTableDifference>[];
 
-    difference.tablesToAdd.forEach((t) {
+    for (var t in difference.tablesToAdd) {
       final copy = SchemaTable.from(t!);
       if (copy.hasForeignKeyInUniqueSet) {
         copy.uniqueColumnSet = null;
@@ -357,25 +357,25 @@ class SchemaBuilder {
       createTable(copy);
 
       fkDifferences.add(SchemaTableDifference(copy, t));
-    });
+    }
 
-    fkDifferences.forEach((td) {
+    for (var td in fkDifferences) {
       _generateTableCommands(td, changeList: changeList);
-    });
+    }
 
-    difference.tablesToDelete.forEach((t) {
+    for (var t in difference.tablesToDelete) {
       changeList?.add("Deleting table '${t!.name}'");
       deleteTable(t!.name!);
-    });
+    }
 
-    difference.tablesToModify.forEach((t) {
+    for (var t in difference.tablesToModify) {
       _generateTableCommands(t, changeList: changeList);
-    });
+    }
   }
 
   void _generateTableCommands(SchemaTableDifference difference,
       {List<String>? changeList}) {
-    difference.columnsToAdd.forEach((c) {
+    for (var c in difference.columnsToAdd) {
       changeList?.add(
           "Adding column '${c!.name}' to table '${difference.actualTable!.name}'");
       addColumn(difference.actualTable!.name!, c!);
@@ -386,15 +386,15 @@ class SchemaBuilder {
             "Add an 'unencodedInitialValue' to the statement 'database.addColumn(\"${difference.actualTable!.name}\", "
             "SchemaColumn(\"${c.name}\", ...)'.");
       }
-    });
+    }
 
-    difference.columnsToRemove.forEach((c) {
+    for (var c in difference.columnsToRemove) {
       changeList?.add(
           "Deleting column '${c!.name}' from table '${difference.actualTable!.name}'");
       deleteColumn(difference.actualTable!.name!, c!.name);
-    });
+    }
 
-    difference.columnsToModify.forEach((columnDiff) {
+    for (var columnDiff in difference.columnsToModify) {
       changeList?.add(
           "Modifying column '${columnDiff.actualColumn!.name}' in '${difference.actualTable!.name}'");
       alterColumn(difference.actualTable!.name!, columnDiff.actualColumn!.name,
@@ -414,7 +414,7 @@ class SchemaBuilder {
             "Add an 'unencodedInitialValue' to the statement 'database.addColumn(\"${difference.actualTable!.name}\", "
             "SchemaColumn(\"${columnDiff.actualColumn!.name}\", ...)'.");
       }
-    });
+    }
 
     if (difference.uniqueSetDifference?.hasDifferences ?? false) {
       changeList?.add(
@@ -432,12 +432,12 @@ class SchemaBuilder {
   static String _getNewTableExpression(SchemaTable table) {
     var builder = StringBuffer();
     builder.write('database.createTable(SchemaTable("${table.name}", [');
-    builder.write(table.columns.map(_getNewColumnExpression).join(","));
-    builder.write("]");
+    builder.write(table.columns.map(_getNewColumnExpression).join(','));
+    builder.write(']');
 
     if (table.uniqueColumnSet != null) {
-      var set = table.uniqueColumnSet!.map((p) => '"$p"').join(",");
-      builder.write(", uniqueColumnSetNames: [$set]");
+      var set = table.uniqueColumnSet!.map((p) => '"$p"').join(',');
+      builder.write(', uniqueColumnSetNames: [$set]');
     }
 
     builder.write('));');
@@ -449,43 +449,43 @@ class SchemaBuilder {
     if (column.relatedTableName != null) {
       builder
           .write('SchemaColumn.relationship("${column.name}", ${column.type}');
-      builder.write(", relatedTableName: \"${column.relatedTableName}\"");
-      builder.write(", relatedColumnName: \"${column.relatedColumnName}\"");
-      builder.write(", rule: ${column.deleteRule}");
+      builder.write(', relatedTableName: "${column.relatedTableName}"');
+      builder.write(', relatedColumnName: "${column.relatedColumnName}"');
+      builder.write(', rule: ${column.deleteRule}');
     } else {
       builder.write('SchemaColumn("${column.name}", ${column.type}');
       if (column.isPrimaryKey!) {
-        builder.write(", isPrimaryKey: true");
+        builder.write(', isPrimaryKey: true');
       } else {
-        builder.write(", isPrimaryKey: false");
+        builder.write(', isPrimaryKey: false');
       }
       if (column.autoincrement!) {
-        builder.write(", autoincrement: true");
+        builder.write(', autoincrement: true');
       } else {
-        builder.write(", autoincrement: false");
+        builder.write(', autoincrement: false');
       }
       if (column.defaultValue != null) {
         builder.write(', defaultValue: "${column.defaultValue}"');
       }
       if (column.isIndexed!) {
-        builder.write(", isIndexed: true");
+        builder.write(', isIndexed: true');
       } else {
-        builder.write(", isIndexed: false");
+        builder.write(', isIndexed: false');
       }
     }
 
     if (column.isNullable!) {
-      builder.write(", isNullable: true");
+      builder.write(', isNullable: true');
     } else {
-      builder.write(", isNullable: false");
+      builder.write(', isNullable: false');
     }
     if (column.isUnique!) {
-      builder.write(", isUnique: true");
+      builder.write(', isUnique: true');
     } else {
-      builder.write(", isUnique: false");
+      builder.write(', isUnique: false');
     }
 
-    builder.write(")");
+    builder.write(')');
     return builder.toString();
   }
 }

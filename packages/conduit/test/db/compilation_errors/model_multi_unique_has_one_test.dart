@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 
 void main() {
   test(
-      "Add Table to table definition with has- property in unique list throws exception",
+      'Add Table to table definition with has- property in unique list throws exception',
       () {
     try {
       ManagedDataModel([

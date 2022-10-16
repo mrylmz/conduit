@@ -12,27 +12,27 @@ import 'http.dart';
 /// to add mappings in an application's [ApplicationChannel] subclass constructor.
 class CodecRegistry {
   CodecRegistry._() {
-    add(ContentType("application", "json", charset: "utf-8"), const JsonCodec(),
+    add(ContentType('application', 'json', charset: 'utf-8'), const JsonCodec(),
         allowCompression: true);
-    add(ContentType("application", "x-www-form-urlencoded", charset: "utf-8"),
+    add(ContentType('application', 'x-www-form-urlencoded', charset: 'utf-8'),
         const _FormCodec(),
         allowCompression: true);
-    setAllowsCompression(ContentType("text", "*"), true);
-    setAllowsCompression(ContentType("application", "javascript"), true);
-    setAllowsCompression(ContentType("text", "event-stream"), false);
+    setAllowsCompression(ContentType('text', '*'), true);
+    setAllowsCompression(ContentType('application', 'javascript'), true);
+    setAllowsCompression(ContentType('text', 'event-stream'), false);
   }
 
   /// The instance used by Conduit to encode and decode HTTP bodies.
   ///
   /// Custom codecs must be added to this instance. This value is guaranteed to be non-null.
   static CodecRegistry get defaultInstance => _defaultInstance;
-  static CodecRegistry _defaultInstance = CodecRegistry._();
+  static final CodecRegistry _defaultInstance = CodecRegistry._();
 
-  Map<String, Codec> _primaryTypeCodecs = {};
-  Map<String, Map<String, Codec>> _fullySpecificedCodecs = {};
-  Map<String, bool> _primaryTypeCompressionMap = {};
-  Map<String, Map<String, bool>> _fullySpecifiedCompressionMap = {};
-  Map<String, Map<String, String?>> _defaultCharsetMap = {};
+  final Map<String, Codec> _primaryTypeCodecs = {};
+  final Map<String, Map<String, Codec>> _fullySpecificedCodecs = {};
+  final Map<String, bool> _primaryTypeCompressionMap = {};
+  final Map<String, Map<String, bool>> _fullySpecifiedCompressionMap = {};
+  final Map<String, Map<String, String?>> _defaultCharsetMap = {};
 
   /// Adds a custom [codec] for [contentType].
   ///
@@ -67,7 +67,7 @@ class CodecRegistry {
   /// Only use default charsets when the codec must first be decoded into a [String].
   void add(ContentType contentType, Codec codec,
       {bool allowCompression = true}) {
-    if (contentType.subType == "*") {
+    if (contentType.subType == '*') {
       _primaryTypeCodecs[contentType.primaryType] = codec;
       _primaryTypeCompressionMap[contentType.primaryType] = allowCompression;
     } else {
@@ -94,7 +94,7 @@ class CodecRegistry {
   /// the body object.
   // ignore: avoid_positional_boolean_parameters
   void setAllowsCompression(ContentType contentType, bool allowed) {
-    if (contentType.subType == "*") {
+    if (contentType.subType == '*') {
       _primaryTypeCompressionMap[contentType.primaryType] = allowed;
     } else {
       var innerCompress =
@@ -139,7 +139,7 @@ class CodecRegistry {
 
     if ((contentType.charset?.length ?? 0) > 0) {
       charsetCodec = _codecForCharset(contentType.charset);
-    } else if (contentType.primaryType == "text" && contentCodec == null) {
+    } else if (contentType.primaryType == 'text' && contentCodec == null) {
       charsetCodec = latin1;
     } else {
       charsetCodec = _defaultCharsetCodecForType(contentType);
@@ -165,7 +165,7 @@ class CodecRegistry {
   Codec<String, List<int>> _codecForCharset(String? charset) {
     var encoding = Encoding.getByName(charset);
     if (encoding == null) {
-      throw Response(415, null, {"error": "invalid charset '$charset'"});
+      throw Response(415, null, {'error': "invalid charset '$charset'"});
     }
 
     return encoding;
@@ -177,7 +177,7 @@ class CodecRegistry {
       return null;
     }
 
-    var encodingName = inner[type.subType] ?? inner["*"];
+    var encodingName = inner[type.subType] ?? inner['*'];
     if (encodingName == null) {
       return null;
     }
@@ -201,13 +201,13 @@ class _FormEncoder extends Converter<Map<String, dynamic>, String> {
 
   @override
   String convert(Map<String, dynamic> data) {
-    return data.keys.map((k) => _encodePair(k, data[k])).join("&");
+    return data.keys.map((k) => _encodePair(k, data[k])).join('&');
   }
 
   String _encodePair(String key, dynamic value) {
-    final encode = (String v) => "$key=${Uri.encodeQueryComponent(v)}";
+    encode(String v) => '$key=${Uri.encodeQueryComponent(v)}';
     if (value is List<String>) {
-      return value.map(encode).join("&");
+      return value.map(encode).join('&');
     } else if (value is String) {
       return encode(value);
     }

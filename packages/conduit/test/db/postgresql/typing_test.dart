@@ -11,49 +11,49 @@ void main() {
     context = null;
   });
 
-  test("Values get typed when used in predicate", () async {
+  test('Values get typed when used in predicate', () async {
     context = await PostgresTestConfig().contextWithModels([TestModel]);
 
     final q = Query<TestModel>(context!)
       ..where((o) => o.id).equalTo(1)
-      ..where((o) => o.n).equalTo("a")
+      ..where((o) => o.n).equalTo('a')
       ..where((o) => o.t).equalTo(DateTime.now())
       ..where((o) => o.l).equalTo(1)
       ..where((o) => o.b).equalTo(true)
       ..where((o) => o.d).equalTo(1.0)
-      ..where((o) => o.doc).equalTo(Document({"k": "v"}));
+      ..where((o) => o.doc).equalTo(Document({'k': 'v'}));
 
     var builder = (q as PostgresQuery).createFetchBuilder();
-    expect(builder.predicate!.format, contains("id:int8"));
-    expect(builder.predicate!.format, contains("n:text"));
-    expect(builder.predicate!.format, contains("t:timestamp"));
-    expect(builder.predicate!.format, contains("l:int4"));
-    expect(builder.predicate!.format, contains("b:boolean"));
-    expect(builder.predicate!.format, contains("d:float8"));
-    expect(builder.predicate!.format, contains("doc:jsonb"));
+    expect(builder.predicate!.format, contains('id:int8'));
+    expect(builder.predicate!.format, contains('n:text'));
+    expect(builder.predicate!.format, contains('t:timestamp'));
+    expect(builder.predicate!.format, contains('l:int4'));
+    expect(builder.predicate!.format, contains('b:boolean'));
+    expect(builder.predicate!.format, contains('d:float8'));
+    expect(builder.predicate!.format, contains('doc:jsonb'));
   });
 
-  test("Values get typed when used as insertion values", () async {
+  test('Values get typed when used as insertion values', () async {
     context = await PostgresTestConfig().contextWithModels([TestModel]);
 
     final q = Query<TestModel>(context!)
       ..values.id = 1
-      ..values.n = "a"
+      ..values.n = 'a'
       ..values.t = DateTime.now()
       ..values.l = 1
       ..values.b = true
       ..values.d = 1.0
-      ..values.doc = Document({"k": "v"});
+      ..values.doc = Document({'k': 'v'});
 
     var builder = PostgresQueryBuilder(q as PostgresQuery);
     var insertString = builder.sqlValuesToInsert;
-    expect(insertString, contains("id:int8"));
-    expect(insertString, contains("n:text"));
-    expect(insertString, contains("t:timestamp"));
-    expect(insertString, contains("l:int4"));
-    expect(insertString, contains("b:boolean"));
-    expect(insertString, contains("d:float8"));
-    expect(insertString, contains("doc:jsonb"));
+    expect(insertString, contains('id:int8'));
+    expect(insertString, contains('n:text'));
+    expect(insertString, contains('t:timestamp'));
+    expect(insertString, contains('l:int4'));
+    expect(insertString, contains('b:boolean'));
+    expect(insertString, contains('d:float8'));
+    expect(insertString, contains('doc:jsonb'));
   });
 }
 

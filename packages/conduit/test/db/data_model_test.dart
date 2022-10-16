@@ -3,7 +3,7 @@ import 'package:conduit/src/dev/helpers.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group("Valid data model", () {
+  group('Valid data model', () {
     late ManagedContext context;
     late ManagedDataModel dataModel;
     setUp(() {
@@ -16,7 +16,7 @@ void main() {
       await context.close();
     });
 
-    test("Entities have appropriate types", () {
+    test('Entities have appropriate types', () {
       var entity = dataModel.entityForType(User);
       expect(User == entity.instanceType, true);
       expect('_User' == entity.tableDefinition, true);
@@ -34,21 +34,21 @@ void main() {
       expect('_EnumObject' == entity.tableDefinition, true);
     });
 
-    test("Non-existent entity throws StateError", () {
+    test('Non-existent entity throws StateError', () {
       try {
         dataModel.entityForType(String);
         fail('unreachable');
       } catch (_) {}
     });
 
-    test("Can fetch models by instance and table definition", () {
+    test('Can fetch models by instance and table definition', () {
       var e1 = dataModel.entityForType(User);
       var e2 = dataModel.entityForType(_User);
       expect(e1 == e2, true);
     });
 
-    test("All attributes/relationships are in properties", () {
-      [User, Manager, Item, EnumObject, DocumentObject].forEach((t) {
+    test('All attributes/relationships are in properties', () {
+      for (var t in [User, Manager, Item, EnumObject, DocumentObject]) {
         var entity = dataModel.entityForType(t);
 
         entity.attributes.forEach((key, attr) {
@@ -58,69 +58,69 @@ void main() {
         entity.relationships!.forEach((key, attr) {
           expect(entity.properties[key] == attr, true);
         });
-      });
+      }
     });
 
     test("Relationships aren't attributes and vice versa", () {
-      expect(dataModel.entityForType(User).relationships!["id"], isNull);
-      expect(dataModel.entityForType(User).attributes["id"], isNotNull);
+      expect(dataModel.entityForType(User).relationships!['id'], isNull);
+      expect(dataModel.entityForType(User).attributes['id'], isNotNull);
 
-      expect(dataModel.entityForType(User).attributes["manager"], isNull);
+      expect(dataModel.entityForType(User).attributes['manager'], isNull);
       expect(
-          dataModel.entityForType(User).relationships!["manager"], isNotNull);
+          dataModel.entityForType(User).relationships!['manager'], isNotNull);
 
-      expect(dataModel.entityForType(Manager).attributes["worker"], isNull);
+      expect(dataModel.entityForType(Manager).attributes['worker'], isNull);
       expect(
-          dataModel.entityForType(Manager).relationships!["worker"], isNotNull);
+          dataModel.entityForType(Manager).relationships!['worker'], isNotNull);
     });
 
-    test("Entities have appropriate metadata", () {
+    test('Entities have appropriate metadata', () {
       var entity = dataModel.entityForType(User);
-      expect(entity.tableName, "_User");
-      expect(entity.primaryKey, "id");
+      expect(entity.tableName, '_User');
+      expect(entity.primaryKey, 'id');
 
       entity = dataModel.entityForType(Item);
-      expect(entity.tableName, "_Item");
-      expect(entity.primaryKey, "name");
+      expect(entity.tableName, '_Item');
+      expect(entity.primaryKey, 'name');
     });
 
-    test("Primary key attributes have appropriate values", () {
+    test('Primary key attributes have appropriate values', () {
       var entity = dataModel.entityForType(User);
       var idAttr = entity.attributes[entity.primaryKey]!;
       expect(idAttr.isPrimaryKey, true);
       expect(idAttr.type!.kind, ManagedPropertyType.bigInteger);
       expect(idAttr.autoincrement, true);
-      expect(idAttr.name, "id");
+      expect(idAttr.name, 'id');
 
       entity = dataModel.entityForType(Item);
       idAttr = entity.attributes[entity.primaryKey]!;
       expect(idAttr.isPrimaryKey, true);
       expect(idAttr.type!.kind, ManagedPropertyType.string);
       expect(idAttr.autoincrement, false);
-      expect(idAttr.name, "name");
+      expect(idAttr.name, 'name');
     });
 
-    test("Default properties omit omitted attributes and has* relationships",
+    test('Default properties omit omitted attributes and has* relationships',
         () {
       var entity = dataModel.entityForType(User);
-      expect(entity.defaultProperties, ["id", "username", "flag"]);
-      expect(entity.properties["loadedTimestamp"], isNotNull);
-      expect(entity.properties["manager"], isNotNull);
-      expect(entity.properties["items"], isNotNull);
+      expect(entity.defaultProperties, ['id', 'username', 'flag']);
+      expect(entity.properties['loadedTimestamp'], isNotNull);
+      expect(entity.properties['manager'], isNotNull);
+      expect(entity.properties['items'], isNotNull);
     });
 
-    test("Default properties contain belongsTo relationship", () {
+    test('Default properties contain belongsTo relationship', () {
       var entity = dataModel.entityForType(Item);
-      expect(entity.defaultProperties, ["name", "user"]);
+      expect(entity.defaultProperties, ['name', 'user']);
     });
 
-    test("Attributes have appropriate value set", () {
+    test('Attributes have appropriate value set', () {
       var entity = dataModel.entityForType(User);
-      var loadedValue = entity.attributes["loadedTimestamp"]!;
+      var loadedValue = entity.attributes['loadedTimestamp']!;
       expect(loadedValue.isPrimaryKey, false);
       expect(loadedValue.type!.kind, ManagedPropertyType.datetime);
       expect(loadedValue.autoincrement, false);
-      expect(loadedValue.name, "loadedTimestamp");
+      expect(loadedValue.name, 'loadedTimestamp');
       expect(loadedValue.defaultValue, "'now()'");
       expect(loadedValue.isIndexed, true);
       expect(loadedValue.isNullable, true);
@@ -128,11 +128,11 @@ void main() {
       expect(loadedValue.isIncludedInDefaultResultSet, false);
     });
 
-    test("Relationships have appropriate values set", () {
+    test('Relationships have appropriate values set', () {
       var entity = dataModel.entityForType(Item);
-      var relDesc = entity.relationships!["user"]!;
+      var relDesc = entity.relationships!['user']!;
       expect(relDesc.isNullable, false);
-      expect(relDesc.inverseKey, "items");
+      expect(relDesc.inverseKey, 'items');
       expect(
           relDesc.inverse ==
               dataModel.entityForType(User).relationships![relDesc.inverseKey],
@@ -142,9 +142,9 @@ void main() {
       expect(relDesc.relationshipType, ManagedRelationshipType.belongsTo);
 
       entity = dataModel.entityForType(Manager);
-      relDesc = entity.relationships!["worker"]!;
+      relDesc = entity.relationships!['worker']!;
       expect(relDesc.isNullable, true);
-      expect(relDesc.inverseKey, "manager");
+      expect(relDesc.inverseKey, 'manager');
       expect(
           relDesc.inverse ==
               dataModel.entityForType(User).relationships![relDesc.inverseKey],
@@ -154,8 +154,8 @@ void main() {
       expect(relDesc.relationshipType, ManagedRelationshipType.belongsTo);
 
       entity = dataModel.entityForType(User);
-      relDesc = entity.relationships!["manager"]!;
-      expect(relDesc.inverseKey, "worker");
+      relDesc = entity.relationships!['manager']!;
+      expect(relDesc.inverseKey, 'worker');
       expect(
           relDesc.inverse ==
               dataModel
@@ -166,140 +166,140 @@ void main() {
           relDesc.destinationEntity == dataModel.entityForType(Manager), true);
       expect(relDesc.relationshipType, ManagedRelationshipType.hasOne);
 
-      expect(entity.relationships!["items"]!.relationshipType,
+      expect(entity.relationships!['items']!.relationshipType,
           ManagedRelationshipType.hasMany);
     });
 
-    test("Enums are string attributes in table definition", () {
+    test('Enums are string attributes in table definition', () {
       var entity = dataModel.entityForType(EnumObject);
-      expect(entity.attributes["enumValues"]!.type!.kind,
+      expect(entity.attributes['enumValues']!.type!.kind,
           ManagedPropertyType.string);
     });
 
-    test("Document properties are .document", () {
+    test('Document properties are .document', () {
       final entity = dataModel.entityForType(DocumentObject);
-      expect(entity.attributes["document"]!.type!.kind,
+      expect(entity.attributes['document']!.type!.kind,
           ManagedPropertyType.document);
     });
 
     test(
-        "Table names are derived from table definition type, can be overridden by annotation",
+        'Table names are derived from table definition type, can be overridden by annotation',
         () {
-      expect(dataModel.entityForType(User).tableName, "_User");
-      expect(dataModel.entityForType(Item).tableName, "_Item");
-      expect(dataModel.entityForType(Manager).tableName, "_Manager");
-      expect(dataModel.entityForType(EnumObject).tableName, "_EnumObject");
+      expect(dataModel.entityForType(User).tableName, '_User');
+      expect(dataModel.entityForType(Item).tableName, '_Item');
+      expect(dataModel.entityForType(Manager).tableName, '_Manager');
+      expect(dataModel.entityForType(EnumObject).tableName, '_EnumObject');
       expect(
-          dataModel.entityForType(DocumentObject).tableName, "_DocumentObject");
-      expect(dataModel.entityForType(AnnotatedTable).tableName, "foobar");
+          dataModel.entityForType(DocumentObject).tableName, '_DocumentObject');
+      expect(dataModel.entityForType(AnnotatedTable).tableName, 'foobar');
     });
 
-    test("Managed objects can have foreign key references to one another", () {
+    test('Managed objects can have foreign key references to one another', () {
       final dm = ManagedDataModel([CyclicLeft, CyclicRight]);
 
       expect(
           dm
               .entityForType(CyclicLeft)
-              .relationships!["leftRef"]!
+              .relationships!['leftRef']!
               .destinationEntity
               .name,
-          "CyclicRight");
+          'CyclicRight');
       expect(
-          dm.entityForType(CyclicLeft).relationships!["leftRef"]!.inverse!.name,
-          "from");
+          dm.entityForType(CyclicLeft).relationships!['leftRef']!.inverse!.name,
+          'from');
       expect(
-          dm.entityForType(CyclicLeft).relationships!["leftRef"]!.isBelongsTo,
+          dm.entityForType(CyclicLeft).relationships!['leftRef']!.isBelongsTo,
           true);
       expect(
           dm
               .entityForType(CyclicLeft)
-              .relationships!["from"]!
+              .relationships!['from']!
               .destinationEntity
               .name,
-          "CyclicRight");
-      expect(dm.entityForType(CyclicLeft).relationships!["from"]!.inverse!.name,
-          "rightRef");
-      expect(dm.entityForType(CyclicLeft).relationships!["from"]!.isBelongsTo,
+          'CyclicRight');
+      expect(dm.entityForType(CyclicLeft).relationships!['from']!.inverse!.name,
+          'rightRef');
+      expect(dm.entityForType(CyclicLeft).relationships!['from']!.isBelongsTo,
           false);
 
       expect(
           dm
               .entityForType(CyclicRight)
-              .relationships!["rightRef"]!
+              .relationships!['rightRef']!
               .destinationEntity
               .name,
-          "CyclicLeft");
+          'CyclicLeft');
       expect(
           dm
               .entityForType(CyclicRight)
-              .relationships!["rightRef"]!
+              .relationships!['rightRef']!
               .inverse!
               .name,
-          "from");
+          'from');
       expect(
-          dm.entityForType(CyclicRight).relationships!["rightRef"]!.isBelongsTo,
+          dm.entityForType(CyclicRight).relationships!['rightRef']!.isBelongsTo,
           true);
       expect(
           dm
               .entityForType(CyclicRight)
-              .relationships!["from"]!
+              .relationships!['from']!
               .destinationEntity
               .name,
-          "CyclicLeft");
+          'CyclicLeft');
       expect(
-          dm.entityForType(CyclicRight).relationships!["from"]!.inverse!.name,
-          "leftRef");
-      expect(dm.entityForType(CyclicRight).relationships!["from"]!.isBelongsTo,
+          dm.entityForType(CyclicRight).relationships!['from']!.inverse!.name,
+          'leftRef');
+      expect(dm.entityForType(CyclicRight).relationships!['from']!.isBelongsTo,
           false);
     });
 
-    test("Managed objecs can have foreign key references to themselves", () {
+    test('Managed objecs can have foreign key references to themselves', () {
       final dm = ManagedDataModel([SelfReferential]);
       expect(
           dm
               .entityForType(SelfReferential)
-              .relationships!["parent"]!
+              .relationships!['parent']!
               .destinationEntity
               .name,
-          "SelfReferential");
+          'SelfReferential');
       expect(
           dm
               .entityForType(SelfReferential)
-              .relationships!["parent"]!
+              .relationships!['parent']!
               .inverse!
               .name,
-          "child");
+          'child');
       expect(
           dm
               .entityForType(SelfReferential)
-              .relationships!["parent"]!
+              .relationships!['parent']!
               .isBelongsTo,
           true);
       expect(
           dm
               .entityForType(SelfReferential)
-              .relationships!["child"]!
+              .relationships!['child']!
               .destinationEntity
               .name,
-          "SelfReferential");
+          'SelfReferential');
       expect(
           dm
               .entityForType(SelfReferential)
-              .relationships!["child"]!
+              .relationships!['child']!
               .inverse!
               .name,
-          "parent");
+          'parent');
       expect(
           dm
               .entityForType(SelfReferential)
-              .relationships!["child"]!
+              .relationships!['child']!
               .isBelongsTo,
           false);
     });
   });
 
-  group("Edge cases", () {
-    test("ManagedObject with two foreign keys to same object are distinct", () {
+  group('Edge cases', () {
+    test('ManagedObject with two foreign keys to same object are distinct', () {
       var model = ManagedDataModel([
         DoubleRelationshipForeignKeyModel,
         DoubleRelationshipHasModel,
@@ -308,21 +308,21 @@ void main() {
 
       var isManyOf = model
           .entityForType(DoubleRelationshipForeignKeyModel)
-          .relationships!["isManyOf"]!;
-      expect(isManyOf.inverse!.name, "hasManyOf");
+          .relationships!['isManyOf']!;
+      expect(isManyOf.inverse!.name, 'hasManyOf');
       expect(isManyOf.destinationEntity.tableName,
           model.entityForType(DoubleRelationshipHasModel).tableName);
 
       var isOneOf = model
           .entityForType(DoubleRelationshipForeignKeyModel)
-          .relationships!["isOneOf"]!;
-      expect(isOneOf.inverse!.name, "hasOneOf");
+          .relationships!['isOneOf']!;
+      expect(isOneOf.inverse!.name, 'hasOneOf');
       expect(isOneOf.destinationEntity.tableName,
           model.entityForType(DoubleRelationshipHasModel).tableName);
     });
 
     test(
-        "ManagedObject with multiple relationships where one is deferred succeeds in finding relationship",
+        'ManagedObject with multiple relationships where one is deferred succeeds in finding relationship',
         () {
       var model = ManagedDataModel([
         DoubleRelationshipForeignKeyModel,
@@ -332,14 +332,14 @@ void main() {
 
       var partial = model
           .entityForType(DoubleRelationshipForeignKeyModel)
-          .relationships!["partial"]!;
+          .relationships!['partial']!;
       expect(partial.destinationEntity.tableName,
           model.entityForType(SomeOtherRelationshipModel).tableName);
     });
   });
 
-  group("Valid data model with deferred types", () {
-    test("Entities have correct properties and relationships", () {
+  group('Valid data model with deferred types', () {
+    test('Entities have correct properties and relationships', () {
       var dataModel = ManagedDataModel([TotalModel, PartialReferenceModel]);
 
       expect(dataModel.entities.length, 2);
@@ -348,149 +348,149 @@ void main() {
       var referenceEntity = dataModel.entityForType(PartialReferenceModel);
 
       expect(totalEntity.properties.length, 5);
-      expect(totalEntity.primaryKey, "id");
-      expect(totalEntity.attributes["transient"]!.isTransient, true);
-      expect(totalEntity.attributes["addedField"]!.name, isNotNull);
-      expect(totalEntity.attributes["id"]!.isPrimaryKey, true);
-      expect(totalEntity.attributes["field"]!.isIndexed, true);
+      expect(totalEntity.primaryKey, 'id');
+      expect(totalEntity.attributes['transient']!.isTransient, true);
+      expect(totalEntity.attributes['addedField']!.name, isNotNull);
+      expect(totalEntity.attributes['id']!.isPrimaryKey, true);
+      expect(totalEntity.attributes['field']!.isIndexed, true);
       expect(
-          totalEntity.relationships!["hasManyRelationship"]!.destinationEntity
+          totalEntity.relationships!['hasManyRelationship']!.destinationEntity
               .tableName,
           referenceEntity.tableName);
       expect(
-          totalEntity.relationships!["hasManyRelationship"]!.relationshipType,
+          totalEntity.relationships!['hasManyRelationship']!.relationshipType,
           ManagedRelationshipType.hasMany);
 
       expect(
           referenceEntity
-              .relationships!["foreignKeyColumn"]!.destinationEntity.tableName,
+              .relationships!['foreignKeyColumn']!.destinationEntity.tableName,
           totalEntity.tableName);
     });
 
-    test("Will use tableName of base class if not declared in subclass", () {
+    test('Will use tableName of base class if not declared in subclass', () {
       var dataModel = ManagedDataModel([TotalModel, PartialReferenceModel]);
-      expect(dataModel.entityForType(TotalModel).tableName, "predefined");
+      expect(dataModel.entityForType(TotalModel).tableName, 'predefined');
     });
 
     test("Order of partial data model doesn't matter when related", () {
       var dm1 = ManagedDataModel([TotalModel, PartialReferenceModel]);
       var dm2 = ManagedDataModel([PartialReferenceModel, TotalModel]);
-      expect(dm1.entities.map((e) => e.tableName).contains("predefined"), true);
+      expect(dm1.entities.map((e) => e.tableName).contains('predefined'), true);
       expect(
           dm1.entities
               .map((e) => e.tableName)
-              .contains("_PartialReferenceModel"),
+              .contains('_PartialReferenceModel'),
           true);
-      expect(dm2.entities.map((e) => e.tableName).contains("predefined"), true);
+      expect(dm2.entities.map((e) => e.tableName).contains('predefined'), true);
       expect(
           dm2.entities
               .map((e) => e.tableName)
-              .contains("_PartialReferenceModel"),
+              .contains('_PartialReferenceModel'),
           true);
     });
 
-    test("Partials have defaultProperties from table definition superclasses",
+    test('Partials have defaultProperties from table definition superclasses',
         () {
       var dataModel = ManagedDataModel([TotalModel, PartialReferenceModel]);
       var defaultProperties =
           dataModel.entityForType(TotalModel).defaultProperties!;
-      expect(defaultProperties.contains("id"), true);
-      expect(defaultProperties.contains("field"), true);
-      expect(defaultProperties.contains("addedField"), true);
+      expect(defaultProperties.contains('id'), true);
+      expect(defaultProperties.contains('field'), true);
+      expect(defaultProperties.contains('addedField'), true);
 
       expect(
           dataModel
               .entityForType(PartialReferenceModel)
               .defaultProperties!
-              .contains("foreignKeyColumn"),
+              .contains('foreignKeyColumn'),
           true);
     });
   });
 
-  test("Transient properties are appropriately added to entity", () {
+  test('Transient properties are appropriately added to entity', () {
     var dm = ManagedDataModel([TransientTest]);
     var entity = dm.entityForType(TransientTest);
 
-    expect(entity.attributes["defaultedText"]!.isTransient, true);
-    expect(entity.attributes["inputOnly"]!.isTransient, true);
-    expect(entity.attributes["outputOnly"]!.isTransient, true);
-    expect(entity.attributes["bothButOnlyOnOne"]!.isTransient, true);
-    expect(entity.attributes["inputInt"]!.isTransient, true);
-    expect(entity.attributes["outputInt"]!.isTransient, true);
-    expect(entity.attributes["inOut"]!.isTransient, true);
-    expect(entity.attributes["bothOverQualified"]!.isTransient, true);
+    expect(entity.attributes['defaultedText']!.isTransient, true);
+    expect(entity.attributes['inputOnly']!.isTransient, true);
+    expect(entity.attributes['outputOnly']!.isTransient, true);
+    expect(entity.attributes['bothButOnlyOnOne']!.isTransient, true);
+    expect(entity.attributes['inputInt']!.isTransient, true);
+    expect(entity.attributes['outputInt']!.isTransient, true);
+    expect(entity.attributes['inOut']!.isTransient, true);
+    expect(entity.attributes['bothOverQualified']!.isTransient, true);
 
-    expect(entity.attributes["invalidInput"], isNull);
-    expect(entity.attributes["invalidOutput"], isNull);
-    expect(entity.attributes["notAnAttribute"], isNull);
+    expect(entity.attributes['invalidInput'], isNull);
+    expect(entity.attributes['invalidOutput'], isNull);
+    expect(entity.attributes['notAnAttribute'], isNull);
   });
 
   test(
-      "Types with same inverse name for two relationships use type as tie-breaker to determine inverse",
+      'Types with same inverse name for two relationships use type as tie-breaker to determine inverse',
       () {
     var model = ManagedDataModel([LeftMany, JoinMany, RightMany]);
 
     var joinEntity = model.entityForType(JoinMany);
     expect(
-        joinEntity.relationships!["left"]!.destinationEntity.instanceType ==
+        joinEntity.relationships!['left']!.destinationEntity.instanceType ==
             LeftMany,
         true);
     expect(
-        joinEntity.relationships!["right"]!.destinationEntity.instanceType ==
+        joinEntity.relationships!['right']!.destinationEntity.instanceType ==
             RightMany,
         true);
   });
 
-  group("Multi-unique", () {
+  group('Multi-unique', () {
     test(
-        "Add Table to table definition with unique list makes instances unique for those columns",
+        'Add Table to table definition with unique list makes instances unique for those columns',
         () {
       var dm = ManagedDataModel([MultiUnique]);
       var e = dm.entityForType(MultiUnique);
 
       expect(e.uniquePropertySet!.length, 2);
-      expect(e.uniquePropertySet!.contains(e.properties["a"]), true);
-      expect(e.uniquePropertySet!.contains(e.properties["b"]), true);
+      expect(e.uniquePropertySet!.contains(e.properties['a']), true);
+      expect(e.uniquePropertySet!.contains(e.properties['b']), true);
     });
 
     test(
-        "Add Table to table definition with unique list makes instances unique for those columns, where column is foreign key relationship",
+        'Add Table to table definition with unique list makes instances unique for those columns, where column is foreign key relationship',
         () {
       var dm = ManagedDataModel([MultiUniqueBelongsTo, MultiUniqueHasA]);
       var e = dm.entityForType(MultiUniqueBelongsTo);
       expect(e.uniquePropertySet!.length, 2);
-      expect(e.uniquePropertySet!.contains(e.properties["rel"]), true);
-      expect(e.uniquePropertySet!.contains(e.properties["b"]), true);
+      expect(e.uniquePropertySet!.contains(e.properties['rel']), true);
+      expect(e.uniquePropertySet!.contains(e.properties['b']), true);
     });
 
     test(
-        "Add Table to table definition with unique list makes instances unique for those columns, where column is foreign key relationship",
+        'Add Table to table definition with unique list makes instances unique for those columns, where column is foreign key relationship',
         () {
       var dm = ManagedDataModel([MultiUniqueBelongsTo, MultiUniqueHasA]);
       var e = dm.entityForType(MultiUniqueBelongsTo);
       expect(e.uniquePropertySet!.length, 2);
-      expect(e.uniquePropertySet!.contains(e.properties["rel"]), true);
-      expect(e.uniquePropertySet!.contains(e.properties["b"]), true);
+      expect(e.uniquePropertySet!.contains(e.properties['rel']), true);
+      expect(e.uniquePropertySet!.contains(e.properties['b']), true);
     });
 
     test(
-        "Add Table to table definition with unique list makes instances unique for those columns, where column is foreign key relationship",
+        'Add Table to table definition with unique list makes instances unique for those columns, where column is foreign key relationship',
         () {
       var dm = ManagedDataModel([MultiUniqueBelongsTo, MultiUniqueHasA]);
       var e = dm.entityForType(MultiUniqueBelongsTo);
       expect(e.uniquePropertySet!.length, 2);
-      expect(e.uniquePropertySet!.contains(e.properties["rel"]), true);
-      expect(e.uniquePropertySet!.contains(e.properties["b"]), true);
+      expect(e.uniquePropertySet!.contains(e.properties['rel']), true);
+      expect(e.uniquePropertySet!.contains(e.properties['b']), true);
     });
 
     test(
-        "Add Table to table definition with unique list makes instances unique for those columns, where column is foreign key relationship",
+        'Add Table to table definition with unique list makes instances unique for those columns, where column is foreign key relationship',
         () {
       var dm = ManagedDataModel([MultiUniqueBelongsTo, MultiUniqueHasA]);
       var e = dm.entityForType(MultiUniqueBelongsTo);
       expect(e.uniquePropertySet!.length, 2);
-      expect(e.uniquePropertySet!.contains(e.properties["rel"]), true);
-      expect(e.uniquePropertySet!.contains(e.properties["b"]), true);
+      expect(e.uniquePropertySet!.contains(e.properties['rel']), true);
+      expect(e.uniquePropertySet!.contains(e.properties['b']), true);
     });
   });
 }
@@ -547,11 +547,11 @@ class TransientTest extends ManagedObject<_TransientTest>
   String? notAnAttribute;
 
   @Serialize(input: false, output: true)
-  String get defaultedText => "Mr. $text";
+  String get defaultedText => 'Mr. $text';
 
   @Serialize(input: true, output: false)
   set defaultedText(String str) {
-    text = str.split(" ").last;
+    text = str.split(' ').last;
   }
 
   @Serialize(input: true, output: false)
@@ -627,7 +627,7 @@ class PartialModel {
   ManagedSet<PartialReferenceModel>? hasManyRelationship;
 
   static String tableName() {
-    return "predefined";
+    return 'predefined';
   }
 }
 
@@ -796,7 +796,7 @@ class _DocumentObject {
 
 class AnnotatedTable extends ManagedObject<_AnnotatedTable> {}
 
-@Table(name: "foobar")
+@Table(name: 'foobar')
 class _AnnotatedTable {
   @primaryKey
   int? id;

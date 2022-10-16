@@ -55,7 +55,7 @@ abstract class Serializable {
 
     final copy = Map<String, dynamic>.from(object);
     final stillRequired = require?.toList();
-    object.keys.forEach((key) {
+    for (var key in object.keys) {
       if (reject?.contains(key) ?? false) {
         throw SerializableException(["invalid input key '$key'"]);
       }
@@ -64,7 +64,7 @@ abstract class Serializable {
         copy.remove(key);
       }
       stillRequired?.remove(key);
-    });
+    }
 
     if (stillRequired?.isNotEmpty ?? false) {
       throw SerializableException(
@@ -100,14 +100,14 @@ class SerializableException implements HandlerException {
   @override
   Response get response {
     return Response.badRequest(
-        body: {"error": "entity validation failed", "reasons": reasons});
+        body: {'error': 'entity validation failed', 'reasons': reasons});
   }
 
   @override
   String toString() {
-    final errorString = response.body["error"] as String?;
-    final reasons = (response.body["reasons"] as List).join(", ");
-    return "$errorString $reasons";
+    final errorString = response.body['error'] as String?;
+    final reasons = (response.body['reasons'] as List).join(', ');
+    return '$errorString $reasons';
   }
 }
 

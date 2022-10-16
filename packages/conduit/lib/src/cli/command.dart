@@ -30,16 +30,16 @@ abstract class CLICommand {
     final arguments = reflect(this).type.instanceMembers.values.where((m) =>
         m.metadata.any((im) => im.type.isAssignableTo(reflectType(Argument))));
 
-    arguments.forEach((arg) {
+    for (var arg in arguments) {
       if (!arg.isGetter) {
-        throw StateError("Declaration "
-            "${MirrorSystem.getName(arg.owner!.simpleName)}.${MirrorSystem.getName(arg.simpleName)} "
-            "has CLI annotation, but is not a getter.");
+        throw StateError('Declaration '
+            '${MirrorSystem.getName(arg.owner!.simpleName)}.${MirrorSystem.getName(arg.simpleName)} '
+            'has CLI annotation, but is not a getter.');
       }
 
       final Argument? argType = firstMetadataOfType<Argument>(arg);
       argType!.addToParser(options);
-    });
+    }
   }
 
   /// Options for this command.
@@ -57,26 +57,26 @@ abstract class CLICommand {
         ?.runningProcess;
   }
 
-  @Flag("version",
-      help: "Prints version of this tool", negatable: false, defaultsTo: false)
-  bool get showVersion => decode<bool>("version");
+  @Flag('version',
+      help: 'Prints version of this tool', negatable: false, defaultsTo: false)
+  bool get showVersion => decode<bool>('version');
 
-  @Flag("color", help: "Toggles ANSI color", negatable: true, defaultsTo: true)
-  bool get showColors => decode<bool>("color");
+  @Flag('color', help: 'Toggles ANSI color', negatable: true, defaultsTo: true)
+  bool get showColors => decode<bool>('color');
 
-  @Flag("help",
-      abbr: "h", help: "Shows this", negatable: false, defaultsTo: false)
-  bool get helpMeItsScary => decode<bool>("help");
+  @Flag('help',
+      abbr: 'h', help: 'Shows this', negatable: false, defaultsTo: false)
+  bool get helpMeItsScary => decode<bool>('help');
 
-  @Flag("stacktrace",
-      help: "Shows the stacktrace if an error occurs", defaultsTo: false)
-  bool get showStacktrace => decode<bool>("stacktrace");
+  @Flag('stacktrace',
+      help: 'Shows the stacktrace if an error occurs', defaultsTo: false)
+  bool get showStacktrace => decode<bool>('stacktrace');
 
-  @Flag("machine",
+  @Flag('machine',
       help:
-          "Output is machine-readable, usable for creating tools on top of this CLI. Behavior varies by command.",
+          'Output is machine-readable, usable for creating tools on top of this CLI. Behavior varies by command.',
       defaultsTo: false)
-  bool get isMachineOutput => decode<bool>("machine");
+  bool get isMachineOutput => decode<bool>('machine');
 
   final Map<String, CLICommand> _commandMap = {};
 
@@ -86,17 +86,17 @@ abstract class CLICommand {
 
   set outputSink(StringSink sink) {
     _outputSink = sink;
-    _commandMap.values.forEach((cmd) {
+    for (var cmd in _commandMap.values) {
       cmd.outputSink = sink;
-    });
+    }
   }
 
   Version? get toolVersion => _toolVersion;
   Version? _toolVersion;
 
-  static const _delimiter = "-- ";
-  static const _tabs = "    ";
-  static const _errorDelimiter = "*** ";
+  static const _delimiter = '-- ';
+  static const _tabs = '    ';
+  static const _errorDelimiter = '*** ';
 
   /// Use this method to extract a required value for the command line argument for [key].
   /// If the command line argument uses defaultsTo to set a default value that will
@@ -147,8 +147,9 @@ abstract class CLICommand {
         if (t == null) {
           throw CLIException(
               'Invalid integer value "$val" for argument "$key".');
-        } else
+        } else {
           return t as T;
+        }
       }
       return RuntimeContext.current.coerce<T>(val);
     } on TypeCoercionException catch (_) {
@@ -158,10 +159,11 @@ abstract class CLICommand {
   }
 
   T? _orElse<T>(T? Function()? orElse) {
-    if (orElse != null)
+    if (orElse != null) {
       return orElse();
-    else
+    } else {
       return null;
+    }
   }
 
   void registerCommand(CLICommand cmd) {
@@ -201,18 +203,18 @@ abstract class CLICommand {
       await determineToolVersion();
 
       if (showVersion) {
-        outputSink.writeln("Conduit CLI version: $toolVersion");
+        outputSink.writeln('Conduit CLI version: $toolVersion');
         return 0;
       }
 
       if (!isMachineOutput) {
-        displayInfo("Conduit CLI Version: $toolVersion");
+        displayInfo('Conduit CLI Version: $toolVersion');
       }
 
       preProcess();
 
       if (helpMeItsScary) {
-        printHelp(parentCommandName: parentCommandNames.join(" "));
+        printHelp(parentCommandName: parentCommandNames.join(' '));
         return 0;
       }
 
@@ -225,8 +227,8 @@ abstract class CLICommand {
         printStackTrace(st);
       }
     } catch (e, st) {
-      displayError("Uncaught error");
-      displayProgress("$e");
+      displayError('Uncaught error');
+      displayProgress('$e');
       printStackTrace(st);
     } finally {
       await cleanup();
@@ -242,11 +244,11 @@ abstract class CLICommand {
       var conduitDirectory = Directory(FileSystemEntity.parentOf(
           FileSystemEntity.parentOf(toolLibraryFilePath)));
       var toolPubspecFile =
-          File.fromUri(conduitDirectory.absolute.uri.resolve("pubspec.yaml"));
+          File.fromUri(conduitDirectory.absolute.uri.resolve('pubspec.yaml'));
 
       final toolPubspecContents =
           loadYaml(toolPubspecFile.readAsStringSync()) as Map;
-      final toolVersion = toolPubspecContents["version"] as String;
+      final toolVersion = toolPubspecContents['version'] as String;
       _toolVersion = Version.parse(toolVersion);
     } catch (e) {
       print(e);
@@ -255,43 +257,53 @@ abstract class CLICommand {
 
   void preProcess() {}
 
-  void displayError(String? errorMessage,
-      {bool showUsage = false, CLIColor color = CLIColor.boldRed}) {
+  void displayError(
+    String? errorMessage, {
+    bool showUsage = false,
+    CLIColor color = CLIColor.boldRed,
+  }) {
     outputSink.writeln(
-        "${colorSymbol(color)}$_errorDelimiter$errorMessage$defaultColorSymbol");
+      '${colorSymbol(color)}$_errorDelimiter$errorMessage$defaultColorSymbol',
+    );
     if (showUsage) {
-      outputSink.writeln("\n${options.usage}");
+      outputSink.writeln('\n${options.usage}');
     }
   }
 
-  void displayInfo(String infoMessage, {CLIColor color = CLIColor.boldNone}) {
+  void displayInfo(
+    String infoMessage, {
+    CLIColor color = CLIColor.boldNone,
+  }) {
     outputSink.writeln(
-        "${colorSymbol(color)}$_delimiter$infoMessage$defaultColorSymbol");
+        '${colorSymbol(color)}$_delimiter$infoMessage$defaultColorSymbol');
   }
 
-  void displayProgress(String progressMessage,
-      {CLIColor color = CLIColor.none}) {
+  void displayProgress(
+    String progressMessage, {
+    CLIColor color = CLIColor.none,
+  }) {
     outputSink.writeln(
-        "${colorSymbol(color)}$_tabs$progressMessage$defaultColorSymbol");
+      '${colorSymbol(color)}$_tabs$progressMessage$defaultColorSymbol',
+    );
   }
 
   String? colorSymbol(CLIColor color) {
     if (!showColors) {
-      return "";
+      return '';
     }
     return _lookupTable[color];
   }
 
   String get name;
 
-  String get detailedDescription => "";
+  String get detailedDescription => '';
 
   String get usage {
     var buf = StringBuffer(name);
     if (_commandMap.isNotEmpty) {
-      buf.write(" <command>");
+      buf.write(' <command>');
     }
-    buf.write(" [arguments]");
+    buf.write(' [arguments]');
     return buf.toString();
   }
 
@@ -299,62 +311,62 @@ abstract class CLICommand {
 
   String get defaultColorSymbol {
     if (!showColors) {
-      return "";
+      return '';
     }
-    return "\u001b[0m";
+    return '\u001b[0m';
   }
 
   static const Map<CLIColor, String> _lookupTable = {
-    CLIColor.red: "\u001b[31m",
-    CLIColor.green: "\u001b[32m",
-    CLIColor.blue: "\u001b[34m",
-    CLIColor.boldRed: "\u001b[31;1m",
-    CLIColor.boldGreen: "\u001b[32;1m",
-    CLIColor.boldBlue: "\u001b[34;1m",
-    CLIColor.boldNone: "\u001b[0;1m",
-    CLIColor.none: "\u001b[0m",
+    CLIColor.red: '\u001b[31m',
+    CLIColor.green: '\u001b[32m',
+    CLIColor.blue: '\u001b[34m',
+    CLIColor.boldRed: '\u001b[31;1m',
+    CLIColor.boldGreen: '\u001b[32;1m',
+    CLIColor.boldBlue: '\u001b[34;1m',
+    CLIColor.boldNone: '\u001b[0;1m',
+    CLIColor.none: '\u001b[0m',
   };
 
   void printHelp({String? parentCommandName}) {
-    print("$description");
-    print("$detailedDescription");
-    print("");
+    print(description);
+    print(detailedDescription);
+    print('');
     if (parentCommandName == null) {
-      print("Usage: $usage");
+      print('Usage: $usage');
     } else {
-      print("Usage: $parentCommandName $usage");
+      print('Usage: $parentCommandName $usage');
     }
-    print("");
-    print("Options:");
-    print("${options.usage}");
+    print('');
+    print('Options:');
+    print(options.usage);
 
     if (options.commands.isNotEmpty) {
-      print("Available sub-commands:");
+      print('Available sub-commands:');
 
       var commandNames = options.commands.keys.toList();
       commandNames.sort((a, b) => b.length.compareTo(a.length));
       var length = commandNames.first.length + 3;
-      commandNames.forEach((command) {
+      for (var command in commandNames) {
         var desc = _commandMap[command]?.description;
         print("  ${command.padRight(length, " ")}$desc");
-      });
+      }
     }
   }
 
   bool isExecutableInShellPath(String name) {
-    String locator = Platform.isWindows ? "where" : "which";
+    String locator = Platform.isWindows ? 'where' : 'which';
     ProcessResult results = Process.runSync(locator, [name], runInShell: true);
 
     return results.exitCode == 0;
   }
 
   void printStackTrace(StackTrace st) {
-    outputSink.writeln("  **** Stacktrace");
-    st.toString().split("\n").forEach((line) {
+    outputSink.writeln('  **** Stacktrace');
+    st.toString().split('\n').forEach((line) {
       if (line.isEmpty) {
-        outputSink.writeln("  ****");
+        outputSink.writeln('  ****');
       } else {
-        outputSink.writeln("  * $line");
+        outputSink.writeln('  * $line');
       }
     });
   }

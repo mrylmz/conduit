@@ -33,13 +33,13 @@ class RouteSpecification {
   Controller? controller;
 
   @override
-  String toString() => segments.join("/");
+  String toString() => segments.join('/');
 }
 
 List<String> _pathsFromRoutePattern(final String inputPattern) {
   var routePattern = inputPattern;
   var endingOptionalCloseCount = 0;
-  while (routePattern.endsWith("]")) {
+  while (routePattern.endsWith(']')) {
     routePattern = routePattern.substring(0, routePattern.length - 1);
     endingOptionalCloseCount++;
   }
@@ -103,10 +103,10 @@ List<RouteSegment> _splitPathSegments(String inputPath) {
   // Once we've gotten into this method, the path has been validated for optionals and regex and optionals have been removed.
 
   // Trim leading and trailing
-  while (path.startsWith("/")) {
+  while (path.startsWith('/')) {
     path = path.substring(1, path.length);
   }
-  while (path.endsWith("/")) {
+  while (path.endsWith('/')) {
     path = path.substring(0, path.length - 1);
   }
 
@@ -140,7 +140,7 @@ List<RouteSegment> _splitPathSegments(String inputPath) {
     }
   }
 
-  if (segments.any((seg) => seg == "")) {
+  if (segments.any((seg) => seg == '')) {
     throw ArgumentError(
         "Router compilation failed. Route pattern '$path' contains an empty path segment.");
   }

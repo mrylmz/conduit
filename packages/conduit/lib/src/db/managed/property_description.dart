@@ -14,20 +14,24 @@ import 'relationship_type.dart';
 /// and [ManagedAttributeDescription].
 abstract class ManagedPropertyDescription {
   ManagedPropertyDescription(
-      this.entity, this.name, this.type, this.declaredType,
-      {bool unique = false,
-      bool indexed = false,
-      bool nullable = false,
-      bool includedInDefaultResultSet = true,
-      bool autoincrement = false,
-      List<ManagedValidator?> validators = const []})
-      : isUnique = unique,
+    this.entity,
+    this.name,
+    this.type,
+    this.declaredType, {
+    bool unique = false,
+    bool indexed = false,
+    bool nullable = false,
+    bool includedInDefaultResultSet = true,
+    this.autoincrement = false,
+    List<ManagedValidator?> validators = const [],
+  })  : isUnique = unique,
         isIndexed = indexed,
         isNullable = nullable,
         isIncludedInDefaultResultSet = includedInDefaultResultSet,
-        autoincrement = autoincrement,
         _validators = validators {
-    _validators.forEach((v) => v!.property = this);
+    for (var v in _validators) {
+      v!.property = this;
+    }
   }
 
   /// A reference to the [ManagedEntity] that contains this property.
@@ -75,7 +79,7 @@ abstract class ManagedPropertyDescription {
   ///
   /// This flag is not included in schemas documents used by database migrations and other tools.
   bool get isPrivate {
-    return name.startsWith("_");
+    return name.startsWith('_');
   }
 
   /// [ManagedValidator]s for this instance.
@@ -119,7 +123,7 @@ abstract class ManagedPropertyDescription {
       case ManagedPropertyType.string:
         return APISchemaObject.string();
       case ManagedPropertyType.datetime:
-        return APISchemaObject.string(format: "date-time");
+        return APISchemaObject.string(format: 'date-time');
       case ManagedPropertyType.boolean:
         return APISchemaObject.boolean();
       case ManagedPropertyType.list:
@@ -148,26 +152,32 @@ abstract class ManagedPropertyDescription {
 /// adds two properties to [ManagedPropertyDescription] that are only valid for non-relationship types, [isPrimaryKey] and [defaultValue].
 class ManagedAttributeDescription extends ManagedPropertyDescription {
   ManagedAttributeDescription(
-      ManagedEntity entity, String name, ManagedType type, Type? declaredType,
-      {Serialize? transientStatus,
-      bool primaryKey = false,
-      String? defaultValue,
-      bool unique = false,
-      bool indexed = false,
-      bool nullable = false,
-      bool includedInDefaultResultSet = true,
-      bool autoincrement = false,
-      List<ManagedValidator?> validators = const []})
-      : isPrimaryKey = primaryKey,
-        defaultValue = defaultValue,
-        transientStatus = transientStatus,
-        super(entity, name, type, declaredType,
-            unique: unique,
-            indexed: indexed,
-            nullable: nullable,
-            includedInDefaultResultSet: includedInDefaultResultSet,
-            autoincrement: autoincrement,
-            validators: validators);
+    ManagedEntity entity,
+    String name,
+    ManagedType type,
+    Type? declaredType, {
+    this.transientStatus,
+    bool primaryKey = false,
+    this.defaultValue,
+    bool unique = false,
+    bool indexed = false,
+    bool nullable = false,
+    bool includedInDefaultResultSet = true,
+    bool autoincrement = false,
+    List<ManagedValidator?> validators = const [],
+  })  : isPrimaryKey = primaryKey,
+        super(
+          entity,
+          name,
+          type,
+          declaredType,
+          unique: unique,
+          indexed: indexed,
+          nullable: nullable,
+          includedInDefaultResultSet: includedInDefaultResultSet,
+          autoincrement: autoincrement,
+          validators: validators,
+        );
 
   ManagedAttributeDescription.transient(ManagedEntity entity, String name,
       ManagedType type, Type declaredType, this.transientStatus)
@@ -250,8 +260,9 @@ class ManagedAttributeDescription extends ManagedPropertyDescription {
 
     // Add'l schema info
     prop.isNullable = isNullable;
-    validators
-        .forEach((v) => v!.definition.constrainSchemaObject(context, prop));
+    for (var v in validators) {
+      v!.definition.constrainSchemaObject(context, prop);
+    }
 
     if (isEnumeratedValue) {
       prop.enumerated = prop.enumerated!.map(convertToPrimitiveValue).toList();
@@ -268,11 +279,11 @@ class ManagedAttributeDescription extends ManagedPropertyDescription {
     }
 
     if (isUnique) {
-      buf.writeln("No two objects may have the same value for this field.");
+      buf.writeln('No two objects may have the same value for this field.');
     }
 
     if (isPrimaryKey) {
-      buf.writeln("This is the primary identifier for this object.");
+      buf.writeln('This is the primary identifier for this object.');
     }
 
     if (defaultValue != null) {
@@ -290,30 +301,30 @@ class ManagedAttributeDescription extends ManagedPropertyDescription {
   String toString() {
     final flagBuffer = StringBuffer();
     if (isPrimaryKey) {
-      flagBuffer.write("primary_key ");
+      flagBuffer.write('primary_key ');
     }
     if (isTransient) {
-      flagBuffer.write("transient ");
+      flagBuffer.write('transient ');
     }
     if (autoincrement) {
-      flagBuffer.write("autoincrementing ");
+      flagBuffer.write('autoincrementing ');
     }
     if (isUnique) {
-      flagBuffer.write("unique ");
+      flagBuffer.write('unique ');
     }
     if (defaultValue != null) {
-      flagBuffer.write("defaults to $defaultValue ");
+      flagBuffer.write('defaults to $defaultValue ');
     }
     if (isIndexed) {
-      flagBuffer.write("indexed ");
+      flagBuffer.write('indexed ');
     }
     if (isNullable) {
-      flagBuffer.write("nullable ");
+      flagBuffer.write('nullable ');
     } else {
-      flagBuffer.write("required ");
+      flagBuffer.write('required ');
     }
 
-    return "- $name | $type | Flags: ${flagBuffer.toString()}";
+    return '- $name | $type | Flags: ${flagBuffer.toString()}';
   }
 
   @override
@@ -326,7 +337,7 @@ class ManagedAttributeDescription extends ManagedPropertyDescription {
       return value.toIso8601String();
     } else if (isEnumeratedValue) {
       // todo: optimize?
-      return value.toString().split(".").last;
+      return value.toString().split('.').last;
     } else if (type!.kind == ManagedPropertyType.document &&
         value is Document) {
       return value.data;
@@ -493,13 +504,14 @@ class ManagedRelationshipDescription extends ManagedPropertyDescription {
       throw ValidationException(["invalid input type for '$name'"]);
     }
 
-    final instantiator = (dynamic m) {
+    instantiator(dynamic m) {
       if (m is! Map<String, dynamic>) {
         throw ValidationException(["invalid input type for '$name'"]);
       }
       final instance = destinationEntity.instanceOf()..readFromMap(m);
       return instance;
-    };
+    }
+
     return destinationEntity.setOf(value.map(instantiator));
   }
 
@@ -527,21 +539,21 @@ class ManagedRelationshipDescription extends ManagedPropertyDescription {
 
   @override
   String toString() {
-    var relTypeString = "has-one";
+    var relTypeString = 'has-one';
     switch (relationshipType) {
       case ManagedRelationshipType.belongsTo:
-        relTypeString = "belongs to";
+        relTypeString = 'belongs to';
         break;
       case ManagedRelationshipType.hasMany:
-        relTypeString = "has-many";
+        relTypeString = 'has-many';
         break;
       case ManagedRelationshipType.hasOne:
-        relTypeString = "has-a";
+        relTypeString = 'has-a';
         break;
       // case null:
       //   relTypeString = 'Not set';
       //   break;
     }
-    return "- $name -> '${destinationEntity.name}' | Type: $relTypeString | Inverse: ${inverseKey}";
+    return "- $name -> '${destinationEntity.name}' | Type: $relTypeString | Inverse: $inverseKey";
   }
 }

@@ -27,16 +27,16 @@ class CORSPolicy {
   }
 
   CORSPolicy._defaults() {
-    allowedOrigins = ["*"];
+    allowedOrigins = ['*'];
     allowCredentials = true;
     exposedResponseHeaders = [];
-    allowedMethods = ["POST", "PUT", "DELETE", "GET"];
+    allowedMethods = ['POST', 'PUT', 'DELETE', 'GET'];
     allowedRequestHeaders = [
-      "origin",
-      "authorization",
-      "x-requested-with",
-      "x-forwarded-for",
-      "content-type"
+      'origin',
+      'authorization',
+      'x-requested-with',
+      'x-forwarded-for',
+      'content-type'
     ];
     cacheInSeconds = 86400;
   }
@@ -57,23 +57,23 @@ class CORSPolicy {
   ///
   /// These are headers that are considered acceptable as part of any CORS request and cannot be changed.
   static const List<String> simpleRequestHeaders = [
-    "accept",
-    "accept-language",
-    "content-language",
-    "content-type"
+    'accept',
+    'accept-language',
+    'content-language',
+    'content-type'
   ];
 
   /// List of 'Simple' CORS Response headers.
   ///
   /// These headers can be returned in a response without explicitly exposing them and cannot be changed.
   static const List<String> simpleResponseHeaders = [
-    "cache-control",
-    "content-language",
-    "content-type",
-    "content-type",
-    "expires",
-    "last-modified",
-    "pragma"
+    'cache-control',
+    'content-language',
+    'content-type',
+    'content-type',
+    'expires',
+    'last-modified',
+    'pragma'
   ];
 
   /// The list of case-sensitive allowed origins.
@@ -112,18 +112,18 @@ class CORSPolicy {
   /// This will add Access-Control-Allow-Origin, Access-Control-Expose-Headers and Access-Control-Allow-Credentials
   /// depending on the this policy.
   Map<String, dynamic> headersForRequest(Request request) {
-    var origin = request.raw.headers.value("origin");
+    var origin = request.raw.headers.value('origin');
 
     var headers = <String, dynamic>{};
-    headers["Access-Control-Allow-Origin"] = origin;
+    headers['Access-Control-Allow-Origin'] = origin;
 
     if (exposedResponseHeaders.isNotEmpty) {
-      headers["Access-Control-Expose-Headers"] =
-          exposedResponseHeaders.join(", ");
+      headers['Access-Control-Expose-Headers'] =
+          exposedResponseHeaders.join(', ');
     }
 
     if (allowCredentials!) {
-      headers["Access-Control-Allow-Credentials"] = "true";
+      headers['Access-Control-Allow-Credentials'] = 'true';
     }
 
     return headers;
@@ -135,11 +135,11 @@ class CORSPolicy {
   /// or that [allowedOrigins] contains *.
   /// This method is invoked internally by [Controller]s that have a [Controller.policy].
   bool isRequestOriginAllowed(HttpRequest request) {
-    if (allowedOrigins.contains("*")) {
+    if (allowedOrigins.contains('*')) {
       return true;
     }
 
-    var origin = request.headers.value("origin");
+    var origin = request.headers.value('origin');
     if (allowedOrigins.contains(origin)) {
       return true;
     }
@@ -156,14 +156,14 @@ class CORSPolicy {
       return false;
     }
 
-    var method = request.headers.value("access-control-request-method");
+    var method = request.headers.value('access-control-request-method');
     if (!allowedMethods.contains(method)) {
       return false;
     }
 
     var requestedHeaders = request.headers
-        .value("access-control-request-headers")
-        ?.split(",")
+        .value('access-control-request-headers')
+        ?.split(',')
         .map((str) => str.trim().toLowerCase())
         .toList();
     if (requestedHeaders?.isNotEmpty ?? false) {
@@ -184,17 +184,17 @@ class CORSPolicy {
   /// This method is invoked internally by [Controller]s that have a [Controller.policy].
   Response preflightResponse(Request req) {
     var headers = {
-      "Access-Control-Allow-Origin": req.raw.headers.value("origin"),
-      "Access-Control-Allow-Methods": allowedMethods.join(", "),
-      "Access-Control-Allow-Headers": allowedRequestHeaders.join(", ")
+      'Access-Control-Allow-Origin': req.raw.headers.value('origin'),
+      'Access-Control-Allow-Methods': allowedMethods.join(', '),
+      'Access-Control-Allow-Headers': allowedRequestHeaders.join(', ')
     };
 
     if (allowCredentials!) {
-      headers["Access-Control-Allow-Credentials"] = "true";
+      headers['Access-Control-Allow-Credentials'] = 'true';
     }
 
     if (cacheInSeconds != null) {
-      headers["Access-Control-Max-Age"] = "$cacheInSeconds";
+      headers['Access-Control-Max-Age'] = '$cacheInSeconds';
     }
 
     return Response.ok(null, headers: headers);

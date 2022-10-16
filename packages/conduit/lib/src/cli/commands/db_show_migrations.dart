@@ -10,24 +10,24 @@ class CLIDatabaseShowMigrations extends CLICommand
   @override
   Future<int> handle() async {
     var files = projectMigrations.map((mig) {
-      var versionString = "${mig.versionNumber}".padLeft(8, "0");
-      return " $versionString | ${mig.uri!.pathSegments.last}";
-    }).join("\n");
+      var versionString = '${mig.versionNumber}'.padLeft(8, '0');
+      return ' $versionString | ${mig.uri!.pathSegments.last}';
+    }).join('\n');
 
-    print(" Version  | Path");
-    print("----------|-----------");
-    print("$files");
+    print(' Version  | Path');
+    print('----------|-----------');
+    print(files);
 
     return 0;
   }
 
   @override
   String get name {
-    return "list";
+    return 'list';
   }
 
   @override
   String get description {
-    return "Show the path and version all migration files for this project.";
+    return 'Show the path and version all migration files for this project.';
   }
 }

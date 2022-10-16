@@ -70,17 +70,17 @@ class SchemaColumn {
   ///
   /// Where [map] is typically created by [asMap].
   SchemaColumn.fromMap(Map<String, dynamic> map) {
-    name = map["name"] as String;
-    _type = map["type"] as String?;
-    isIndexed = map["indexed"] as bool?;
-    isNullable = map["nullable"] as bool?;
-    autoincrement = map["autoincrement"] as bool?;
-    isUnique = map["unique"] as bool?;
-    defaultValue = map["defaultValue"] as String?;
-    isPrimaryKey = map["primaryKey"] as bool?;
-    relatedTableName = map["relatedTableName"] as String?;
-    relatedColumnName = map["relatedColumnName"] as String?;
-    _deleteRule = map["deleteRule"] as String?;
+    name = map['name'] as String;
+    _type = map['type'] as String?;
+    isIndexed = map['indexed'] as bool?;
+    isNullable = map['nullable'] as bool?;
+    autoincrement = map['autoincrement'] as bool?;
+    isUnique = map['unique'] as bool?;
+    defaultValue = map['defaultValue'] as String?;
+    isPrimaryKey = map['primaryKey'] as bool?;
+    relatedTableName = map['relatedTableName'] as String?;
+    relatedColumnName = map['relatedColumnName'] as String?;
+    _deleteRule = map['deleteRule'] as String?;
   }
 
   /// Creates an empty instance of this type.
@@ -101,10 +101,11 @@ class SchemaColumn {
   ManagedPropertyType? get type => typeFromTypeString(_type);
 
   set type(ManagedPropertyType? t) {
-    if (t != null)
+    if (t != null) {
       _type = typeStringForType(t);
-    else
+    } else {
       type = null;
+    }
   }
 
   /// Whether or not this column is indexed.
@@ -170,23 +171,23 @@ class SchemaColumn {
   static String? typeStringForType(ManagedPropertyType type) {
     switch (type) {
       case ManagedPropertyType.integer:
-        return "integer";
+        return 'integer';
       case ManagedPropertyType.doublePrecision:
-        return "double";
+        return 'double';
       case ManagedPropertyType.bigInteger:
-        return "bigInteger";
+        return 'bigInteger';
       case ManagedPropertyType.boolean:
-        return "boolean";
+        return 'boolean';
       case ManagedPropertyType.datetime:
-        return "datetime";
+        return 'datetime';
       case ManagedPropertyType.string:
-        return "string";
+        return 'string';
       case ManagedPropertyType.list:
         return null;
       case ManagedPropertyType.map:
         return null;
       case ManagedPropertyType.document:
-        return "document";
+        return 'document';
     }
     // return null;
   }
@@ -194,19 +195,19 @@ class SchemaColumn {
   /// Returns inverse of [typeStringForType].
   static ManagedPropertyType? typeFromTypeString(String? type) {
     switch (type) {
-      case "integer":
+      case 'integer':
         return ManagedPropertyType.integer;
-      case "double":
+      case 'double':
         return ManagedPropertyType.doublePrecision;
-      case "bigInteger":
+      case 'bigInteger':
         return ManagedPropertyType.bigInteger;
-      case "boolean":
+      case 'boolean':
         return ManagedPropertyType.boolean;
-      case "datetime":
+      case 'datetime':
         return ManagedPropertyType.datetime;
-      case "string":
+      case 'string':
         return ManagedPropertyType.string;
-      case "document":
+      case 'document':
         return ManagedPropertyType.document;
     }
     return null;
@@ -216,26 +217,26 @@ class SchemaColumn {
   static String? deleteRuleStringForDeleteRule(DeleteRule rule) {
     switch (rule) {
       case DeleteRule.cascade:
-        return "cascade";
+        return 'cascade';
       case DeleteRule.nullify:
-        return "nullify";
+        return 'nullify';
       case DeleteRule.restrict:
-        return "restrict";
+        return 'restrict';
       case DeleteRule.setDefault:
-        return "default";
+        return 'default';
     }
   }
 
   /// Returns inverse of [deleteRuleStringForDeleteRule].
   static DeleteRule? deleteRuleForDeleteRuleString(String? rule) {
     switch (rule) {
-      case "cascade":
+      case 'cascade':
         return DeleteRule.cascade;
-      case "nullify":
+      case 'nullify':
         return DeleteRule.nullify;
-      case "restrict":
+      case 'restrict':
         return DeleteRule.restrict;
-      case "default":
+      case 'default':
         return DeleteRule.setDefault;
     }
     return null;
@@ -244,22 +245,22 @@ class SchemaColumn {
   /// Returns portable representation of this instance.
   Map<String, dynamic> asMap() {
     return {
-      "name": name,
-      "type": _type,
-      "nullable": isNullable,
-      "autoincrement": autoincrement,
-      "unique": isUnique,
-      "defaultValue": defaultValue,
-      "primaryKey": isPrimaryKey,
-      "relatedTableName": relatedTableName,
-      "relatedColumnName": relatedColumnName,
-      "deleteRule": _deleteRule,
-      "indexed": isIndexed
+      'name': name,
+      'type': _type,
+      'nullable': isNullable,
+      'autoincrement': autoincrement,
+      'unique': isUnique,
+      'defaultValue': defaultValue,
+      'primaryKey': isPrimaryKey,
+      'relatedTableName': relatedTableName,
+      'relatedColumnName': relatedColumnName,
+      'deleteRule': _deleteRule,
+      'indexed': isIndexed
     };
   }
 
   @override
-  String toString() => "$name (-> $relatedTableName.$relatedColumnName)";
+  String toString() => '$name (-> $relatedTableName.$relatedColumnName)';
 }
 
 /// The difference between two compared [SchemaColumn]s.
@@ -298,31 +299,31 @@ class SchemaColumnDifference {
       if (expectedColumn!.name.toLowerCase() !=
           actualColumn!.name.toLowerCase()) {
         _differingProperties.add(_PropertyDifference(
-            "name", expectedColumn!.name, actualColumn!.name));
+            'name', expectedColumn!.name, actualColumn!.name));
       }
 
       if (expectedColumn!.isIndexed != actualColumn!.isIndexed) {
         _differingProperties.add(_PropertyDifference(
-            "isIndexed", expectedColumn!.isIndexed, actualColumn!.isIndexed));
+            'isIndexed', expectedColumn!.isIndexed, actualColumn!.isIndexed));
       }
 
       if (expectedColumn!.isUnique != actualColumn!.isUnique) {
         _differingProperties.add(_PropertyDifference(
-            "isUnique", expectedColumn!.isUnique, actualColumn!.isUnique));
+            'isUnique', expectedColumn!.isUnique, actualColumn!.isUnique));
       }
 
       if (expectedColumn!.isNullable != actualColumn!.isNullable) {
-        _differingProperties.add(_PropertyDifference("isNullable",
+        _differingProperties.add(_PropertyDifference('isNullable',
             expectedColumn!.isNullable, actualColumn!.isNullable));
       }
 
       if (expectedColumn!.defaultValue != actualColumn!.defaultValue) {
-        _differingProperties.add(_PropertyDifference("defaultValue",
+        _differingProperties.add(_PropertyDifference('defaultValue',
             expectedColumn!.defaultValue, actualColumn!.defaultValue));
       }
 
       if (expectedColumn!.deleteRule != actualColumn!.deleteRule) {
-        _differingProperties.add(_PropertyDifference("deleteRule",
+        _differingProperties.add(_PropertyDifference('deleteRule',
             expectedColumn!.deleteRule, actualColumn!.deleteRule));
       }
     }
@@ -364,7 +365,7 @@ class SchemaColumnDifference {
     }).toList();
   }
 
-  List<_PropertyDifference> _differingProperties = [];
+  final List<_PropertyDifference> _differingProperties = [];
 }
 
 class _PropertyDifference {
@@ -375,7 +376,7 @@ class _PropertyDifference {
   final dynamic actualValue;
 
   String getErrorMessage(String? actualTableName, String? expectedColumnName) {
-    return "Column '${expectedColumnName}' in table '${actualTableName}' expected "
+    return "Column '$expectedColumnName' in table '$actualTableName' expected "
         "'$expectedValue' for '$name', but migration files yield '$actualValue'";
   }
 }

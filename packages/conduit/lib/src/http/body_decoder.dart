@@ -106,7 +106,7 @@ abstract class BodyDecoder {
       rethrow;
     } catch (_) {
       throw Response.badRequest(
-          body: {"error": "request entity could not be decoded"});
+          body: {'error': 'request entity could not be decoded'});
     }
 
     return _cast<T>(_decodedData);
@@ -118,7 +118,7 @@ abstract class BodyDecoder {
   /// prior to invoking this method or an error is thrown.
   T as<T>() {
     if (!hasBeenDecoded) {
-      throw StateError("Attempted to access request body without decoding it.");
+      throw StateError('Attempted to access request body without decoding it.');
     }
 
     return _cast<T>(_decodedData);
@@ -129,7 +129,7 @@ abstract class BodyDecoder {
       return RuntimeContext.current.coerce<T>(body);
     } on TypeCoercionException {
       throw Response.badRequest(
-          body: {"error": "request entity was unexpected type"});
+          body: {'error': 'request entity was unexpected type'});
     }
   }
 

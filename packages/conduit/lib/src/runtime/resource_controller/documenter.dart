@@ -43,7 +43,7 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
 
   @override
   void documentComponents(ResourceController rc, APIDocumentContext context) {
-    runtime.operations.forEach((b) {
+    for (var b in runtime.operations) {
       [b.positionalParameters, b.namedParameters]
           .expand((b) => b)
           .where((b) => b.location == BindingType.body)
@@ -55,16 +55,16 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
           _registerType(context, boundType.typeArguments.first);
         }
       });
-    });
+    }
   }
 
   @override
   List<APIParameter?> documentOperationParameters(
       ResourceController rc, APIDocumentContext context, Operation? operation) {
-    bool usesFormEncodedData = operation!.method == "POST" &&
+    bool usesFormEncodedData = operation!.method == 'POST' &&
         rc.acceptedContentTypes.any((ct) =>
-            ct.primaryType == "application" &&
-            ct.subType == "x-www-form-urlencoded");
+            ct.primaryType == 'application' &&
+            ct.subType == 'x-www-form-urlencoded');
 
     return parametersForOperation(operation)
         .map((param) {
@@ -86,10 +86,10 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
       ResourceController rc, APIDocumentContext context, Operation? operation) {
     final op = runtime.getOperationRuntime(
         operation!.method, operation.pathVariables)!;
-    final usesFormEncodedData = operation.method == "POST" &&
+    final usesFormEncodedData = operation.method == 'POST' &&
         rc.acceptedContentTypes.any((ct) =>
-            ct.primaryType == "application" &&
-            ct.subType == "x-www-form-urlencoded");
+            ct.primaryType == 'application' &&
+            ct.subType == 'x-www-form-urlencoded');
     final boundBody = op.positionalParameters
             .firstWhereOrNull((p) => p.location == BindingType.body) ??
         op.namedParameters
@@ -100,7 +100,7 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
       if (ref != null) {
         return APIRequestBody.schema(ref,
             contentTypes: rc.acceptedContentTypes
-                .map((ct) => "${ct.primaryType}/${ct.subType}"),
+                .map((ct) => '${ct.primaryType}/${ct.subType}'),
             isRequired: boundBody.isRequired);
       }
     } else if (usesFormEncodedData) {
@@ -114,7 +114,7 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
       });
 
       return APIRequestBody.schema(APISchemaObject.object(props),
-          contentTypes: ["application/x-www-form-urlencoded"],
+          contentTypes: ['application/x-www-form-urlencoded'],
           isRequired: true);
     }
 
@@ -179,7 +179,7 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
       List<String> operationScopes, List<AuthScope> methodScopes) {
     final existingScopes = operationScopes.map((s) => AuthScope(s)).toList();
 
-    methodScopes.forEach((methodScope) {
+    for (var methodScope in methodScopes) {
       for (var existingScope in existingScopes) {
         if (existingScope.isSubsetOrEqualTo(methodScope)) {
           operationScopes.remove(existingScope.toString());
@@ -187,7 +187,7 @@ class ResourceControllerDocumenterImpl extends ResourceControllerDocumenter {
       }
 
       operationScopes.add(methodScope.toString());
-    });
+    }
   }
 
   APIParameter _documentParameter(APIDocumentContext context,

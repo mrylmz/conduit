@@ -1,5 +1,5 @@
 // ignore: unnecessary_const
-@Tags(["cli"])
+@Tags(['cli'])
 import 'dart:io';
 
 import 'package:fs_test_agent/dart_project_agent.dart';
@@ -23,8 +23,8 @@ void main() {
   tearDownAll(DartProjectAgent.tearDownAll);
 
   setUp(() async {
-    projectUnderTestCli = templateCli.replicate(Uri.parse("replica/"));
-    projectUnderTestCli.projectAgent.addLibraryFile("application_test", """
+    projectUnderTestCli = templateCli.replicate(Uri.parse('replica/'));
+    projectUnderTestCli.projectAgent.addLibraryFile('application_test', """
 import 'package:conduit/conduit.dart';
 
 class TestObject extends ManagedObject<_TestObject> {}
@@ -42,79 +42,79 @@ class _TestObject {
     projectUnderTestCli.delete();
   });
 
-  test("If validating with no migration dir, get error", () async {
-    var res = await projectUnderTestCli.run("db", ["validate"]);
+  test('If validating with no migration dir, get error', () async {
+    var res = await projectUnderTestCli.run('db', ['validate']);
 
     expect(res, isNot(0));
-    expect(projectUnderTestCli.output, contains("No migration files found"));
+    expect(projectUnderTestCli.output, contains('No migration files found'));
   });
 
-  test("Validating two equal schemas succeeds", () async {
-    var res = await projectUnderTestCli.run("db", ["generate"]);
+  test('Validating two equal schemas succeeds', () async {
+    var res = await projectUnderTestCli.run('db', ['generate']);
     expect(res, 0);
 
-    res = await projectUnderTestCli.run("db", ["validate"]);
+    res = await projectUnderTestCli.run('db', ['validate']);
     expect(res, 0);
-    expect(projectUnderTestCli.output, contains("Validation OK"));
-    expect(projectUnderTestCli.output, contains("version is 1"));
+    expect(projectUnderTestCli.output, contains('Validation OK'));
+    expect(projectUnderTestCli.output, contains('version is 1'));
   });
 
-  test("Validating different schemas fails", () async {
-    var res = await projectUnderTestCli.run("db", ["generate"]);
+  test('Validating different schemas fails', () async {
+    var res = await projectUnderTestCli.run('db', ['generate']);
     expect(res, 0);
 
     projectUnderTestCli.agent
-        .modifyFile("migrations/00000001_initial.migration.dart", (contents) {
-      const upgradeLocation = "upgrade()";
+        .modifyFile('migrations/00000001_initial.migration.dart', (contents) {
+      const upgradeLocation = 'upgrade()';
       final nextLine =
-          contents.indexOf("\n", contents.indexOf(upgradeLocation));
-      return contents.replaceRange(nextLine, nextLine + 1, """
-        database.createTable(SchemaTable(\"foo\", []));
-        """);
+          contents.indexOf('\n', contents.indexOf(upgradeLocation));
+      return contents.replaceRange(nextLine, nextLine + 1, '''
+        database.createTable(SchemaTable("foo", []));
+        ''');
     });
 
-    res = await projectUnderTestCli.run("db", ["validate"]);
+    res = await projectUnderTestCli.run('db', ['validate']);
     expect(res, isNot(0));
-    expect(projectUnderTestCli.output, contains("Validation failed"));
+    expect(projectUnderTestCli.output, contains('Validation failed'));
   });
 
   test(
-    "Validating runs all migrations in directory and checks the total product",
+    'Validating runs all migrations in directory and checks the total product',
     () async {
-      var res = await projectUnderTestCli.run("db", ["generate"]);
+      var res = await projectUnderTestCli.run('db', ['generate']);
       expect(res, 0);
 
       projectUnderTestCli.agent.modifyFile(
-        "migrations/00000001_initial.migration.dart",
+        'migrations/00000001_initial.migration.dart',
         (contents) {
-          const upgradeLocation = "upgrade()";
+          const upgradeLocation = 'upgrade()';
           final nextLine =
-              contents.indexOf("\n", contents.indexOf(upgradeLocation));
+              contents.indexOf('\n', contents.indexOf(upgradeLocation));
           return contents.replaceRange(
             nextLine,
             nextLine + 1,
-            "database.createTable(SchemaTable(\"foo\", []));\n",
+            'database.createTable(SchemaTable("foo", []));\n',
           );
         },
       );
 
-      res = await projectUnderTestCli.run("db", ["validate"]);
+      res = await projectUnderTestCli.run('db', ['validate']);
       expect(res, isNot(0));
-      expect(projectUnderTestCli.output, contains("Validation failed"));
+      expect(projectUnderTestCli.output, contains('Validation failed'));
 
-      res = await projectUnderTestCli.run("db", ["generate"]);
+      res = await projectUnderTestCli.run('db', ['generate']);
       expect(res, 0);
 
       var secondMigrationFile = File.fromUri(
         projectUnderTestCli.defaultMigrationDirectory.uri
-            .resolve("00000002_unnamed.migration.dart"),
+            .resolve('00000002_unnamed.migration.dart'),
       );
       expect(
         secondMigrationFile.readAsStringSync(),
-        contains("database.deleteTable(\"foo\")"),
+        contains('database.deleteTable("foo")'),
       );
 
-      res = await projectUnderTestCli.run("db", ["validate"]);
+      res = await projectUnderTestCli.run('db', ['validate']);
       expect(res, 0);
     },
   );

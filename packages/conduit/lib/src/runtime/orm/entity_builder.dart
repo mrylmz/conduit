@@ -15,22 +15,13 @@ class EntityBuilder {
       : instanceType = reflectClass(type),
         tableDefinitionType = getTableDefinitionForType(type),
         metadata = firstMetadataOfType(getTableDefinitionForType(type)) {
-    name = _getName();
-
     entity = ManagedEntity(
-        name, type, MirrorSystem.getName(tableDefinitionType.simpleName))
-      ..validators = [];
-
+      name,
+      type,
+      MirrorSystem.getName(tableDefinitionType.simpleName),
+    )..validators = [];
     runtime = ManagedEntityRuntimeImpl(instanceType, entity);
-
     properties = _getProperties();
-    var _primaryKeyProperty =
-        properties.firstWhereOrNull((p) => p.column?.isPrimaryKey ?? false);
-    if (_primaryKeyProperty == null) {
-      throw ManagedDataModelErrorImpl.noPrimaryKey(entity);
-    }
-
-    primaryKeyProperty = _primaryKeyProperty;
   }
 
   final ClassMirror instanceType;
@@ -39,10 +30,39 @@ class EntityBuilder {
 
   ManagedEntityRuntime? runtime;
 
-  String? name;
+  String? get name {
+    if (metadata?.name != null) {
+      return metadata!.name;
+    }
+
+    var declaredTableNameClass = classHierarchyForClass(tableDefinitionType)
+        .firstWhereOrNull((cm) => cm.staticMembers[#tableName] != null);
+
+    if (declaredTableNameClass == null) {
+      return tableDefinitionTypeName;
+    }
+
+    Logger('conduit').warning(
+      "Overriding ManagedObject.tableName is deprecated. Use '@Table(name: ...)' instead.",
+    );
+
+    return declaredTableNameClass.invoke(#tableName, []).reflectee as String?;
+  }
+
   late ManagedEntity entity;
   List<String>? uniquePropertySet;
-  late PropertyBuilder primaryKeyProperty;
+  PropertyBuilder get primaryKeyProperty {
+    final property = properties.firstWhereOrNull(
+      (property) => property.column?.isPrimaryKey ?? false,
+    );
+
+    if (property == null) {
+      throw ManagedDataModelErrorImpl.noPrimaryKey(entity);
+    }
+
+    return property;
+  }
+
   List<PropertyBuilder> properties = [];
   Map<String?, ManagedAttributeDescription?> attributes = {};
   Map<String?, ManagedRelationshipDescription?> relationships = {};
@@ -174,23 +194,6 @@ class EntityBuilder {
         "has multiple inverse candidates. There must be exactly one property that is a subclass of the expected type "
         "('${MirrorSystem.getName(foreignKey.getDeclarationType().simpleName)}'), but the following are all possible:"
         " ${candidates.map((p) => p.name).join(", ")}");
-  }
-
-  String? _getName() {
-    if (metadata?.name != null) {
-      return metadata!.name;
-    }
-
-    var declaredTableNameClass = classHierarchyForClass(tableDefinitionType)
-        .firstWhereOrNull((cm) => cm.staticMembers[#tableName] != null);
-
-    if (declaredTableNameClass == null) {
-      return tableDefinitionTypeName;
-    }
-
-    Logger("conduit").warning(
-        "Overriding ManagedObject.tableName is deprecated. Use '@Table(name: ...)' instead.");
-    return declaredTableNameClass.invoke(#tableName, []).reflectee as String?;
   }
 
   List<PropertyBuilder> _getProperties() {

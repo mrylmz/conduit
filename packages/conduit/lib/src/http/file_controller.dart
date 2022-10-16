@@ -41,41 +41,41 @@ class FileController extends Controller {
   ///
   /// Note that the 'Last-Modified' header is always applied to a response served from this instance.
   FileController(String pathOfDirectoryToServe,
-      {FutureOr<Response> onFileNotFound(
-          FileController controller, Request req)?})
+      {FutureOr<Response> Function(
+          FileController controller, Request req)? onFileNotFound})
       : _servingDirectory = Uri.directory(pathOfDirectoryToServe),
         _onFileNotFound = onFileNotFound;
 
-  static Map<String, ContentType> _defaultExtensionMap = {
+  static final Map<String, ContentType> _defaultExtensionMap = {
     /* Web content */
-    "html": ContentType("text", "html", charset: "utf-8"),
-    "css": ContentType("text", "css", charset: "utf-8"),
-    "js": ContentType("application", "javascript", charset: "utf-8"),
-    "json": ContentType("application", "json", charset: "utf-8"),
+    'html': ContentType('text', 'html', charset: 'utf-8'),
+    'css': ContentType('text', 'css', charset: 'utf-8'),
+    'js': ContentType('application', 'javascript', charset: 'utf-8'),
+    'json': ContentType('application', 'json', charset: 'utf-8'),
 
     /* Images */
-    "jpg": ContentType("image", "jpeg"),
-    "jpeg": ContentType("image", "jpeg"),
-    "eps": ContentType("application", "postscript"),
-    "png": ContentType("image", "png"),
-    "gif": ContentType("image", "gif"),
-    "bmp": ContentType("image", "bmp"),
-    "tiff": ContentType("image", "tiff"),
-    "tif": ContentType("image", "tiff"),
-    "ico": ContentType("image", "x-icon"),
-    "svg": ContentType("image", "svg+xml"),
+    'jpg': ContentType('image', 'jpeg'),
+    'jpeg': ContentType('image', 'jpeg'),
+    'eps': ContentType('application', 'postscript'),
+    'png': ContentType('image', 'png'),
+    'gif': ContentType('image', 'gif'),
+    'bmp': ContentType('image', 'bmp'),
+    'tiff': ContentType('image', 'tiff'),
+    'tif': ContentType('image', 'tiff'),
+    'ico': ContentType('image', 'x-icon'),
+    'svg': ContentType('image', 'svg+xml'),
 
     /* Documents */
-    "rtf": ContentType("application", "rtf"),
-    "pdf": ContentType("application", "pdf"),
-    "csv": ContentType("text", "plain", charset: "utf-8"),
-    "md": ContentType("text", "plain", charset: "utf-8"),
+    'rtf': ContentType('application', 'rtf'),
+    'pdf': ContentType('application', 'pdf'),
+    'csv': ContentType('text', 'plain', charset: 'utf-8'),
+    'md': ContentType('text', 'plain', charset: 'utf-8'),
 
     /* Fonts */
-    "ttf": ContentType("font", "ttf"),
-    "eot": ContentType("application", "vnd.ms-fontobject"),
-    "woff": ContentType("font", "woff"),
-    "otf": ContentType("font", "otf"),
+    'ttf': ContentType('font', 'ttf'),
+    'eot': ContentType('application', 'vnd.ms-fontobject'),
+    'woff': ContentType('font', 'woff'),
+    'otf': ContentType('font', 'otf'),
   };
 
   final Map<String, ContentType> _extensionMap = Map.from(_defaultExtensionMap);
@@ -90,7 +90,7 @@ class FileController extends Controller {
   ///
   /// Returns null if there is no entry for [extension]. Entries can be added with [setContentTypeForExtension].
   ContentType? contentTypeForExtension(String extension) {
-    if (extension.startsWith(".")) {
+    if (extension.startsWith('.')) {
       return _extensionMap[extension.substring(1)];
     }
     return _extensionMap[extension];
@@ -130,7 +130,7 @@ class FileController extends Controller {
   ///
   /// Note that the 'Last-Modified' header is always applied to a response served from this instance.
   ///
-  void addCachePolicy(CachePolicy policy, bool shouldApplyToPath(String path)) {
+  void addCachePolicy(CachePolicy policy, bool Function(String path) shouldApplyToPath) {
     _policyPairs.add(_PolicyPair(policy, shouldApplyToPath));
   }
 
@@ -147,15 +147,15 @@ class FileController extends Controller {
 
   @override
   Future<RequestOrResponse> handle(Request request) async {
-    if (request.method != "GET") {
+    if (request.method != 'GET') {
       return Response(HttpStatus.methodNotAllowed, null, null);
     }
 
     var relativePath = request.path.remainingPath;
-    var fileUri = _servingDirectory.resolve(relativePath ?? "");
+    var fileUri = _servingDirectory.resolve(relativePath ?? '');
     File file;
     if (FileSystemEntity.isDirectorySync(fileUri.toFilePath())) {
-      file = File.fromUri(fileUri.resolve("index.html"));
+      file = File.fromUri(fileUri.resolve('index.html'));
     } else {
       file = File.fromUri(fileUri);
     }
@@ -168,7 +168,7 @@ class FileController extends Controller {
       var response = Response.notFound();
       if (request.acceptsContentType(ContentType.html)) {
         response
-          ..body = "<html><h3>404 Not Found</h3></html>"
+          ..body = '<html><h3>404 Not Found</h3></html>'
           ..contentType = ContentType.html;
       }
       return response;
@@ -186,7 +186,7 @@ class FileController extends Controller {
 
     var lastModifiedDateStringValue = HttpDate.format(lastModifiedDate);
     var contentType = contentTypeForExtension(path.extension(file.path)) ??
-        ContentType("application", "octet-stream");
+        ContentType('application', 'octet-stream');
     var byteStream = file.openRead();
 
     return Response.ok(byteStream,
@@ -200,14 +200,14 @@ class FileController extends Controller {
   Map<String, APIOperation> documentOperations(
       APIDocumentContext context, String route, APIPath path) {
     return {
-      "get": APIOperation(
-          "getFile",
+      'get': APIOperation(
+          'getFile',
           {
-            "200": APIResponse("Successful file fetch.",
-                content: {"*/*": APIMediaType(schema: APISchemaObject.file())}),
-            "404": APIResponse("No file exists at path.")
+            '200': APIResponse('Successful file fetch.',
+                content: {'*/*': APIMediaType(schema: APISchemaObject.file())}),
+            '404': APIResponse('No file exists at path.')
           },
-          description: "Content-Type is determined by the suffix of the file.",
+          description: 'Content-Type is determined by the suffix of the file.',
           summary: "Returns the contents of a file on the server's filesystem.")
     };
   }

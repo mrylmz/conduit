@@ -3,14 +3,14 @@ import 'package:conduit_common_test/conduit_common_test.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group("Offset/limit", () {
+  group('Offset/limit', () {
     ManagedContext? context;
 
     setUpAll(() async {
       context =
           await PostgresTestConfig().contextWithModels([PageableTestModel]);
       for (int i = 0; i < 10; i++) {
-        var p = PageableTestModel()..value = "$i";
+        var p = PageableTestModel()..value = '$i';
         await (Query<PageableTestModel>(context!)..values = p).insert();
       }
     });
@@ -20,17 +20,17 @@ void main() {
       context = null;
     });
 
-    test("Fetch limit and offset specify a particular row", () async {
+    test('Fetch limit and offset specify a particular row', () async {
       var q = Query<PageableTestModel>(context!)
         ..fetchLimit = 1
         ..offset = 2;
 
       var results = await q.fetch();
       expect(results.length, 1);
-      expect(results.first.value, "2");
+      expect(results.first.value, '2');
     });
 
-    test("Offset out of bounds returns no results", () async {
+    test('Offset out of bounds returns no results', () async {
       var q = Query<PageableTestModel>(context!)
         ..fetchLimit = 1
         ..offset = 10;
@@ -39,7 +39,7 @@ void main() {
       expect(results.length, 0);
     });
 
-    test("Offset respects ordering specified by sort descriptors", () async {
+    test('Offset respects ordering specified by sort descriptors', () async {
       var q = Query<PageableTestModel>(context!)
         ..fetchLimit = 2
         ..offset = 2
@@ -47,27 +47,27 @@ void main() {
 
       var results = await q.fetch();
       expect(results.length, 2);
-      expect(results.first.value, "7");
-      expect(results[1].value, "6");
+      expect(results.first.value, '7');
+      expect(results[1].value, '6');
     });
   });
 
-  group("Paging", () {
+  group('Paging', () {
     ManagedContext? context;
 
-    var check = (List checkIDs, List<PageableTestModel> values) {
+    check(List checkIDs, List<PageableTestModel> values) {
       expect(checkIDs.length, values.length);
       var ids = values.map((v) => v.id).toList();
       for (int i = 0; i < ids.length; i++) {
         expect(ids[i], checkIDs[i]);
       }
-    };
+    }
 
     setUpAll(() async {
       context =
           await PostgresTestConfig().contextWithModels([PageableTestModel]);
       for (int i = 0; i < 10; i++) {
-        var p = PageableTestModel()..value = "$i";
+        var p = PageableTestModel()..value = '$i';
         await (Query<PageableTestModel>(context!)..values = p).insert();
       }
     });
@@ -103,7 +103,7 @@ void main() {
      ---------------------
      */
 
-    test("Ascending from known data set edge, limited to inside data set",
+    test('Ascending from known data set edge, limited to inside data set',
         () async {
       // select * from t where id > 0 order by id asc limit 5;
       var req = Query<PageableTestModel>(context!)
@@ -113,7 +113,7 @@ void main() {
       check([1, 2, 3, 4, 5], res);
     });
 
-    test("Ascending from first element, limited to inside data set", () async {
+    test('Ascending from first element, limited to inside data set', () async {
       // select * from t where id > 1 order by id asc limit 5;
       var req = Query<PageableTestModel>(context!)
         ..pageBy((p) => p.id, QuerySortOrder.ascending, boundingValue: 1)
@@ -122,7 +122,7 @@ void main() {
       check([2, 3, 4, 5, 6], res);
     });
 
-    test("Ascending from first element, extended past data set", () async {
+    test('Ascending from first element, extended past data set', () async {
       // select * from t where id > 0 order by id asc limit 15;
       var req = Query<PageableTestModel>(context!)
         ..pageBy((p) => p.id, QuerySortOrder.ascending, boundingValue: 0)
@@ -131,7 +131,7 @@ void main() {
       check([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], res);
     });
 
-    test("Ascending from inside data set to known edge", () async {
+    test('Ascending from inside data set to known edge', () async {
       // select * from t where id > 6 order by id asc limit 4;
       var req = Query<PageableTestModel>(context!)
         ..pageBy((p) => p.id, QuerySortOrder.ascending, boundingValue: 6)
@@ -140,7 +140,7 @@ void main() {
       check([7, 8, 9, 10], res);
     });
 
-    test("Ascending from inside data set to past edge", () async {
+    test('Ascending from inside data set to past edge', () async {
       // select * from t where id > 6 order by id asc limit 5
       var req = Query<PageableTestModel>(context!)
         ..pageBy((p) => p.id, QuerySortOrder.ascending, boundingValue: 6)
@@ -149,7 +149,7 @@ void main() {
       check([7, 8, 9, 10], res);
     });
 
-    test("Ascending from edge of data set into outside data set", () async {
+    test('Ascending from edge of data set into outside data set', () async {
       // select * from t where id > 10 order by id asc limit 5
       var req = Query<PageableTestModel>(context!)
         ..pageBy((p) => p.id, QuerySortOrder.ascending, boundingValue: 10)
@@ -158,7 +158,7 @@ void main() {
       expect(res.length, 0);
     });
 
-    test("Ascending from outside the data set and onward", () async {
+    test('Ascending from outside the data set and onward', () async {
       // select * from t where id > 11 order by id asc limit 10
       var req = Query<PageableTestModel>(context!)
         ..pageBy((p) => p.id, QuerySortOrder.ascending, boundingValue: 11)
@@ -167,7 +167,7 @@ void main() {
       expect(res.length, 0);
     });
 
-    test("Ascending from null to all the way outside the data set", () async {
+    test('Ascending from null to all the way outside the data set', () async {
       // select * from t order by id asc limit 15
       var req = Query<PageableTestModel>(context!)
         ..pageBy((p) => p.id, QuerySortOrder.ascending)
@@ -176,7 +176,7 @@ void main() {
       check([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], res);
     });
 
-    test("Ascending from null to halfway into the data set", () async {
+    test('Ascending from null to halfway into the data set', () async {
       // select * from t order by id asc limit 5;
       var req = Query<PageableTestModel>(context!)
         ..pageBy((p) => p.id, QuerySortOrder.ascending)
@@ -185,7 +185,7 @@ void main() {
       check([1, 2, 3, 4, 5], res);
     });
 
-    test("Descending from beginning of data set to before data set", () async {
+    test('Descending from beginning of data set to before data set', () async {
       // select * from t where id < 0 order by id desc limit 10
       var req = Query<PageableTestModel>(context!)
         ..pageBy((p) => p.id, QuerySortOrder.descending, boundingValue: 0)
@@ -194,7 +194,7 @@ void main() {
       expect(res.length, 0);
     });
 
-    test("Descending from first element in data set to before data set",
+    test('Descending from first element in data set to before data set',
         () async {
       // select * from t where id < 1 order by id desc limit 10;
       var req = Query<PageableTestModel>(context!)
@@ -204,7 +204,7 @@ void main() {
       expect(res.length, 0);
     });
 
-    test("Descending from middle of data set to before data set", () async {
+    test('Descending from middle of data set to before data set', () async {
       // select * from t where id < 4 order by id desc limit 10;
       var req = Query<PageableTestModel>(context!)
         ..pageBy((p) => p.id, QuerySortOrder.descending, boundingValue: 4)
@@ -213,7 +213,7 @@ void main() {
       check([3, 2, 1], res);
     });
 
-    test("Descending from middle of data set to edge of data set", () async {
+    test('Descending from middle of data set to edge of data set', () async {
       // select * from t where id < 5 order by id desc limit 4;
       var req = Query<PageableTestModel>(context!)
         ..pageBy((p) => p.id, QuerySortOrder.descending, boundingValue: 5)
@@ -223,7 +223,7 @@ void main() {
     });
 
     test(
-        "Descending from outside end of data set to beginning edge of data set",
+        'Descending from outside end of data set to beginning edge of data set',
         () async {
       // select * from t where id < 11 order by id desc limit 10;
       var req = Query<PageableTestModel>(context!)
@@ -233,7 +233,7 @@ void main() {
       check([10, 9, 8, 7, 6, 5, 4, 3, 2, 1], res);
     });
 
-    test("Descending from last element in data set to middle of data set",
+    test('Descending from last element in data set to middle of data set',
         () async {
       // select * from t where id < 10 order by id desc limit 5;
       var req = Query<PageableTestModel>(context!)
@@ -243,7 +243,7 @@ void main() {
       check([9, 8, 7, 6, 5], res);
     });
 
-    test("Descending from outside end of data set to middle of data set",
+    test('Descending from outside end of data set to middle of data set',
         () async {
       // select * from t where id < 11 order by id desc limit 5
       var req = Query<PageableTestModel>(context!)
@@ -253,7 +253,7 @@ void main() {
       check([10, 9, 8, 7, 6], res);
     });
 
-    test("Descending from null to beginning of data set", () async {
+    test('Descending from null to beginning of data set', () async {
       // select * from t order by id desc limit 10
       var req = Query<PageableTestModel>(context!)
         ..pageBy((p) => p.id, QuerySortOrder.descending)
@@ -262,7 +262,7 @@ void main() {
       check([10, 9, 8, 7, 6, 5, 4, 3, 2, 1], res);
     });
 
-    test("Descending from null to middle of data set", () async {
+    test('Descending from null to middle of data set', () async {
       // select * from t order by id desc limit 5
       var req = Query<PageableTestModel>(context!)
         ..pageBy((p) => p.id, QuerySortOrder.descending)
@@ -272,21 +272,21 @@ void main() {
     });
   });
 
-  group("Failure cases", () {
+  group('Failure cases', () {
     ManagedContext? context;
-    var check = (List checkIDs, List<PageableTestModel> values) {
+    check(List checkIDs, List<PageableTestModel> values) {
       expect(checkIDs.length, values.length);
       var ids = values.map((v) => v.id).toList();
       for (int i = 0; i < ids.length; i++) {
         expect(ids[i], checkIDs[i]);
       }
-    };
+    }
 
     setUpAll(() async {
       context = await PostgresTestConfig()
           .contextWithModels([PageableTestModel, HasMany, BelongsTo]);
       for (int i = 0; i < 10; i++) {
-        var p = PageableTestModel()..value = "$i";
+        var p = PageableTestModel()..value = '$i';
         await (Query<PageableTestModel>(context!)..values = p).insert();
       }
     });
@@ -296,7 +296,7 @@ void main() {
       context = null;
     });
 
-    test("Incorrect type for boundingValue", () async {
+    test('Incorrect type for boundingValue', () async {
       var req = Query<PageableTestModel>(context!)
         ..pageBy((p) => p.value, QuerySortOrder.ascending, boundingValue: 0);
 
@@ -312,8 +312,8 @@ void main() {
     test("Page property doesn't exist throws error", () async {
       try {
         var _ = Query<PageableTestModel>(context!)
-          ..pageBy((p) => p["foobar"], QuerySortOrder.ascending,
-              boundingValue: "0");
+          ..pageBy((p) => p['foobar'], QuerySortOrder.ascending,
+              boundingValue: '0');
 
         expect(true, false);
       } on ArgumentError catch (e) {
@@ -324,16 +324,16 @@ void main() {
       }
     });
 
-    test("Query when not fetching paging property still succeeds", () async {
+    test('Query when not fetching paging property still succeeds', () async {
       var req = Query<PageableTestModel>(context!)
-        ..pageBy((p) => p.value, QuerySortOrder.ascending, boundingValue: "0")
+        ..pageBy((p) => p.value, QuerySortOrder.ascending, boundingValue: '0')
         ..returningProperties((p) => [p.id])
         ..fetchLimit = 5;
       var res = await req.fetch();
       check([2, 3, 4, 5, 6], res);
     });
 
-    test("Page by relationship fails", () async {
+    test('Page by relationship fails', () async {
       try {
         Query<HasMany>(context!)
             .pageBy((p) => p.objects, QuerySortOrder.ascending);

@@ -98,7 +98,7 @@ class ManagedType {
 
   @override
   String toString() {
-    return "$kind";
+    return '$kind';
   }
 
   static List<Type> get supportedDartTypes {

@@ -2,7 +2,7 @@ import 'package:conduit/conduit.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test("Delete rule of setNull throws exception if property is not nullable",
+  test('Delete rule of setNull throws exception if property is not nullable',
       () {
     try {
       ManagedDataModel([Owner, FailingChild]);

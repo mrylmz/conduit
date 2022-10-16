@@ -13,10 +13,10 @@ Future startApplication<T extends ApplicationChannel>(
   final port = ReceivePort();
 
   port.listen((msg) {
-    if (msg["command"] == "stop") {
+    if (msg['command'] == 'stop') {
       port.close();
       app.stop().then((_) {
-        parentPort.send({"status": "stopped"});
+        parentPort.send({'status': 'stopped'});
       });
     }
   });
@@ -26,5 +26,5 @@ Future startApplication<T extends ApplicationChannel>(
   } else {
     await app.start(numberOfInstances: isolateCount);
   }
-  parentPort.send({"status": "ok", "port": port.sendPort});
+  parentPort.send({'status': 'ok', 'port': port.sendPort});
 }

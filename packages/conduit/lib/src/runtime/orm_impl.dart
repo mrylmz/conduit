@@ -43,7 +43,7 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
     final type =
         reflectType(ManagedSet, [instanceType.reflectedType]) as ClassMirror;
     final set =
-        type.newInstance(const Symbol("fromDynamic"), [objects]).reflectee
+        type.newInstance(const Symbol('fromDynamic'), [objects]).reflectee
             as ManagedSet?;
 
     if (set == null) {
@@ -93,7 +93,7 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
       {required List<Uri> importUris}) {
     // For every annotation, grab the name of the type and find the corresponding type mirror in our list of type mirrors.
     // Documentation mismatch: `annotation.name.name` is NOT the class name, it is the entire constructor name.
-    final typeOfAnnotationName = annotation.name.name.split(".").first;
+    final typeOfAnnotationName = annotation.name.name.split('.').first;
     final mirrorOfAnnotationType = buildCtx.context.types.firstWhereOrNull(
         (t) => MirrorSystem.getName(t.simpleName) == typeOfAnnotationName);
 
@@ -122,7 +122,7 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
 
       final type = element.variable.type;
       final isSubclassOrInstanceOfValidate =
-          type.getDisplayString(withNullability: true) == "Validate" ||
+          type.getDisplayString(withNullability: true) == 'Validate' ||
               buildCtx.context.getSubclassesOf(Validate).any(
                 (subclass) {
                   return MirrorSystem.getName(subclass.simpleName) ==
@@ -130,7 +130,7 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
                 },
               );
       final isInstanceOfColumn =
-          type.getDisplayString(withNullability: true) == "Column";
+          type.getDisplayString(withNullability: true) == 'Column';
 
       if (isSubclassOrInstanceOfValidate) {
         importUris.add(annotation.element!.source!.uri);
@@ -176,17 +176,17 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
 
     if (property.type?.isEnumerated ?? false) {
       final enumeratedValues =
-          property.type!.enumerationMap.values.map(sourcifyValue).join(",");
+          property.type!.enumerationMap.values.map(sourcifyValue).join(',');
       constructorInvocations.add('Validate.oneOf([$enumeratedValues])');
     }
 
     if (constructorInvocations.isEmpty) {
-      return "";
+      return '';
     }
 
     final inverseType = property is ManagedRelationshipDescription
-        ? "${property.destinationEntity.instanceType}"
-        : "null";
+        ? '${property.destinationEntity.instanceType}'
+        : 'null';
 
     return """() {
   return [${constructorInvocations.join(",")}].map((v) {
@@ -200,7 +200,7 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
       {required List<Uri> importUris}) {
     final expression = argList.arguments
         .whereType<NamedExpression>()
-        .firstWhereOrNull((c) => c.name.label.name == "validators")
+        .firstWhereOrNull((c) => c.name.label.name == 'validators')
         ?.expression as ListLiteral?;
     if (expression == null) {
       return null;
@@ -226,11 +226,11 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
 
   String _getManagedTypeInstantiator(ManagedType? type) {
     if (type == null) {
-      return "null";
+      return 'null';
     }
 
     final elementStr = type.elements == null
-        ? "null"
+        ? 'null'
         : _getManagedTypeInstantiator(type.elements);
 
     final enumStr = "{${type.enumerationMap.keys.map((k) {
@@ -238,7 +238,7 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
       return "'$k': $vStr";
     }).join(",")}}";
 
-    return "ManagedType.make<${type.type}>(${type.kind}, $elementStr, $enumStr)";
+    return 'ManagedType.make<${type.type}>(${type.kind}, $elementStr, $enumStr)';
   }
 
   String _getDefaultValueLiteral(ManagedAttributeDescription attribute) {
@@ -246,18 +246,18 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
     return sourcifyValue(value,
         onError:
             "The default value for '${attribute.entity.instanceType}.${attribute.name}' "
-            "contains both double and single quotes");
+            'contains both double and single quotes');
   }
 
   String _getAttributeInstantiator(
       BuildContext ctx, ManagedAttributeDescription attribute,
       {required List<Uri> importUris}) {
     final transienceStr = attribute.isTransient
-        ? "Serialize(input: ${attribute.transientStatus!.isAvailableAsInput}, output: ${attribute.transientStatus!.isAvailableAsOutput})"
+        ? 'Serialize(input: ${attribute.transientStatus!.isAvailableAsInput}, output: ${attribute.transientStatus!.isAvailableAsOutput})'
         : null;
     final validatorStr = attribute.isTransient
-        ? "[]"
-        : "[${_getValidators(ctx, attribute, importUris: importUris)}]";
+        ? '[]'
+        : '[${_getValidators(ctx, attribute, importUris: importUris)}]';
 
     return """
 ManagedAttributeDescription.make<${attribute.declaredType}>(entity, '${attribute.name}',
@@ -298,12 +298,12 @@ ManagedRelationshipDescription.make<${relationship.declaredType}>(
       {required List<Uri> importUris}) {
     final attributesStr = entity.attributes.keys.map((name) {
       return "'$name': ${_getAttributeInstantiator(context, entity.attributes[name]!, importUris: importUris)}";
-    }).join(", ");
+    }).join(', ');
 
     final symbolMapBuffer = StringBuffer();
     entity.properties.forEach((str, val) {
       final sourcifiedKey = sourcifyValue(str);
-      symbolMapBuffer.write("Symbol($sourcifiedKey): $sourcifiedKey,");
+      symbolMapBuffer.write('Symbol($sourcifiedKey): $sourcifiedKey,');
       symbolMapBuffer
           .write("Symbol(${sourcifyValue("$str=")}): $sourcifiedKey,");
     });
@@ -328,11 +328,11 @@ return entity
         .where((attr) => attr!.transientStatus!.isAvailableAsInput)
         .map((attr) {
       return "case '${attr!.name}': (object as ${instanceType.reflectedType}).${attr.name} = value as ${attr.declaredType}; break;";
-    }).join("\n");
+    }).join('\n');
 
-    return """switch (key) {
+    return '''switch (key) {
     $cases
-}""";
+}''';
   }
 
   String _getGetTransientValueForKeyImpl(BuildContext ctx) {
@@ -341,11 +341,11 @@ return entity
         .where((attr) => attr!.transientStatus!.isAvailableAsOutput)
         .map((attr) {
       return "case '${attr!.name}': return (object as ${instanceType.reflectedType}).${attr.name};";
-    }).join("\n");
+    }).join('\n');
 
-    return """switch (key) {
+    return '''switch (key) {
     $cases
-}""";
+}''';
   }
 
   String _getDynamicConvertFromPrimitiveValueImpl(BuildContext ctx) {
@@ -370,7 +370,7 @@ return entity
   }
 
   String _getGetPropertyNameImpl(BuildContext ctx) {
-    return """final name = entity.symbolMap[invocation.memberName];
+    return '''final name = entity.symbolMap[invocation.memberName];
 if (name != null) {
   return name;
 }
@@ -387,21 +387,21 @@ if (idxEnd < 0) {
 final symbolName = invocationMemberNameAsString.substring(idxUnderscore, idxEnd);
 
 return entity.symbolMap[Symbol(symbolName)];
-""";
+''';
   }
 
   @override
   Future<String> compile(BuildContext ctx) async {
     final importUris = <Uri>[];
 
-    final className = "${MirrorSystem.getName(instanceType.simpleName)}";
+    final className = MirrorSystem.getName(instanceType.simpleName);
     final originalFileUri = instanceType.location!.sourceUri.toString();
     final relationshipsStr = entity.relationships!.keys.map((name) {
       return "'$name': ${_getRelationshipInstantiator(ctx, entity.relationships![name]!, importUris: importUris)}";
-    }).join(", ");
+    }).join(', ');
 
     final uniqueStr = entity.uniquePropertySet == null
-        ? "null"
+        ? 'null'
         : "[${entity.uniquePropertySet!.map((u) => "'${u!.name}'").join(",")}].map((k) => entity.properties[k]).toList()";
 
     final entityConstructor =

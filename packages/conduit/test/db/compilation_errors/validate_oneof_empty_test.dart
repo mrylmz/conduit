@@ -12,13 +12,13 @@ class _FEO {
 }
 
 void main() {
-  test("Empty oneOf", () {
+  test('Empty oneOf', () {
     try {
       ManagedDataModel([FailingEmptyOneOf]);
       expect(true, false);
     } on ManagedDataModelError catch (e) {
-      expect(e.toString(), contains("Validate.oneOf"));
-      expect(e.toString(), contains("_FEO.d"));
+      expect(e.toString(), contains('Validate.oneOf'));
+      expect(e.toString(), contains('_FEO.d'));
     }
   });
 }

@@ -23,7 +23,7 @@ class AuthorizationBearerParser extends AuthorizationParser<String?> {
           AuthorizationParserExceptionReason.missing);
     }
 
-    final matcher = RegExp("Bearer (.+)");
+    final matcher = RegExp('Bearer (.+)');
     final match = matcher.firstMatch(authorizationHeader);
     if (match == null) {
       throw AuthorizationParserException(
@@ -44,7 +44,7 @@ class AuthBasicCredentials {
   String? password;
 
   @override
-  String toString() => "$username:$password";
+  String toString() => '$username:$password';
 }
 
 /// Parses a Basic Authorization header.
@@ -65,7 +65,7 @@ class AuthorizationBasicParser
           AuthorizationParserExceptionReason.missing);
     }
 
-    final matcher = RegExp("Basic (.+)");
+    final matcher = RegExp('Basic (.+)');
     final match = matcher.firstMatch(authorizationHeader);
     if (match == null) {
       throw AuthorizationParserException(
@@ -82,7 +82,7 @@ class AuthorizationBasicParser
           AuthorizationParserExceptionReason.malformed);
     }
 
-    final splitCredentials = decodedCredentials.split(":");
+    final splitCredentials = decodedCredentials.split(':');
     if (splitCredentials.length != 2) {
       throw AuthorizationParserException(
           AuthorizationParserExceptionReason.malformed);

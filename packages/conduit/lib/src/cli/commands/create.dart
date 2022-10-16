@@ -15,15 +15,15 @@ class CLITemplateCreator extends CLICommand with CLIConduitGlobal {
     registerCommand(CLITemplateList());
   }
 
-  @Option("template",
-      abbr: "t", help: "Name of the template to use", defaultsTo: "default")
-  String get templateName => decode("template");
+  @Option('template',
+      abbr: 't', help: 'Name of the template to use', defaultsTo: 'default')
+  String get templateName => decode('template');
 
-  @Flag("offline",
+  @Flag('offline',
       negatable: false,
-      help: "Will fetch dependencies from a local cache if they exist.",
+      help: 'Will fetch dependencies from a local cache if they exist.',
       defaultsTo: false)
-  bool get offline => decode("offline");
+  bool get offline => decode('offline');
 
   String? get projectName =>
       remainingArguments.isNotEmpty ? remainingArguments.first : null;
@@ -31,18 +31,18 @@ class CLITemplateCreator extends CLICommand with CLIConduitGlobal {
   @override
   Future<int> handle() async {
     if (projectName == null) {
-      printHelp(parentCommandName: "conduit");
+      printHelp(parentCommandName: 'conduit');
       return 1;
     }
 
     if (!isSnakeCase(projectName!)) {
-      displayError("Invalid project name ($projectName is not snake_case).");
+      displayError('Invalid project name ($projectName is not snake_case).');
       return 1;
     }
 
     var destDirectory = destinationDirectoryFromPath(projectName!);
     if (destDirectory.existsSync()) {
-      displayError("${destDirectory.path} already exists, stopping.");
+      displayError('${destDirectory.path} already exists, stopping.');
       return 1;
     }
 
@@ -51,30 +51,30 @@ class CLITemplateCreator extends CLICommand with CLIConduitGlobal {
     final templateSourceDirectory =
         Directory.fromUri(getTemplateLocation(templateName) ?? Uri());
     if (!templateSourceDirectory.existsSync()) {
-      displayError("No template at ${templateSourceDirectory.path}.");
+      displayError('No template at ${templateSourceDirectory.path}.');
       return 1;
     }
 
-    displayProgress("Template source is: ${templateSourceDirectory.path}");
+    displayProgress('Template source is: ${templateSourceDirectory.path}');
     displayProgress("See more templates with 'conduit create list-templates'");
     copyProjectFiles(destDirectory, templateSourceDirectory, projectName!);
 
     createProjectSpecificFiles(destDirectory.path);
     try {
       final conduitLocation = conduitPackageRef!.resolve()!.location;
-      if (conduitPackageRef?.sourceType == "path") {
+      if (conduitPackageRef?.sourceType == 'path') {
         if (!addDependencyOverridesToPackage(destDirectory.path, {
-          "conduit": conduitLocation.uri,
-          "conduit_test": _packageUri(conduitLocation, 'test_harness'),
-          "conduit_codable": _packageUri(conduitLocation, 'codable'),
-          "conduit_common": _packageUri(conduitLocation, 'common'),
-          "conduit_common_test": _packageUri(conduitLocation, 'common_test'),
-          "conduit_config": _packageUri(conduitLocation, 'config'),
-          "conduit_isolate_exec": _packageUri(conduitLocation, 'isolate_exec'),
-          "conduit_open_api": _packageUri(conduitLocation, 'open_api'),
-          "conduit_password_hash":
+          'conduit': conduitLocation.uri,
+          'conduit_test': _packageUri(conduitLocation, 'test_harness'),
+          'conduit_codable': _packageUri(conduitLocation, 'codable'),
+          'conduit_common': _packageUri(conduitLocation, 'common'),
+          'conduit_common_test': _packageUri(conduitLocation, 'common_test'),
+          'conduit_config': _packageUri(conduitLocation, 'config'),
+          'conduit_isolate_exec': _packageUri(conduitLocation, 'isolate_exec'),
+          'conduit_open_api': _packageUri(conduitLocation, 'open_api'),
+          'conduit_password_hash':
               _packageUri(conduitLocation, 'password_hash'),
-          "conduit_runtime": _packageUri(conduitLocation, 'runtime'),
+          'conduit_runtime': _packageUri(conduitLocation, 'runtime'),
         })) {
           displayError(
               'You are running from a local source (pub global activate --source=path) version of conduit and are missing the source for some dependencies.');
@@ -88,7 +88,7 @@ class CLITemplateCreator extends CLICommand with CLIConduitGlobal {
 
     displayInfo(
         "Fetching project dependencies (pub get ${offline ? "--offline" : ""})...");
-    displayInfo("Please wait...");
+    displayInfo('Please wait...');
     try {
       await fetchProjectDependencies(destDirectory, offline: offline);
     } on TimeoutException {
@@ -96,12 +96,13 @@ class CLITemplateCreator extends CLICommand with CLIConduitGlobal {
           "Fetching dependencies timed out. Run 'pub get' in your project directory.");
     }
 
-    displayProgress("Success.");
+    displayProgress('Success.');
     displayInfo("project '$projectName' successfully created.");
-    displayProgress("Project is located at ${destDirectory.path}");
-    displayProgress("Open this directory in IntelliJ IDEA, Atom or VS Code.");
+    displayProgress('Project is located at ${destDirectory.path}');
+    displayProgress('Open this directory in IntelliJ IDEA, Atom or VS Code.');
     displayProgress(
-        "See ${destDirectory.path}${path_lib.separator}README.md for more information.");
+      'See ${destDirectory.path}${path_lib.separator}README.md for more information.',
+    );
 
     return 0;
   }
@@ -112,18 +113,18 @@ class CLITemplateCreator extends CLICommand with CLIConduitGlobal {
 
   bool shouldIncludeItem(FileSystemEntity entity) {
     var ignoreFiles = [
-      "packages",
-      "pubspec.lock",
-      "Dart_Packages.xml",
-      "workspace.xml",
-      "tasks.xml",
-      "vcs.xml",
+      'packages',
+      'pubspec.lock',
+      'Dart_Packages.xml',
+      'workspace.xml',
+      'tasks.xml',
+      'vcs.xml',
     ];
 
     var hiddenFilesToKeep = [
-      ".gitignore",
-      ".travis.yml",
-      "analysis_options.yaml"
+      '.gitignore',
+      '.travis.yml',
+      'analysis_options.yaml'
     ];
 
     var lastComponent = entity.uri.pathSegments.last;
@@ -132,7 +133,7 @@ class CLITemplateCreator extends CLICommand with CLIConduitGlobal {
           entity.uri.pathSegments[entity.uri.pathSegments.length - 2];
     }
 
-    if (lastComponent.startsWith(".") &&
+    if (lastComponent.startsWith('.') &&
         !hiddenFilesToKeep.contains(lastComponent)) {
       return false;
     }
@@ -175,9 +176,9 @@ class CLITemplateCreator extends CLICommand with CLIConduitGlobal {
         destinationDirectory.path, fileNameForFile(projectName, sourceFile));
     var contents = sourceFile.readAsStringSync();
 
-    contents = contents.replaceAll("wildfire", projectName);
+    contents = contents.replaceAll('wildfire', projectName);
     contents =
-        contents.replaceAll("Wildfire", camelCaseFromSnakeCase(projectName));
+        contents.replaceAll('Wildfire', camelCaseFromSnakeCase(projectName));
 
     var outputFile = File(path);
     outputFile.createSync();
@@ -186,11 +187,11 @@ class CLITemplateCreator extends CLICommand with CLIConduitGlobal {
 
   String fileNameForFile(String projectName, File sourceFile) {
     return sourceFile.uri.pathSegments.last
-        .replaceFirst("wildfire", projectName);
+        .replaceFirst('wildfire', projectName);
   }
 
   Directory destinationDirectoryFromPath(String pathString) {
-    if (pathString.startsWith("/")) {
+    if (pathString.startsWith('/')) {
       return Directory(pathString);
     }
     var currentDirPath = join(Directory.current.path, pathString);
@@ -199,31 +200,31 @@ class CLITemplateCreator extends CLICommand with CLIConduitGlobal {
   }
 
   void createProjectSpecificFiles(String directoryPath) {
-    displayProgress("Generating config.yaml from config.src.yaml.");
-    var configSrcPath = File(path_lib.join(directoryPath, "config.src.yaml"));
+    displayProgress('Generating config.yaml from config.src.yaml.');
+    var configSrcPath = File(path_lib.join(directoryPath, 'config.src.yaml'));
     configSrcPath
-        .copySync(File(path_lib.join(directoryPath, "config.yaml")).path);
+        .copySync(File(path_lib.join(directoryPath, 'config.yaml')).path);
   }
 
   bool addDependencyOverridesToPackage(
       String packageDirectoryPath, Map<String, Uri> overrides) {
-    var pubspecFile = File(path_lib.join(packageDirectoryPath, "pubspec.yaml"));
+    var pubspecFile = File(path_lib.join(packageDirectoryPath, 'pubspec.yaml'));
     var contents = pubspecFile.readAsStringSync();
 
     bool valid = true;
 
     final overrideBuffer = StringBuffer();
-    overrideBuffer.writeln("dependency_overrides:");
+    overrideBuffer.writeln('dependency_overrides:');
     overrides.forEach((packageName, location) {
       var path = location.toFilePath(windows: Platform.isWindows);
 
       valid &= _testPackagePath(path, packageName);
-      overrideBuffer.writeln("  $packageName:");
+      overrideBuffer.writeln('  $packageName:');
       overrideBuffer.writeln(
-          "    path:  ${location.toFilePath(windows: Platform.isWindows)}");
+          '    path:  ${location.toFilePath(windows: Platform.isWindows)}');
     });
 
-    pubspecFile.writeAsStringSync("$contents\n$overrideBuffer");
+    pubspecFile.writeAsStringSync('$contents\n$overrideBuffer');
 
     return valid;
   }
@@ -231,43 +232,43 @@ class CLITemplateCreator extends CLICommand with CLIConduitGlobal {
   void copyProjectFiles(Directory destinationDirectory,
       Directory sourceDirectory, String? projectName) {
     displayInfo(
-        "Copying template files to project directory (${destinationDirectory.path})...");
+        'Copying template files to project directory (${destinationDirectory.path})...');
     try {
       destinationDirectory.createSync();
 
       Directory(sourceDirectory.path).listSync().forEach((f) {
-        displayProgress("Copying contents of ${f.path}");
+        displayProgress('Copying contents of ${f.path}');
         interpretContentFile(projectName, destinationDirectory, f);
       });
     } catch (e) {
       destinationDirectory.deleteSync(recursive: true);
-      displayError("$e");
+      displayError('$e');
       rethrow;
     }
   }
 
   bool isSnakeCase(String string) {
-    var expr = RegExp("^[a-z][a-z0-9_]*\$");
+    var expr = RegExp('^[a-z][a-z0-9_]*\$');
     return expr.hasMatch(string);
   }
 
   String camelCaseFromSnakeCase(String string) {
-    return string.split("_").map((str) {
+    return string.split('_').map((str) {
       var firstChar = str.substring(0, 1);
       var remainingString = str.substring(1, str.length);
       return firstChar.toUpperCase() + remainingString;
-    }).join("");
+    }).join('');
   }
 
   Future<int> fetchProjectDependencies(Directory workingDirectory,
       {bool offline = false}) async {
-    var args = ["pub", "get"];
+    var args = ['pub', 'get'];
     if (offline) {
-      args.add("--offline");
+      args.add('--offline');
     }
 
     try {
-      const cmd = "dart";
+      const cmd = 'dart';
       var process = await Process.start(cmd, args,
               workingDirectory: workingDirectory.absolute.path,
               runInShell: true)
@@ -283,37 +284,37 @@ class CLITemplateCreator extends CLICommand with CLIConduitGlobal {
 
       if (exitCode != 0) {
         throw CLIException(
-            "If you are offline, try using `pub get --offline`.");
+            'If you are offline, try using `pub get --offline`.');
       }
 
       return exitCode;
     } on TimeoutException {
       displayError(
-          "Timed out fetching dependencies. Reconnect to the internet or use `pub get --offline`.");
+          'Timed out fetching dependencies. Reconnect to the internet or use `pub get --offline`.');
       rethrow;
     }
   }
 
   @override
   String get usage {
-    return "${super.usage} <project_name>";
+    return '${super.usage} <project_name>';
   }
 
   @override
   String get name {
-    return "create";
+    return 'create';
   }
 
   @override
   String get detailedDescription {
-    return "This command will use a template from the conduit package determined by either "
-        "git-url (and git-ref), path-source or version. If none of these "
-        "are specified, the most recent version on pub.dartlang.org is used.";
+    return 'This command will use a template from the conduit package determined by either '
+        'git-url (and git-ref), path-source or version. If none of these '
+        'are specified, the most recent version on pub.dartlang.org is used.';
   }
 
   @override
   String get description {
-    return "Creates Conduit applications from templates.";
+    return 'Creates Conduit applications from templates.';
   }
 
   /// check if a path exists sync.
@@ -346,8 +347,8 @@ class CLITemplateList extends CLICommand with CLIConduitGlobal {
         .toList();
     final templateDescriptions =
         await Future.wait(templateDirectories.map(_templateDescription));
-    displayInfo("Available templates:");
-    displayProgress("");
+    displayInfo('Available templates:');
+    displayProgress('');
 
     templateDescriptions.forEach(displayProgress);
 
@@ -356,19 +357,19 @@ class CLITemplateList extends CLICommand with CLIConduitGlobal {
 
   @override
   String get name {
-    return "list-templates";
+    return 'list-templates';
   }
 
   @override
   String get description {
-    return "List Conduit application templates.";
+    return 'List Conduit application templates.';
   }
 
   Future<String> _templateDescription(Directory templateDirectory) async {
     final name = templateDirectory
         .uri.pathSegments[templateDirectory.uri.pathSegments.length - 2];
     final pubspecContents =
-        await File.fromUri(templateDirectory.uri.resolve("pubspec.yaml"))
+        await File.fromUri(templateDirectory.uri.resolve('pubspec.yaml'))
             .readAsString();
     final pubspecDefinition = loadYaml(pubspecContents);
 
@@ -385,15 +386,15 @@ class CLIConduitGlobal {
       return null;
     }
     return apps
-        .firstWhere((app) => app.name == "conduit")
+        .firstWhere((app) => app.name == 'conduit')
         .getDefiningPackageRef();
   }
 
   Uri? get templateDirectory {
-    return conduitPackageRef?.resolve()?.location.uri.resolve("templates/");
+    return conduitPackageRef?.resolve()?.location.uri.resolve('templates/');
   }
 
   Uri? getTemplateLocation(String templateName) {
-    return templateDirectory?.resolve("$templateName/");
+    return templateDirectory?.resolve('$templateName/');
   }
 }

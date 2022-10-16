@@ -38,12 +38,14 @@ class ManagedDataModel extends Object
           "Data model types were not found: ${notFound.map((e) => e!.entity.name).join(", ")}");
     }
 
-    expectedRuntimes.forEach((runtime) {
+    for (var runtime in expectedRuntimes) {
       _entities[runtime!.entity.instanceType] = runtime.entity;
       _tableDefinitionToEntityMap[runtime.entity.tableDefinition] =
           runtime.entity;
-    });
-    expectedRuntimes.forEach((runtime) => runtime!.finalize(this));
+    }
+    for (var runtime in expectedRuntimes) {
+      runtime!.finalize(this);
+    }
   }
 
   /// Creates an instance of a [ManagedDataModel] from all subclasses of [ManagedObject] in all libraries visible to the calling library.
@@ -59,17 +61,19 @@ class ManagedDataModel extends Object
     final runtimes = RuntimeContext.current.runtimes.iterable
         .whereType<ManagedEntityRuntime>();
 
-    runtimes.forEach((runtime) {
+    for (var runtime in runtimes) {
       _entities[runtime.entity.instanceType] = runtime.entity;
       _tableDefinitionToEntityMap[runtime.entity.tableDefinition] =
           runtime.entity;
-    });
-    runtimes.forEach((runtime) => runtime.finalize(this));
+    }
+    for (var runtime in runtimes) {
+      runtime.finalize(this);
+    }
   }
 
   Iterable<ManagedEntity> get entities => _entities.values;
-  Map<Type, ManagedEntity> _entities = {};
-  Map<String, ManagedEntity> _tableDefinitionToEntityMap = {};
+  final Map<Type, ManagedEntity> _entities = {};
+  final Map<String, ManagedEntity> _tableDefinitionToEntityMap = {};
 
   /// Returns a [ManagedEntity] for a [Type].
   ///
@@ -99,7 +103,9 @@ class ManagedDataModel extends Object
 
   @override
   void documentComponents(APIDocumentContext context) {
-    entities.forEach((e) => e.documentComponents(context));
+    for (var e in entities) {
+      e.documentComponents(context);
+    }
   }
 }
 
@@ -111,6 +117,6 @@ class ManagedDataModelError extends Error {
 
   @override
   String toString() {
-    return "Data Model Error: $message";
+    return 'Data Model Error: $message';
   }
 }

@@ -77,7 +77,7 @@ class UserController extends ResourceController {
   Future<Response> createUser(@Bind.body() User user) async {
     if (user.username == null || user.password == null) {
       return Response.badRequest(
-          body: {"error": "username and password required."});
+          body: {'error': 'username and password required.'});
     }
 
     final salt = AuthUtility.generateRandomSalt();

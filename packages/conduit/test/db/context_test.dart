@@ -5,7 +5,7 @@ import 'package:conduit_common_test/conduit_common_test.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group("Multiple contexts, same data model", () {
+  group('Multiple contexts, same data model', () {
     final dm = ManagedDataModel([T, U]);
 
     ManagedContext? ctx1;
@@ -21,36 +21,36 @@ void main() {
       await ctx2.close();
     });
 
-    test("Queries are sent to the correct database", () async {
-      var q = Query<T>(ctx1!)..values.name = "bob";
+    test('Queries are sent to the correct database', () async {
+      var q = Query<T>(ctx1!)..values.name = 'bob';
       await q.insert();
 
       final t1 = await Query<T>(ctx1!).fetch();
       final t2 = await Query<T>(ctx2).fetch();
 
       expect(t1.length, 1);
-      expect(t1.first.name, "bob");
+      expect(t1.first.name, 'bob');
       expect(t2.length, 0);
     });
 
     test("If one context is released, other context's is OK", () async {
-      var q = Query<T>(ctx1!)..values.name = "bob";
+      var q = Query<T>(ctx1!)..values.name = 'bob';
       await q.insert();
 
       await ctx1!.close();
       ctx1 = null;
 
-      q = Query<T>(ctx2)..values.name = "fred";
+      q = Query<T>(ctx2)..values.name = 'fred';
       await q.insert();
 
       final t2 = await Query<T>(ctx2).fetch();
 
       expect(t2.length, 1);
-      expect(t2.first.name, "fred");
+      expect(t2.first.name, 'fred');
     });
   });
 
-  group("Multiple contexts, different data model", () {
+  group('Multiple contexts, different data model', () {
     late ManagedContext ctx1;
     late ManagedContext ctx2;
 
@@ -64,7 +64,7 @@ void main() {
       await ctx2.close();
     });
 
-    test("Queries are sent to the appropriate database", () async {
+    test('Queries are sent to the appropriate database', () async {
       final t1 = await Query<T>(ctx1).fetch();
       final t2 = await Query<U>(ctx2).fetch();
 
@@ -79,14 +79,14 @@ void main() {
         Query<T>(ctx2);
         fail('unreachable');
       } on ArgumentError catch (e) {
-        expect(e.toString(), contains("Invalid context"));
+        expect(e.toString(), contains('Invalid context'));
       }
 
       try {
         Query<U>(ctx1);
         fail('unreachable');
       } on ArgumentError catch (e) {
-        expect(e.toString(), contains("Invalid context"));
+        expect(e.toString(), contains('Invalid context'));
       }
     });
   });

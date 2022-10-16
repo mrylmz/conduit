@@ -5,7 +5,7 @@ import 'package:conduit_runtime/runtime.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test("Find default ApplicationChannel", () {
+  test('Find default ApplicationChannel', () {
     expect(
         RuntimeContext.current.runtimes.iterable
             .whereType<ChannelRuntime>()
@@ -24,7 +24,7 @@ class TestChannel extends ApplicationChannel {
   @override
   Controller get entryPoint {
     final router = Router();
-    router.route("/controller/[:id]").link(() => FailingController());
+    router.route('/controller/[:id]').link(() => FailingController());
     return router;
   }
 }

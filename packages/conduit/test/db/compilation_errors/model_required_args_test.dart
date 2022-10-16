@@ -2,13 +2,13 @@ import 'package:conduit/conduit.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test("Cannot have unnamed constructor with required args", () {
+  test('Cannot have unnamed constructor with required args', () {
     try {
       ManagedDataModel([DefaultConstructorHasRequiredArgs]);
       fail('unreachable');
     } on ManagedDataModelError catch (e) {
-      expect(e.toString(), contains("DefaultConstructorHasRequiredArgs"));
-      expect(e.toString(), contains("default, unnamed constructor"));
+      expect(e.toString(), contains('DefaultConstructorHasRequiredArgs'));
+      expect(e.toString(), contains('default, unnamed constructor'));
     }
   });
 }

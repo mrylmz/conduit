@@ -55,20 +55,20 @@ class ApplicationServer {
   int identifier;
 
   /// The logger of this instance
-  Logger get logger => Logger("conduit");
+  Logger get logger => Logger('conduit');
 
   /// Starts this instance, allowing it to receive HTTP requests.
   ///
   /// Do not invoke this method directly.
   Future start({bool shareHttpServer = false}) async {
-    logger.fine("ApplicationServer($identifier).start entry");
+    logger.fine('ApplicationServer($identifier).start entry');
 
     await channel!.prepare();
 
     entryPoint = channel!.entryPoint;
     entryPoint.didAddToChannel();
 
-    logger.fine("ApplicationServer($identifier).start binding HTTP");
+    logger.fine('ApplicationServer($identifier).start binding HTTP');
     final securityContext = channel!.securityContext;
     if (securityContext != null) {
       _requiresHTTPS = true;
@@ -85,35 +85,35 @@ class ApplicationServer {
           v6Only: options.isIpv6Only, shared: shareHttpServer);
     }
 
-    logger.fine("ApplicationServer($identifier).start bound HTTP");
+    logger.fine('ApplicationServer($identifier).start bound HTTP');
     return didOpen();
   }
 
   /// Closes this HTTP server and channel.
   Future close() async {
-    logger.fine("ApplicationServer($identifier).close Closing HTTP listener");
+    logger.fine('ApplicationServer($identifier).close Closing HTTP listener');
     if (server != null) {
       await server!.close(force: true);
     }
-    logger.fine("ApplicationServer($identifier).close Closing channel");
+    logger.fine('ApplicationServer($identifier).close Closing channel');
     await channel?.close();
 
     // This is actually closed by channel.messageHub.close, but this shuts up the analyzer.
     hubSink?.close();
-    logger.fine("ApplicationServer($identifier).close Closing complete");
+    logger.fine('ApplicationServer($identifier).close Closing complete');
   }
 
   /// Invoked when this server becomes ready receive requests.
   ///
   /// [ApplicationChannel.willStartReceivingRequests] is invoked after this opening has completed.
   Future didOpen() async {
-    server!.serverHeader = "conduit/$identifier";
+    server!.serverHeader = 'conduit/$identifier';
 
-    logger.fine("ApplicationServer($identifier).didOpen start listening");
+    logger.fine('ApplicationServer($identifier).didOpen start listening');
     server!.map((baseReq) => Request(baseReq)).listen(entryPoint.receive);
 
     channel!.willStartReceivingRequests();
-    logger.info("Server conduit/$identifier started.");
+    logger.info('Server conduit/$identifier started.');
   }
 
   void sendApplicationEvent(dynamic event) {

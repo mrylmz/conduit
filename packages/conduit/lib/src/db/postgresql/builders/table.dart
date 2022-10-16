@@ -114,7 +114,7 @@ class TableBuilder implements Returnable {
 
     var leftColumn = left.sqlColumnName(withTableNamespace: true);
     var rightColumn = right.sqlColumnName(withTableNamespace: true);
-    return QueryPredicate("$leftColumn=$rightColumn", null);
+    return QueryPredicate('$leftColumn=$rightColumn', null);
   }
 
   String createTableAlias() {
@@ -122,14 +122,14 @@ class TableBuilder implements Returnable {
       return parent!.createTableAlias();
     }
 
-    tableAlias ??= "t0";
+    tableAlias ??= 't0';
     aliasCounter++;
-    return "t$aliasCounter";
+    return 't$aliasCounter';
   }
 
   void finalize(Map<String?, dynamic> variables) {
-    final allExpressions = [_manualPredicate]
-      ..addAll(expressionBuilders.map((c) => c.predicate));
+    final allExpressions = [_manualPredicate, ...expressionBuilders.map((c) => c.predicate)]
+      ;
 
     predicate = QueryPredicate.and(allExpressions);
     if (predicate?.parameters != null) {
@@ -143,7 +143,7 @@ class TableBuilder implements Returnable {
 
   void addColumnExpressions(
       List<QueryExpression<dynamic, dynamic>> expressions) {
-    expressions.forEach((expression) {
+    for (var expression in expressions) {
       final firstElement = expression.keyPath.path.first;
       final lastElement = expression.keyPath.path.last;
 
@@ -165,7 +165,7 @@ class TableBuilder implements Returnable {
           final expr =
               ColumnExpressionBuilder(this, lastElement, expression.expression);
           expressionBuilders.add(expr);
-          return;
+          continue;
         }
       } else if (isForeignKey) {
         // This will occur if we selected a belongs to relationship or a belongs to relationship's
@@ -173,11 +173,11 @@ class TableBuilder implements Returnable {
         final expr = ColumnExpressionBuilder(
             this, expression.keyPath.path.first, expression.expression);
         expressionBuilders.add(expr);
-        return;
+        continue;
       }
 
       addColumnExpressionToJoinedTable(expression);
-    });
+    }
   }
 
   void addColumnExpressionToJoinedTable(
@@ -248,27 +248,27 @@ class TableBuilder implements Returnable {
       return entity.tableName;
     }
 
-    return "${entity.tableName} $tableAlias";
+    return '${entity.tableName} $tableAlias';
   }
 
   String? get sqlTableReference => tableAlias ?? entity.tableName;
 
   String get sqlInnerSelect {
     var nestedJoins =
-        returning.whereType<TableBuilder>().map((t) => t.sqlJoin).join(" ");
+        returning.whereType<TableBuilder>().map((t) => t.sqlJoin).join(' ');
 
     var flattenedColumns = flattenedColumnsToReturn;
 
     var columnsWithNamespace = flattenedColumns
         .map((p) => p.sqlColumnName(withTableNamespace: true))
-        .join(",");
+        .join(',');
     var columnsWithoutNamespace =
-        flattenedColumns.map((p) => p.sqlColumnName()).join(",");
+        flattenedColumns.map((p) => p.sqlColumnName()).join(',');
 
-    var outerWhereString = " WHERE ${predicate!.format}";
+    var outerWhereString = ' WHERE ${predicate!.format}';
     var selectString =
-        "SELECT $columnsWithNamespace FROM $sqlTableName $nestedJoins";
-    var alias = "$sqlTableReference($columnsWithoutNamespace)";
+        'SELECT $columnsWithNamespace FROM $sqlTableName $nestedJoins';
+    var alias = '$sqlTableReference($columnsWithoutNamespace)';
     return "LEFT OUTER JOIN ($selectString$outerWhereString) $alias ON ${joiningPredicate.format}";
   }
 
@@ -277,7 +277,7 @@ class TableBuilder implements Returnable {
       return returning
           .whereType<TableBuilder>()
           .map((e) => e.sqlJoin)
-          .join(" ");
+          .join(' ');
     }
 
     // At this point, we know that this table is being joined.
@@ -291,14 +291,14 @@ class TableBuilder implements Returnable {
     final totalJoinPredicate =
         QueryPredicate.and([joiningPredicate, predicate]);
     var thisJoin =
-        "LEFT OUTER JOIN $sqlTableName ON ${totalJoinPredicate.format}";
+        'LEFT OUTER JOIN $sqlTableName ON ${totalJoinPredicate.format}';
 
     if (returning.any((p) => p is TableBuilder)) {
       var nestedJoins = returning.whereType<TableBuilder>().map((p) {
         return p.sqlJoin;
       }).toList();
       nestedJoins.insert(0, thisJoin);
-      return nestedJoins.join(" ");
+      return nestedJoins.join(' ');
     }
 
     return thisJoin;

@@ -4,138 +4,138 @@ import 'package:conduit_codable/conduit_codable.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group("Primitive encode", () {
-    test("Can encode primitive type", () {
+  group('Primitive encode', () {
+    test('Can encode primitive type', () {
       final out = encode((obj) {
-        obj.encode("int", 1);
-        obj.encode("string", "1");
+        obj.encode('int', 1);
+        obj.encode('string', '1');
       });
 
-      expect(out, {"int": 1, "string": "1"});
+      expect(out, {'int': 1, 'string': '1'});
     });
 
-    test("Can encode List<dynamic> type", () {
+    test('Can encode List<dynamic> type', () {
       final out = encode((obj) {
-        obj.encode("key", [1, "2"]);
+        obj.encode('key', [1, '2']);
       });
 
       expect(out, {
-        "key": [1, "2"]
+        'key': [1, '2']
       });
     });
 
-    test("Can encode Map<String, dynamic>", () {
+    test('Can encode Map<String, dynamic>', () {
       final out = encode((obj) {
-        obj.encode("key", {"1": 1, "2": "2"});
+        obj.encode('key', {'1': 1, '2': '2'});
       });
 
       expect(out, {
-        "key": {"1": 1, "2": "2"}
+        'key': {'1': 1, '2': '2'}
       });
     });
 
-    test("Can encode URI", () {
+    test('Can encode URI', () {
       final out = encode((obj) {
-        obj.encode("key", Uri.parse("https://host.com"));
+        obj.encode('key', Uri.parse('https://host.com'));
       });
 
-      expect(out, {"key": "https://host.com"});
+      expect(out, {'key': 'https://host.com'});
     });
 
-    test("Can encode DateTime", () {
+    test('Can encode DateTime', () {
       final out = encode((obj) {
-        obj.encode("key", DateTime(2000));
+        obj.encode('key', DateTime(2000));
       });
 
-      expect(out, {"key": DateTime(2000).toIso8601String()});
+      expect(out, {'key': DateTime(2000).toIso8601String()});
     });
 
-    test("If value is null, do not include key", () {
+    test('If value is null, do not include key', () {
       final out = encode((obj) {
-        obj.encode("key", null);
+        obj.encode('key', null);
       });
 
       expect(out, {});
     });
   });
 
-  group("Coding objects", () {
-    test("Can encode Coding object", () {
+  group('Coding objects', () {
+    test('Can encode Coding object', () {
       final out = encode((object) {
-        object.encodeObject("key", Parent("Bob"));
+        object.encodeObject('key', Parent('Bob'));
       });
 
       expect(out, {
-        "key": {"name": "Bob"}
+        'key': {'name': 'Bob'}
       });
     });
 
-    test("Can encode list of Coding objects", () {
+    test('Can encode list of Coding objects', () {
       final out = encode((object) {
         object.encodeObject(
-          "key",
-          Parent("Bob", children: [Child("Fred"), null, Child("Sally")]),
+          'key',
+          Parent('Bob', children: [Child('Fred'), null, Child('Sally')]),
         );
       });
 
       expect(out, {
-        "key": {
-          "name": "Bob",
-          "children": [
-            {"name": "Fred"},
+        'key': {
+          'name': 'Bob',
+          'children': [
+            {'name': 'Fred'},
             null,
-            {"name": "Sally"}
+            {'name': 'Sally'}
           ]
         }
       });
     });
 
-    test("Can encode map of Coding objects", () {
+    test('Can encode map of Coding objects', () {
       final out = encode((object) {
         object.encodeObject(
-          "key",
+          'key',
           Parent(
-            "Bob",
+            'Bob',
             childMap: {
-              "fred": Child("Fred"),
-              "null": null,
-              "sally": Child("Sally")
+              'fred': Child('Fred'),
+              'null': null,
+              'sally': Child('Sally')
             },
           ),
         );
       });
 
       expect(out, {
-        "key": {
-          "name": "Bob",
-          "childMap": {
-            "fred": {"name": "Fred"},
-            "null": null,
-            "sally": {"name": "Sally"}
+        'key': {
+          'name': 'Bob',
+          'childMap': {
+            'fred': {'name': 'Fred'},
+            'null': null,
+            'sally': {'name': 'Sally'}
           }
         }
       });
     });
   });
 
-  group("Coding object references", () {
-    test("Parent can contain reference to child in single object encode", () {
+  group('Coding object references', () {
+    test('Parent can contain reference to child in single object encode', () {
       final container = Container(
         Parent(
-          "Bob",
-          child: Child._()..referenceURI = Uri(path: "/definitions/child"),
+          'Bob',
+          child: Child._()..referenceURI = Uri(path: '/definitions/child'),
         ),
-        {"child": Child("Sally")},
+        {'child': Child('Sally')},
       );
 
       final out = KeyedArchive.archive(container, allowReferences: true);
       expect(out, {
-        "definitions": {
-          "child": {"name": "Sally"}
+        'definitions': {
+          'child': {'name': 'Sally'}
         },
-        "root": {
-          "name": "Bob",
-          "child": {"\$ref": "#/definitions/child"}
+        'root': {
+          'name': 'Bob',
+          'child': {'\$ref': '#/definitions/child'}
         }
       });
     });
@@ -145,8 +145,8 @@ void main() {
         () {
       final container = Container(
         Parent(
-          "Bob",
-          child: Child._()..referenceURI = Uri(path: "/definitions/child"),
+          'Bob',
+          child: Child._()..referenceURI = Uri(path: '/definitions/child'),
         ),
         {},
       );
@@ -156,7 +156,7 @@ void main() {
         fail('unreachable');
         // ignore: avoid_catching_errors
       } on ArgumentError catch (e) {
-        expect(e.toString(), contains("#/definitions/child"));
+        expect(e.toString(), contains('#/definitions/child'));
       }
     });
 
@@ -165,9 +165,9 @@ void main() {
         () {
       final container = Container(
         Parent(
-          "Bob",
+          'Bob',
           childMap: {
-            "c": Child._()..referenceURI = Uri(path: "/definitions/child")
+            'c': Child._()..referenceURI = Uri(path: '/definitions/child')
           },
         ),
         {},
@@ -178,7 +178,7 @@ void main() {
         fail('unreachable');
         // ignore: avoid_catching_errors
       } on ArgumentError catch (e) {
-        expect(e.toString(), contains("#/definitions/child"));
+        expect(e.toString(), contains('#/definitions/child'));
       }
     });
 
@@ -187,8 +187,8 @@ void main() {
         () {
       final container = Container(
         Parent(
-          "Bob",
-          children: [Child._()..referenceURI = Uri(path: "/definitions/child")],
+          'Bob',
+          children: [Child._()..referenceURI = Uri(path: '/definitions/child')],
         ),
         {},
       );
@@ -198,93 +198,93 @@ void main() {
         fail('unreachable');
         // ignore: avoid_catching_errors
       } on ArgumentError catch (e) {
-        expect(e.toString(), contains("#/definitions/child"));
+        expect(e.toString(), contains('#/definitions/child'));
       }
     });
 
-    test("Parent can contain reference to child in a list of objects", () {
+    test('Parent can contain reference to child in a list of objects', () {
       final container = Container(
         Parent(
-          "Bob",
+          'Bob',
           children: [
-            Child("Sally"),
-            Child._()..referenceURI = Uri(path: "/definitions/child")
+            Child('Sally'),
+            Child._()..referenceURI = Uri(path: '/definitions/child')
           ],
         ),
-        {"child": Child("Fred")},
+        {'child': Child('Fred')},
       );
 
       final out = KeyedArchive.archive(container, allowReferences: true);
       expect(out, {
-        "definitions": {
-          "child": {"name": "Fred"}
+        'definitions': {
+          'child': {'name': 'Fred'}
         },
-        "root": {
-          "name": "Bob",
-          "children": [
-            {"name": "Sally"},
-            {"\$ref": "#/definitions/child"}
+        'root': {
+          'name': 'Bob',
+          'children': [
+            {'name': 'Sally'},
+            {'\$ref': '#/definitions/child'}
           ]
         }
       });
     });
 
-    test("Parent can contain reference to child in a map of objects", () {
+    test('Parent can contain reference to child in a map of objects', () {
       final container = Container(
         Parent(
-          "Bob",
+          'Bob',
           childMap: {
-            "sally": Child("Sally"),
-            "ref": Child._()..referenceURI = Uri(path: "/definitions/child")
+            'sally': Child('Sally'),
+            'ref': Child._()..referenceURI = Uri(path: '/definitions/child')
           },
         ),
-        {"child": Child("Fred")},
+        {'child': Child('Fred')},
       );
 
       final out = KeyedArchive.archive(container, allowReferences: true);
       expect(out, {
-        "definitions": {
-          "child": {"name": "Fred"}
+        'definitions': {
+          'child': {'name': 'Fred'}
         },
-        "root": {
-          "name": "Bob",
-          "childMap": {
-            "sally": {"name": "Sally"},
-            "ref": {"\$ref": "#/definitions/child"}
+        'root': {
+          'name': 'Bob',
+          'childMap': {
+            'sally': {'name': 'Sally'},
+            'ref': {'\$ref': '#/definitions/child'}
           }
         }
       });
     });
 
-    test("Cyclical references are resolved", () {
+    test('Cyclical references are resolved', () {
       final container = Container(
           Parent(
-            "Bob",
+            'Bob',
             children: [
-              Child("Sally"),
-              Child._()..referenceURI = Uri(path: "/definitions/child")
+              Child('Sally'),
+              Child._()..referenceURI = Uri(path: '/definitions/child')
             ],
           ),
           {
-            "child": Child(
-              "Fred",
-              parent: Parent._()..referenceURI = Uri(path: "/root"),
+            'child': Child(
+              'Fred',
+              parent: Parent._()..referenceURI = Uri(path: '/root'),
             )
           });
 
       final out = KeyedArchive.archive(container, allowReferences: true);
       final expected = {
-        "definitions": {
-          "child": {
-            "name": "Fred",
-            "parent": {"\$ref": "#/root"}
+        'definitions': {
+          'child': {
+            'name': 'Fred',
+            'parent': {'\$ref': '#/root'}
           }
         },
-        "root": {
-          "name": "Bob",
-          "children": [
-            {"name": "Sally"},
-            {"\$ref": "#/definitions/child"},
+        'root': {
+          'name': 'Bob',
+          'children': [
+            {'name': 'Sally'},
+            {'\$ref': '#/definitions/child'},
           ]
         }
       };
@@ -302,28 +302,28 @@ void main() {
     });
   });
 
-  test("toPrimitive does not include keyed archives or lists", () {
+  test('toPrimitive does not include keyed archives or lists', () {
     final archive = KeyedArchive.unarchive({
-      "value": "v",
-      "archive": {"key": "value"},
-      "list": [
-        "value",
-        {"key": "value"},
-        ["value"]
+      'value': 'v',
+      'archive': {'key': 'value'},
+      'list': [
+        'value',
+        {'key': 'value'},
+        ['value']
       ]
     });
 
     final encoded = archive.toPrimitive();
-    expect(encoded["value"], "v");
-    expect(encoded["archive"] is Map<String, dynamic>, true);
-    expect(encoded["archive"] is KeyedArchive, false);
-    expect(encoded["list"] is List<dynamic>, true);
-    expect(encoded["list"] is ListArchive, false);
-    expect(encoded["list"][0], "value");
-    expect(encoded["list"][1] is Map<String, dynamic>, true);
-    expect(encoded["list"][1] is KeyedArchive, false);
-    expect(encoded["list"][2] is List<dynamic>, true);
-    expect(encoded["list"][2] is ListArchive, false);
+    expect(encoded['value'], 'v');
+    expect(encoded['archive'] is Map<String, dynamic>, true);
+    expect(encoded['archive'] is KeyedArchive, false);
+    expect(encoded['list'] is List<dynamic>, true);
+    expect(encoded['list'] is ListArchive, false);
+    expect(encoded['list'][0], 'value');
+    expect(encoded['list'][1] is Map<String, dynamic>, true);
+    expect(encoded['list'][1] is KeyedArchive, false);
+    expect(encoded['list'][2] is List<dynamic>, true);
+    expect(encoded['list'][2] is ListArchive, false);
   });
 }
 
@@ -345,14 +345,14 @@ class Container extends Coding {
   void decode(KeyedArchive object) {
     super.decode(object);
 
-    root = object.decodeObject("root", () => Parent._());
-    definitions = object.decodeObjectMap("definitions", () => Child._());
+    root = object.decodeObject('root', () => Parent._());
+    definitions = object.decodeObjectMap('definitions', () => Child._());
   }
 
   @override
   void encode(KeyedArchive object) {
-    object.encodeObject("root", root);
-    object.encodeObjectMap("definitions", definitions);
+    object.encodeObject('root', root);
+    object.encodeObjectMap('definitions', definitions);
   }
 }
 
@@ -371,19 +371,19 @@ class Parent extends Coding {
   void decode(KeyedArchive object) {
     super.decode(object);
 
-    name = object.decode("name");
-    child = object.decodeObject("child", () => Child._());
-    children = object.decodeObjects("children", () => Child._());
-    childMap = object.decodeObjectMap("childMap", () => Child._());
+    name = object.decode('name');
+    child = object.decodeObject('child', () => Child._());
+    children = object.decodeObjects('children', () => Child._());
+    childMap = object.decodeObjectMap('childMap', () => Child._());
   }
 
   @override
   void encode(KeyedArchive object) {
-    object.encode("name", name);
-    object.encodeObject("child", child);
-    object.encodeObjects("children", children);
-    object.encodeObjectMap("childMap", childMap);
-    object.encode("things", things);
+    object.encode('name', name);
+    object.encodeObject('child', child);
+    object.encodeObjects('children', children);
+    object.encodeObjectMap('childMap', childMap);
+    object.encode('things', things);
   }
 }
 
@@ -399,13 +399,13 @@ class Child extends Coding {
   void decode(KeyedArchive object) {
     super.decode(object);
 
-    name = object.decode("name");
-    parent = object.decodeObject("parent", () => Parent._());
+    name = object.decode('name');
+    parent = object.decodeObject('parent', () => Parent._());
   }
 
   @override
   void encode(KeyedArchive object) {
-    object.encode("name", name);
-    object.encodeObject("parent", parent);
+    object.encode('name', name);
+    object.encodeObject('parent', parent);
   }
 }

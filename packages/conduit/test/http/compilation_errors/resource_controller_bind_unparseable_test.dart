@@ -3,10 +3,10 @@ import 'dart:io';
 
 import 'package:conduit/conduit.dart';
 import 'package:conduit_runtime/runtime.dart';
-import "package:test/test.dart";
+import 'package:test/test.dart';
 
 void main() {
-  test("Cannot bind invalid type to default implementation", () {
+  test('Cannot bind invalid type to default implementation', () {
     try {
       // ignore: unnecessary_statements
       RuntimeContext.current;
@@ -15,7 +15,7 @@ void main() {
       expect(
         e.toString(),
         "Bad state: Invalid binding 'x' on 'ErrorDefault.get1':"
-        "Parameter type does not implement static parse method.",
+        'Parameter type does not implement static parse method.',
       );
     }
   });
@@ -23,7 +23,7 @@ void main() {
 
 class ErrorDefault extends ResourceController {
   @Operation.get()
-  Future<Response> get1(@Bind.header("foo") HttpHeaders x) async {
+  Future<Response> get1(@Bind.header('foo') HttpHeaders x) async {
     return Response.ok(null);
   }
 }

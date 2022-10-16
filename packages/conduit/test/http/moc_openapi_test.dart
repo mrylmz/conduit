@@ -8,12 +8,12 @@ import 'package:conduit_open_api/v3.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group("Documentation", () {
+  group('Documentation', () {
     Map<String, APIOperation>? collectionOperations;
     Map<String, APIOperation>? idOperations;
     setUpAll(() async {
       final context = APIDocumentContext(APIDocument()
-        ..info = APIInfo("x", "1.0.0")
+        ..info = APIInfo('x', '1.0.0')
         ..paths = {}
         ..components = APIComponents());
 
@@ -22,90 +22,90 @@ void main() {
       final c = ManagedObjectController<TestModel>(ctx);
       c.restore(c.recycledState);
       c.didAddToChannel();
-      collectionOperations = c.documentOperations(context, "/", APIPath());
+      collectionOperations = c.documentOperations(context, '/', APIPath());
       idOperations = c.documentOperations(
-          context, "/", APIPath(parameters: [APIParameter.path("id")]));
+          context, '/', APIPath(parameters: [APIParameter.path('id')]));
 
       ctx.documentComponents(context);
 
       await context.finalize();
     });
 
-    test("getObject", () {
-      var op = idOperations!["get"]!;
-      expect(op.id, "getTestModel");
+    test('getObject', () {
+      var op = idOperations!['get']!;
+      expect(op.id, 'getTestModel');
 
       expect(op.responses!.length, 2);
 
-      expect(op.responses!["404"], isNotNull);
+      expect(op.responses!['404'], isNotNull);
       expect(
-          op.responses!["200"]!.content!["application/json"]!.schema!
+          op.responses!['200']!.content!['application/json']!.schema!
               .referenceURI!.path,
-          "/components/schemas/TestModel");
+          '/components/schemas/TestModel');
     });
 
-    test("createObject", () {
-      var op = collectionOperations!["post"]!;
-      expect(op.id, "createTestModel");
+    test('createObject', () {
+      var op = collectionOperations!['post']!;
+      expect(op.id, 'createTestModel');
 
       expect(op.responses!.length, 3);
 
-      expect(op.responses!["409"], isNotNull);
-      expect(op.responses!["400"], isNotNull);
+      expect(op.responses!['409'], isNotNull);
+      expect(op.responses!['400'], isNotNull);
       expect(
-          op.responses!["200"]!.content!["application/json"]!.schema!
+          op.responses!['200']!.content!['application/json']!.schema!
               .referenceURI!.path,
-          "/components/schemas/TestModel");
+          '/components/schemas/TestModel');
       expect(
-          op.requestBody!.content!["application/json"]!.schema!.referenceURI!
+          op.requestBody!.content!['application/json']!.schema!.referenceURI!
               .path,
-          "/components/schemas/TestModel");
+          '/components/schemas/TestModel');
     });
 
-    test("updateObject", () {
-      var op = idOperations!["put"]!;
-      expect(op.id, "updateTestModel");
+    test('updateObject', () {
+      var op = idOperations!['put']!;
+      expect(op.id, 'updateTestModel');
 
       expect(op.responses!.length, 4);
 
-      expect(op.responses!["404"], isNotNull);
-      expect(op.responses!["409"], isNotNull);
-      expect(op.responses!["400"], isNotNull);
+      expect(op.responses!['404'], isNotNull);
+      expect(op.responses!['409'], isNotNull);
+      expect(op.responses!['400'], isNotNull);
       expect(
-          op.responses!["200"]!.content!["application/json"]!.schema!
+          op.responses!['200']!.content!['application/json']!.schema!
               .referenceURI!.path,
-          "/components/schemas/TestModel");
+          '/components/schemas/TestModel');
       expect(
-          op.requestBody!.content!["application/json"]!.schema!.referenceURI!
+          op.requestBody!.content!['application/json']!.schema!.referenceURI!
               .path,
-          "/components/schemas/TestModel");
+          '/components/schemas/TestModel');
     });
 
-    test("deleteObject", () {
-      var op = idOperations!["delete"]!;
-      expect(op.id, "deleteTestModel");
+    test('deleteObject', () {
+      var op = idOperations!['delete']!;
+      expect(op.id, 'deleteTestModel');
 
       expect(op.responses!.length, 2);
 
-      expect(op.responses!["404"], isNotNull);
-      expect(op.responses!["200"]!.content, isNull);
+      expect(op.responses!['404'], isNotNull);
+      expect(op.responses!['200']!.content, isNull);
     });
 
-    test("getObjects", () {
-      var op = collectionOperations!["get"]!;
-      expect(op.id, "getTestModels");
+    test('getObjects', () {
+      var op = collectionOperations!['get']!;
+      expect(op.id, 'getTestModels');
 
       expect(op.responses!.length, 2);
       expect(op.parameters!.length, 6);
       expect(op.parameters!.every((p) => p!.isRequired == false), true);
 
-      expect(op.responses!["400"], isNotNull);
-      expect(op.responses!["200"]!.content!["application/json"]!.schema!.type,
+      expect(op.responses!['400'], isNotNull);
+      expect(op.responses!['200']!.content!['application/json']!.schema!.type,
           APIType.array);
       expect(
-          op.responses!["200"]!.content!["application/json"]!.schema!.items!
+          op.responses!['200']!.content!['application/json']!.schema!.items!
               .referenceURI!.path,
-          "/components/schemas/TestModel");
+          '/components/schemas/TestModel');
     });
   });
 }
@@ -134,10 +134,10 @@ class TestChannel extends ApplicationChannel {
   Controller get entryPoint {
     final router = Router();
     router
-        .route("/controller/[:id]")
+        .route('/controller/[:id]')
         .link(() => ManagedObjectController<TestModel>(context!));
 
-    router.route("/dynamic/[:id]").link(() => ManagedObjectController.forEntity(
+    router.route('/dynamic/[:id]').link(() => ManagedObjectController.forEntity(
         context!.dataModel!.entityForType(TestModel), context!));
     return router;
   }

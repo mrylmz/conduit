@@ -177,7 +177,7 @@ class KeyedArchive extends Object
         _map[key] = KeyedArchive(caster.cast(val));
       } else if (val is List) {
         _map[key] = ListArchive.from(val);
-      } else if (key == r"$ref") {
+      } else if (key == r'$ref') {
         referenceURI = Uri.parse(Uri.parse(val.toString()).fragment);
       }
     }
@@ -333,7 +333,7 @@ class KeyedArchive extends Object
       .._map = {}
       ..referenceURI = object.referenceURI;
     if (json.referenceURI != null) {
-      json._map[r"$ref"] = Uri(fragment: json.referenceURI!.path).toString();
+      json._map[r'$ref'] = Uri(fragment: json.referenceURI!.path).toString();
     } else {
       object.encode(json);
     }

@@ -26,8 +26,8 @@ void main() {
     await ctx.close();
   });
 
-  group("Primary key defaults", () {
-    test("@primaryKey defaults to using Validate.constant()", () {
+  group('Primary key defaults', () {
+    test('@primaryKey defaults to using Validate.constant()', () {
       final t = T()..id = 1;
       expect(t.validate(forEvent: Validating.insert).isValid, true);
       expect(t.validate(forEvent: Validating.update).isValid, false);
@@ -42,18 +42,18 @@ void main() {
     });
   });
 
-  group("Foreign keys", () {
-    test("Validator applies to foreign key value", () {
+  group('Foreign keys', () {
+    test('Validator applies to foreign key value', () {
       final fk = FK();
       fk.parent = Parent()..id = 1;
       expect(fk.validate().isValid, false);
-      expect(fk.validate().errors.first, contains("FK.parent.id"));
+      expect(fk.validate().errors.first, contains('FK.parent.id'));
 
       fk.parent.id = 2;
       expect(fk.validate().isValid, true);
     });
 
-    test("If foreign key object is null, validator is not run", () {
+    test('If foreign key object is null, validator is not run', () {
       final fk = FK();
       expect(fk.validate().isValid, true);
     });
@@ -67,36 +67,36 @@ void main() {
     });
 
     test(
-        "If primary key has a validator, it is not run when evaluated as a foreign key",
+        'If primary key has a validator, it is not run when evaluated as a foreign key',
         () {
       final fk = FK();
       fk.parent = Parent()..id = 10;
       expect(fk.validate().isValid, true);
 
       expect(fk.parent.validate().isValid, false);
-      expect(fk.parent.validate().errors.first, contains("Parent.id"));
+      expect(fk.parent.validate().errors.first, contains('Parent.id'));
     });
   });
 
-  group("Validate.matches", () {
-    test("Valid regex reports match", () {
+  group('Validate.matches', () {
+    test('Valid regex reports match', () {
       var t = T()
-        ..regex = "OIASDJKASD"
-        ..contain = "XcontainY";
+        ..regex = 'OIASDJKASD'
+        ..contain = 'XcontainY';
       expect(t.validate().isValid, true);
     });
 
-    test("Invalid regex reports failure", () {
-      var t = T()..regex = "OiASDJKASD";
+    test('Invalid regex reports failure', () {
+      var t = T()..regex = 'OiASDJKASD';
       expect(t.validate().isValid, false);
 
-      t = T()..contain = "abcde";
+      t = T()..contain = 'abcde';
       expect(t.validate().isValid, false);
     });
   });
 
-  group("Validate.compare", () {
-    test("lessThan/int", () {
+  group('Validate.compare', () {
+    test('lessThan/int', () {
       var t = T()..compareIntLessThan1 = 0;
       expect(t.validate().isValid, true);
       t.compareIntLessThan1 = 1;
@@ -105,16 +105,16 @@ void main() {
       expect(t.validate().isValid, false);
     });
 
-    test("lessThanEqual/string", () {
-      var t = T()..compareStringLessThanEqualToBar = "abc";
+    test('lessThanEqual/string', () {
+      var t = T()..compareStringLessThanEqualToBar = 'abc';
       expect(t.validate().isValid, true);
-      t.compareStringLessThanEqualToBar = "bar";
+      t.compareStringLessThanEqualToBar = 'bar';
       expect(t.validate().isValid, true);
-      t.compareStringLessThanEqualToBar = "baz";
+      t.compareStringLessThanEqualToBar = 'baz';
       expect(t.validate().isValid, false);
     });
 
-    test("greaterThan/double", () {
+    test('greaterThan/double', () {
       var t = T()..compareDoubleGreaterThan1 = 2.0;
       expect(t.validate().isValid, true);
       t.compareDoubleGreaterThan1 = 1.0;
@@ -123,7 +123,7 @@ void main() {
       expect(t.validate().isValid, false);
     });
 
-    test("greaterThanEqual/date", () {
+    test('greaterThanEqual/date', () {
       var t = T()..compareDateGreaterThanEqualTo1990 = DateTime.utc(2000);
       expect(t.validate().isValid, true);
       t.compareDateGreaterThanEqualTo1990 = DateTime.utc(1990);
@@ -132,14 +132,14 @@ void main() {
       expect(t.validate().isValid, false);
     });
 
-    test("equal", () {
+    test('equal', () {
       var t = T()..compareIntEqualTo5 = 5;
       expect(t.validate().isValid, true);
       t.compareIntEqualTo5 = 4;
       expect(t.validate().isValid, false);
     });
 
-    test("Combine two yields and of both", () {
+    test('Combine two yields and of both', () {
       var t = T()..compareIntBetween6And10 = 6;
       expect(t.validate().isValid, true);
       t.compareIntBetween6And10 = 10;
@@ -152,77 +152,77 @@ void main() {
     });
   });
 
-  group("Validate.length", () {
-    test("lessThan", () {
-      var t = T()..lengthLessThan5 = "abc";
+  group('Validate.length', () {
+    test('lessThan', () {
+      var t = T()..lengthLessThan5 = 'abc';
       expect(t.validate().isValid, true);
-      t.lengthLessThan5 = "abcde";
+      t.lengthLessThan5 = 'abcde';
       expect(t.validate().isValid, false);
-      t.lengthLessThan5 = "abcdefgh";
-      expect(t.validate().isValid, false);
-    });
-
-    test("lessThanEqual", () {
-      var t = T()..lengthLessThanEqualTo5 = "abc";
-      expect(t.validate().isValid, true);
-      t.lengthLessThanEqualTo5 = "abcde";
-      expect(t.validate().isValid, true);
-      t.lengthLessThanEqualTo5 = "abcdefg";
+      t.lengthLessThan5 = 'abcdefgh';
       expect(t.validate().isValid, false);
     });
 
-    test("greaterThan", () {
-      var t = T()..lengthGreaterThan5 = "abcdefghi";
+    test('lessThanEqual', () {
+      var t = T()..lengthLessThanEqualTo5 = 'abc';
       expect(t.validate().isValid, true);
-      t.lengthGreaterThan5 = "abcde";
-      expect(t.validate().isValid, false);
-      t.lengthGreaterThan5 = "abc";
-      expect(t.validate().isValid, false);
-    });
-
-    test("greaterThanEqual", () {
-      var t = T()..lengthGreaterThanEqualTo5 = "abcdefgh";
+      t.lengthLessThanEqualTo5 = 'abcde';
       expect(t.validate().isValid, true);
-      t.lengthGreaterThanEqualTo5 = "abcde";
-      expect(t.validate().isValid, true);
-      t.lengthGreaterThanEqualTo5 = "abc";
+      t.lengthLessThanEqualTo5 = 'abcdefg';
       expect(t.validate().isValid, false);
     });
 
-    test("equal", () {
-      var t = T()..lengthEqualTo2 = "ab";
+    test('greaterThan', () {
+      var t = T()..lengthGreaterThan5 = 'abcdefghi';
       expect(t.validate().isValid, true);
-      t.lengthEqualTo2 = "c";
+      t.lengthGreaterThan5 = 'abcde';
+      expect(t.validate().isValid, false);
+      t.lengthGreaterThan5 = 'abc';
       expect(t.validate().isValid, false);
     });
 
-    test("Combine two yields and of both", () {
-      var t = T()..lengthBetween6And10 = "abcdef";
+    test('greaterThanEqual', () {
+      var t = T()..lengthGreaterThanEqualTo5 = 'abcdefgh';
       expect(t.validate().isValid, true);
-      t.lengthBetween6And10 = "abcdefghij";
+      t.lengthGreaterThanEqualTo5 = 'abcde';
+      expect(t.validate().isValid, true);
+      t.lengthGreaterThanEqualTo5 = 'abc';
+      expect(t.validate().isValid, false);
+    });
+
+    test('equal', () {
+      var t = T()..lengthEqualTo2 = 'ab';
+      expect(t.validate().isValid, true);
+      t.lengthEqualTo2 = 'c';
+      expect(t.validate().isValid, false);
+    });
+
+    test('Combine two yields and of both', () {
+      var t = T()..lengthBetween6And10 = 'abcdef';
+      expect(t.validate().isValid, true);
+      t.lengthBetween6And10 = 'abcdefghij';
       expect(t.validate().isValid, true);
 
-      t.lengthBetween6And10 = "abcdefghijk";
+      t.lengthBetween6And10 = 'abcdefghijk';
       expect(t.validate().isValid, false);
-      t.lengthBetween6And10 = "abcde";
+      t.lengthBetween6And10 = 'abcde';
       expect(t.validate().isValid, false);
     });
   });
 
-  group("Validate.present", () {
-    test("Ensures key exists", () {
+  group('Validate.present', () {
+    test('Ensures key exists', () {
       var u = U();
       expect(u.validate().isValid, false);
       u.present = 1;
       expect(u.validate().isValid, true);
     });
 
-    test("Does not care about null, as long as present", () {
+    test('Does not care about null, as long as present', () {
       var u = U()..present = null;
       expect(u.validate().isValid, true);
     });
 
-    test("Relationship primary key must be present", () {
+    test('Relationship primary key must be present', () {
       final o = PresenceBelongsTo();
       expect(o.validate().isValid, false);
       o.present = PresenceHas();
@@ -231,12 +231,12 @@ void main() {
       expect(o.validate().isValid, true);
     });
 
-    test("Ensure foreign object key exists", () {
+    test('Ensure foreign object key exists', () {
       final fk = PresenceBelongsTo();
       expect(fk.validate().isValid, false);
     });
 
-    test("If foreign key object is null, validator fails", () {
+    test('If foreign key object is null, validator fails', () {
       final fk = PresenceBelongsTo()..present = null;
       expect(fk.validate().isValid, false);
     });
@@ -246,71 +246,71 @@ void main() {
       final fk = PresenceBelongsTo()..present = PresenceHas();
       expect(fk.validate().isValid, false);
       expect(
-          fk.validate().errors.first, contains("PresenceBelongsTo.present.id"));
+          fk.validate().errors.first, contains('PresenceBelongsTo.present.id'));
     });
   });
 
-  group("Validate.absent", () {
-    test("Ensures key is absent", () {
+  group('Validate.absent', () {
+    test('Ensures key is absent', () {
       var u = U()..present = 1;
       expect(u.validate().isValid, true);
       u.absent = 1;
       expect(u.validate().isValid, false);
     });
 
-    test("Does not treat null as absent", () {
+    test('Does not treat null as absent', () {
       var u = U()
         ..present = 1
         ..absent = null;
       expect(u.validate().isValid, false);
     });
 
-    test("Relationship key must be absent", () {
+    test('Relationship key must be absent', () {
       final o = AbsenceBelongsTo();
       expect(o.validate().isValid, true);
 
       o.absent = AbsenceHas();
       expect(o.validate().isValid, false);
-      expect(o.validate().errors.first, contains("AbsenceBelongsTo.absent.id"));
+      expect(o.validate().errors.first, contains('AbsenceBelongsTo.absent.id'));
 
       o.absent = AbsenceHas()..id = 1;
       expect(o.validate().isValid, false);
-      expect(o.validate().errors.first, contains("AbsenceBelongsTo.absent.id"));
+      expect(o.validate().errors.first, contains('AbsenceBelongsTo.absent.id'));
     });
   });
 
-  group("Validate.oneOf", () {
-    test("Works with String", () {
-      var t = T()..oneOfAB = "A";
+  group('Validate.oneOf', () {
+    test('Works with String', () {
+      var t = T()..oneOfAB = 'A';
       expect(t.validate().isValid, true);
-      t.oneOfAB = "C";
+      t.oneOfAB = 'C';
       expect(t.validate().isValid, false);
     });
 
-    test("Works with int", () {
+    test('Works with int', () {
       var t = T()..oneOf12 = 1;
       expect(t.validate().isValid, true);
       t.oneOf12 = 3;
       expect(t.validate().isValid, false);
     });
 
-    test("Implicitly added to enum types", () {
-      var e = EnumObject()..backing.contents!["enumValues"] = "foobar";
+    test('Implicitly added to enum types', () {
+      var e = EnumObject()..backing.contents!['enumValues'] = 'foobar';
       expect(e.validate().isValid, false);
       e.enumValues = EnumValues.abcd;
       expect(e.validate().isValid, true);
     });
   });
 
-  group("Validate.constant", () {
-    test("Allows attributes during insert, not update", () {
-      var t = Constant()..constantString = "A";
+  group('Validate.constant', () {
+    test('Allows attributes during insert, not update', () {
+      var t = Constant()..constantString = 'A';
       expect(t.validate(forEvent: Validating.insert).isValid, true);
 
       expect(t.validate(forEvent: Validating.update).isValid, false);
     });
 
-    test("Allows relationships during insert, not update", () {
+    test('Allows relationships during insert, not update', () {
       var t = Constant()
         ..constantRef = ConstantRef()
         ..id = 1;
@@ -319,8 +319,8 @@ void main() {
     });
   });
 
-  group("Operation", () {
-    test("Specify update only, only runs on update", () {
+  group('Operation', () {
+    test('Specify update only, only runs on update', () {
       var t = T()..mustBeZeroOnUpdate = 10;
       expect(ManagedValidator.run(t, event: Validating.insert).isValid, true);
 
@@ -331,7 +331,7 @@ void main() {
       expect(ManagedValidator.run(t, event: Validating.update).isValid, true);
     });
 
-    test("Specify insert only, only runs on insert", () {
+    test('Specify insert only, only runs on insert', () {
       var t = T()..mustBeZeroOnInsert = 10;
       expect(ManagedValidator.run(t, event: Validating.update).isValid, true);
 
@@ -342,36 +342,36 @@ void main() {
       expect(ManagedValidator.run(t, event: Validating.insert).isValid, true);
     });
 
-    test("More than one matcher", () {
-      var t = T()..mustBeBayOrBaz = "bay";
+    test('More than one matcher', () {
+      var t = T()..mustBeBayOrBaz = 'bay';
       expect(t.validate().isValid, true);
-      t.mustBeBayOrBaz = "baz";
+      t.mustBeBayOrBaz = 'baz';
       expect(t.validate().isValid, true);
-      t.mustBeBayOrBaz = "bar";
+      t.mustBeBayOrBaz = 'bar';
       expect(t.validate().isValid, false);
-      t.mustBeBayOrBaz = "baa";
+      t.mustBeBayOrBaz = 'baa';
       expect(t.validate().isValid, false);
     });
 
     test("ManagedObject can provide add'l validations by overriding validate",
         () async {
-      var v = V()..aOrbButReallyOnlyA = "a";
+      var v = V()..aOrbButReallyOnlyA = 'a';
       expect(v.validate().isValid, true);
-      v.aOrbButReallyOnlyA = "b";
+      v.aOrbButReallyOnlyA = 'b';
       expect(v.validate().isValid, false);
     });
   });
 
-  group("Custom validator verify", () {
-    test("Custom validator correctly validates a value", () {
-      var t = T()..mustByXYZ = "XYZ";
+  group('Custom validator verify', () {
+    test('Custom validator correctly validates a value', () {
+      var t = T()..mustByXYZ = 'XYZ';
       expect(t.validate().isValid, true);
-      t.mustByXYZ = "not";
+      t.mustByXYZ = 'not';
       expect(t.validate().isValid, false);
     });
   });
 
-  test("Can combine both metadata and arguments to Column", () {
+  test('Can combine both metadata and arguments to Column', () {
     final x = MultiValidate()..canOnlyBe4 = 3;
     expect(x.validate().isValid, false);
     x.canOnlyBe4 = 5;
@@ -390,10 +390,10 @@ class _T {
   @primaryKey
   int? id;
 
-  @Validate.matches(r"^[A-Z]+$")
+  @Validate.matches(r'^[A-Z]+$')
   String? regex;
 
-  @Validate.matches("contain")
+  @Validate.matches('contain')
   String? contain;
 
   @Validate.compare(lessThan: 1)
@@ -402,10 +402,10 @@ class _T {
   @Validate.compare(greaterThan: 1.0)
   double? compareDoubleGreaterThan1;
 
-  @Validate.compare(lessThanEqualTo: "bar")
+  @Validate.compare(lessThanEqualTo: 'bar')
   String? compareStringLessThanEqualToBar;
 
-  @Validate.compare(greaterThanEqualTo: "1990-01-01T00:00:00Z")
+  @Validate.compare(greaterThanEqualTo: '1990-01-01T00:00:00Z')
   DateTime? compareDateGreaterThanEqualTo1990;
 
   @Validate.compare(equalTo: 5)
@@ -432,7 +432,7 @@ class _T {
   @Validate.length(lessThan: 11, greaterThan: 5)
   String? lengthBetween6And10;
 
-  @Validate.oneOf(["A", "B"])
+  @Validate.oneOf(['A', 'B'])
   String? oneOfAB;
 
   @Validate.oneOf([1, 2])
@@ -444,8 +444,8 @@ class _T {
   @Validate.compare(equalTo: 0, onInsert: false, onUpdate: true)
   int? mustBeZeroOnUpdate;
 
-  @Validate.compare(greaterThan: "bar")
-  @Validate.oneOf(["baa", "bar", "bay", "baz"])
+  @Validate.compare(greaterThan: 'bar')
+  @Validate.oneOf(['baa', 'bar', 'bay', 'baz'])
   String? mustBeBayOrBaz;
 
   @CustomValidate()
@@ -471,8 +471,8 @@ class CustomValidate extends Validate {
 
   @override
   void validate(ValidationContext context, dynamic input) {
-    if (input != "XYZ") {
-      context.addError("not XYZ");
+    if (input != 'XYZ') {
+      context.addError('not XYZ');
     }
   }
 }
@@ -482,7 +482,7 @@ class V extends ManagedObject<_V> implements _V {
   ValidationContext validate({Validating forEvent = Validating.insert}) {
     final context = super.validate(forEvent: forEvent);
 
-    if (aOrbButReallyOnlyA == "b") {
+    if (aOrbButReallyOnlyA == 'b') {
       context.addError("can't be b");
     }
 
@@ -517,7 +517,7 @@ class _V {
   @primaryKey
   int? id;
 
-  @Validate.oneOf(["a", "b"])
+  @Validate.oneOf(['a', 'b'])
   String? aOrbButReallyOnlyA;
 }
 

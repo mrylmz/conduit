@@ -87,7 +87,9 @@ class PropertyBuilder {
       autoincrement = column?.autoincrement ?? false;
     }
 
-    validators!.forEach((vb) => vb.compile(entityBuilders));
+    for (var vb in validators!) {
+      vb.compile(entityBuilders);
+    }
   }
 
   void validate(List<EntityBuilder>? entityBuilders) {
@@ -115,7 +117,7 @@ class PropertyBuilder {
       if (defaultValue != null && autoincrement) {
         throw ManagedDataModelError(
             "Property '${parent.name}.$name' is invalid. "
-            "A property cannot have a default value and be autoincrementing. ");
+            'A property cannot have a default value and be autoincrementing. ');
       }
     }
 
@@ -125,11 +127,15 @@ class PropertyBuilder {
           parent.tableDefinitionTypeName, declaration.simpleName);
     }
 
-    validators!.forEach((vb) => vb.validate(entityBuilders));
+    for (var vb in validators!) {
+      vb.validate(entityBuilders);
+    }
   }
 
   void link(List<ManagedEntity> others) {
-    validators!.forEach((v) => v.link(others));
+    for (var v in validators!) {
+      v.link(others);
+    }
     if (isRelationship) {
       var destinationEntity =
           others.firstWhere((e) => e == relatedProperty!.parent.entity);
@@ -230,7 +236,7 @@ class PropertyBuilder {
     }
 
     throw ManagedDataModelError(
-        "Tried getting property type description from non-property. This is an internal error, "
+        'Tried getting property type description from non-property. This is an internal error, '
         "as this method shouldn't be invoked on non-property or non-accessors.");
   }
 

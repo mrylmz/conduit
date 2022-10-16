@@ -12,24 +12,24 @@ String getInvokerSource(BuildContext context,
   final buf = StringBuffer();
   final subclassName = MirrorSystem.getName(controller.type.simpleName);
 
-  buf.writeln("(rc, args) {");
-  buf.writeln("  return (rc as $subclassName).${op.dartMethodName}(");
+  buf.writeln('(rc, args) {');
+  buf.writeln('  return (rc as $subclassName).${op.dartMethodName}(');
 
   var counter = 0;
-  op.positionalParameters.forEach((p) {
-    buf.writeln("    args.positionalArguments[$counter] as ${p.type},");
+  for (var p in op.positionalParameters) {
+    buf.writeln('    args.positionalArguments[$counter] as ${p.type},');
     counter++;
-  });
+  }
 
-  op.namedParameters.forEach((p) {
+  for (var p in op.namedParameters) {
     var defaultValue = sourcifyValue(p.defaultValue);
 
     buf.writeln(
         "    ${p.symbolName}: args.namedArguments['${p.symbolName}'] as ${p.type}? ?? $defaultValue,");
-  });
+  }
 
-  buf.writeln("  );");
-  buf.writeln("}");
+  buf.writeln('  );');
+  buf.writeln('}');
 
   return buf.toString();
 }
@@ -39,10 +39,10 @@ String getApplyRequestPropertiesSource(
   StringBuffer buf = StringBuffer();
   final subclassName = MirrorSystem.getName(runtime.type.simpleName);
 
-  runtime.ivarParameters!.forEach((f) {
-    buf.writeln("(untypedController as $subclassName).${f.symbolName} "
+  for (var f in runtime.ivarParameters!) {
+    buf.writeln('(untypedController as $subclassName).${f.symbolName} '
         "= args.instanceVariables['${f.symbolName}'] as ${f.type}?;");
-  });
+  }
 
   return buf.toString();
 }
@@ -51,12 +51,12 @@ String getResourceControllerImplSource(
     BuildContext context, ResourceControllerRuntimeImpl runtime) {
   final ivarSources = runtime.ivarParameters!
       .map((i) => getParameterSource(context, runtime, i))
-      .join(",\n");
+      .join(',\n');
   final operationSources = runtime.operations
       .map((o) => getOperationSource(context, runtime, o))
-      .join(",\n");
+      .join(',\n');
 
-  return """
+  return '''
 class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
   ResourceControllerRuntimeImpl() {
     ivarParameters = [$ivarSources];
@@ -68,7 +68,7 @@ class ResourceControllerRuntimeImpl extends ResourceControllerRuntime {
     ${getApplyRequestPropertiesSource(context, runtime)}
   }
 }
-  """;
+  ''';
 }
 
 String getDecoderSource(
@@ -97,7 +97,7 @@ String getDecoderSource(
 
 String sourcifyFilter(List<String>? filter) {
   if (filter == null) {
-    return "null";
+    return 'null';
   }
 
   return "[${filter.map((s) => "'$s'").join(",")}]";
@@ -109,7 +109,7 @@ String getBodyDecoderSource(ResourceControllerParameter p) {
   final require = sourcifyFilter(p.requireFilter);
   final accept = sourcifyFilter(p.acceptFilter);
   if (isSerializable(p.type)) {
-    return """(v) {
+    return '''(v) {
     return ${p.type}()
       ..read((v as RequestBody).as(), 
            accept: $accept,
@@ -117,9 +117,9 @@ String getBodyDecoderSource(ResourceControllerParameter p) {
            reject: $reject,
            require: $require);
     }
-    """;
+    ''';
   } else if (isListSerializable(p.type)) {
-    return """ (b) {
+    return ''' (b) {
       final body = b as RequestBody;
       final bodyList = body.as<List<Map<String, dynamic>>>();
       if (bodyList.isEmpty) {
@@ -136,56 +136,56 @@ String getBodyDecoderSource(ResourceControllerParameter p) {
       }).toList();
 
       return ${p.type}.from(iterable);       
-    }""";
+    }''';
   }
 
-  return """(b) { 
+  return '''(b) { 
     return (b as RequestBody).as<${p.type}>();
-  }""";
+  }''';
 }
 
 String getElementDecoderSource(Type type) {
-  final className = "${type}";
+  final className = '$type';
   if (reflectType(type).isSubtypeOf(reflectType(bool))) {
-    return "(v) { return true; }";
+    return '(v) { return true; }';
   } else if (reflectType(type).isSubtypeOf(reflectType(String))) {
-    return "(v) { return v as String; }";
+    return '(v) { return v as String; }';
   }
 
-  return """(v) {
+  return '''(v) {
   try {
     return $className.parse(v as String);
   } catch (_) {
     throw ArgumentError("invalid value");
   }
 }
-      """;
+      ''';
 }
 
 String getListDecoderSource(ResourceControllerParameter p) {
   if (reflectType(p.type).isSubtypeOf(reflectType(List))) {
     final mapper = getElementDecoderSource(
         reflectType(p.type).typeArguments.first.reflectedType);
-    return """(v) {
+    return '''(v) {
   return ${p.type}.from((v as List).map($mapper));  
-}  """;
+}  ''';
   }
 
-  return """(v) {
+  return '''(v) {
   final listOfValues = v as List;
   if (listOfValues.length > 1) {
     throw ArgumentError("multiple values not expected");
   }
   return ${getElementDecoderSource(p.type)}(listOfValues.first);
 }  
-  """;
+  ''';
 }
 
 String getParameterSource(
     BuildContext context,
     ResourceControllerRuntimeImpl runtime,
     ResourceControllerParameter parameter) {
-  return """
+  return '''
 ResourceControllerParameter.make<${parameter.type}>(
   name: ${sourcifyValue(parameter.name)},
   acceptFilter: ${sourcifyFilter(parameter.acceptFilter)},
@@ -197,7 +197,7 @@ ResourceControllerParameter.make<${parameter.type}>(
   isRequired: ${sourcifyValue(parameter.isRequired)},
   defaultValue: ${sourcifyValue(parameter.defaultValue)},
   decoder: ${getDecoderSource(context, runtime, parameter)})
-  """;
+  ''';
 }
 
 String getOperationSource(
@@ -205,15 +205,15 @@ String getOperationSource(
     ResourceControllerRuntimeImpl runtime,
     ResourceControllerOperation operation) {
   final scopeElements = operation.scopes
-      ?.map((s) => "AuthScope(${sourcifyValue(s.toString())})")
-      .join(",");
+      ?.map((s) => 'AuthScope(${sourcifyValue(s.toString())})')
+      .join(',');
   final namedParameters = operation.namedParameters
       .map((p) => getParameterSource(context, runtime, p))
-      .join(",");
+      .join(',');
   final positionalParameters = operation.positionalParameters
       .map((p) => getParameterSource(context, runtime, p))
-      .join(",");
-  final pathVars = operation.pathVariables.map((s) => "'$s'").join(",");
+      .join(',');
+  final pathVars = operation.pathVariables.map((s) => "'$s'").join(',');
 
   return """
 ResourceControllerOperation(

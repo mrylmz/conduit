@@ -10,7 +10,7 @@ void main() {
   late APIDocumentContext ctx;
   setUp(() {
     ctx = APIDocumentContext(APIDocument()
-      ..info = APIInfo("x", "1.0.0")
+      ..info = APIInfo('x', '1.0.0')
       ..paths = {}
       ..components = APIComponents());
   });
@@ -20,64 +20,64 @@ void main() {
     await ctx.finalize();
   });
 
-  test("Serializable contains properties for each declared field", () async {
+  test('Serializable contains properties for each declared field', () async {
     final doc = A().documentSchema(ctx);
     await ctx.finalize();
 
     expect(doc.properties!.length, 2);
 
-    expect(doc.properties!["x"]!.type, APIType.integer);
-    expect(doc.properties!["x"]!.title, "x");
+    expect(doc.properties!['x']!.type, APIType.integer);
+    expect(doc.properties!['x']!.title, 'x');
 
-    expect(doc.properties!["b"]!.type, APIType.object);
-    expect(doc.properties!["b"]!.title, "b");
+    expect(doc.properties!['b']!.type, APIType.object);
+    expect(doc.properties!['b']!.title, 'b');
   });
 
-  test("Nested serializable is documented", () async {
+  test('Nested serializable is documented', () async {
     final doc = A().documentSchema(ctx);
-    expect(doc.properties!["b"]!.properties!.length, 1);
-    expect(doc.properties!["b"]!.properties!["y"]!.type, APIType.string);
+    expect(doc.properties!['b']!.properties!.length, 1);
+    expect(doc.properties!['b']!.properties!['y']!.type, APIType.string);
   });
 
   test(
-      "If Serializable cannot be documented, it still allows doc generation but shows error in document",
+      'If Serializable cannot be documented, it still allows doc generation but shows error in document',
       () async {
     final doc = FailsToDocument().documentSchema(ctx);
     await ctx.finalize();
 
-    expect(doc.title, "FailsToDocument");
-    expect(doc.description, contains("HttpServer"));
+    expect(doc.title, 'FailsToDocument');
+    expect(doc.description, contains('HttpServer'));
     expect(doc.additionalPropertyPolicy,
         APISchemaAdditionalPropertyPolicy.freeForm);
   });
 
-  test("Serializable can override static document method", () async {
+  test('Serializable can override static document method', () async {
     final doc = OverrideDocument().documentSchema(ctx);
     await ctx.finalize();
 
-    expect(doc.properties!["k"], isNotNull);
+    expect(doc.properties!['k'], isNotNull);
   });
 
   test(
-      "Can bind a Serializable implementor to a resource controller method and it auto-documents",
+      'Can bind a Serializable implementor to a resource controller method and it auto-documents',
       () async {
     final c = BoundBodyController();
     c.didAddToChannel();
     c.restore(c.recycledState);
 
     c.documentComponents(ctx);
-    final op = c.documentOperations(ctx, "/", APIPath.empty());
+    final op = c.documentOperations(ctx, '/', APIPath.empty());
     await ctx.finalize();
 
     expect(
-        op["post"]!
+        op['post']!
             .requestBody!
-            .content!["application/json"]!
+            .content!['application/json']!
             .schema!
             .referenceURI!
             .pathSegments
             .last,
-        "BoundBody");
+        'BoundBody');
   });
 }
 
@@ -120,7 +120,7 @@ class FailsToDocument extends Serializable {
 class OverrideDocument extends Serializable {
   @override
   APISchemaObject documentSchema(APIDocumentContext context) {
-    return APISchemaObject.object({"k": APISchemaObject.string()});
+    return APISchemaObject.object({'k': APISchemaObject.string()});
   }
 
   @override

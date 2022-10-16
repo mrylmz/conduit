@@ -14,9 +14,9 @@ import 'package:logging/logging.dart';
 
 void justLogEverything() {
   hierarchicalLoggingEnabled = true;
-  Logger("")
+  Logger('')
     ..level = Level.ALL
-    ..onRecord.listen((p) => print("$p ${p.object} ${p.stackTrace}"));
+    ..onRecord.listen((p) => print('$p ${p.object} ${p.stackTrace}'));
 }
 
 class PassthruController extends Controller {
@@ -102,14 +102,14 @@ class TestToken implements AuthToken, AuthCode {
   @override
   Map<String, dynamic> asMap() {
     var map = {
-      "access_token": accessToken,
-      "token_type": type,
-      "expires_in":
+      'access_token': accessToken,
+      'token_type': type,
+      'expires_in':
           expirationDate!.difference(DateTime.now().toUtc()).inSeconds,
     };
 
     if (refreshToken != null) {
-      map["refresh_token"] = refreshToken;
+      map['refresh_token'] = refreshToken;
     }
 
     return map;
@@ -121,7 +121,7 @@ class InMemoryAuthStorage extends AuthServerDelegate {
     reset();
   }
 
-  static const String defaultPassword = "foobaraxegrind21%";
+  static const String defaultPassword = 'foobaraxegrind21%';
 
   Map<String?, AuthClient>? clients;
   Map<int, TestUser> users = {};
@@ -133,7 +133,7 @@ class InMemoryAuthStorage extends AuthServerDelegate {
       var salt = AuthUtility.generateRandomSalt();
       var u = TestUser()
         ..id = i + 1
-        ..username = "bob+$i@stablekernel.com"
+        ..username = 'bob+$i@stablekernel.com'
         ..salt = salt
         ..hashedPassword =
             AuthUtility.generatePasswordHash(defaultPassword, salt);
@@ -143,41 +143,41 @@ class InMemoryAuthStorage extends AuthServerDelegate {
   }
 
   void reset() {
-    var salt = "ABCDEFGHIJKLMNOPQRSTUVWXYZ012345";
+    var salt = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ012345';
     clients = {
-      "com.stablekernel.app1": AuthClient("com.stablekernel.app1",
-          AuthUtility.generatePasswordHash("kilimanjaro", salt), salt),
-      "com.stablekernel.app2": AuthClient("com.stablekernel.app2",
-          AuthUtility.generatePasswordHash("fuji", salt), salt),
-      "com.stablekernel.redirect": AuthClient.withRedirectURI(
-          "com.stablekernel.redirect",
-          AuthUtility.generatePasswordHash("mckinley", salt),
+      'com.stablekernel.app1': AuthClient('com.stablekernel.app1',
+          AuthUtility.generatePasswordHash('kilimanjaro', salt), salt),
+      'com.stablekernel.app2': AuthClient('com.stablekernel.app2',
+          AuthUtility.generatePasswordHash('fuji', salt), salt),
+      'com.stablekernel.redirect': AuthClient.withRedirectURI(
+          'com.stablekernel.redirect',
+          AuthUtility.generatePasswordHash('mckinley', salt),
           salt,
-          "http://stablekernel.com/auth/redirect"),
-      "com.stablekernel.public":
-          AuthClient("com.stablekernel.public", null, salt),
-      "com.stablekernel.redirect2": AuthClient.withRedirectURI(
-          "com.stablekernel.redirect2",
-          AuthUtility.generatePasswordHash("gibraltar", salt),
+          'http://stablekernel.com/auth/redirect'),
+      'com.stablekernel.public':
+          AuthClient('com.stablekernel.public', null, salt),
+      'com.stablekernel.redirect2': AuthClient.withRedirectURI(
+          'com.stablekernel.redirect2',
+          AuthUtility.generatePasswordHash('gibraltar', salt),
           salt,
-          "http://stablekernel.com/auth/redirect2"),
-      "com.stablekernel.public.redirect": AuthClient.withRedirectURI(
-          "com.stablekernel.public.redirect",
+          'http://stablekernel.com/auth/redirect2'),
+      'com.stablekernel.public.redirect': AuthClient.withRedirectURI(
+          'com.stablekernel.public.redirect',
           null,
           salt,
-          "http://stablekernel.com/auth/public-redirect"),
-      "com.stablekernel.scoped": AuthClient.withRedirectURI(
-          "com.stablekernel.scoped",
-          AuthUtility.generatePasswordHash("kilimanjaro", salt),
+          'http://stablekernel.com/auth/public-redirect'),
+      'com.stablekernel.scoped': AuthClient.withRedirectURI(
+          'com.stablekernel.scoped',
+          AuthUtility.generatePasswordHash('kilimanjaro', salt),
           salt,
-          "http://stablekernel.com/auth/scoped",
-          allowedScopes: [AuthScope("user"), AuthScope("other_scope")]),
-      "com.stablekernel.public.scoped": AuthClient.withRedirectURI(
-          "com.stablekernel.public.scoped",
+          'http://stablekernel.com/auth/scoped',
+          allowedScopes: [AuthScope('user'), AuthScope('other_scope')]),
+      'com.stablekernel.public.scoped': AuthClient.withRedirectURI(
+          'com.stablekernel.public.scoped',
           null,
           salt,
-          "http://stablekernel.com/auth/public-scoped",
-          allowedScopes: [AuthScope("user"), AuthScope("other_scope")]),
+          'http://stablekernel.com/auth/public-scoped',
+          allowedScopes: [AuthScope('user'), AuthScope('other_scope')]),
     };
     users = {};
     tokens = [];
@@ -206,7 +206,7 @@ class InMemoryAuthStorage extends AuthServerDelegate {
           tokens.firstWhereOrNull((t) => t.refreshToken == byRefreshToken);
     } else {
       throw ArgumentError(
-          "byAccessToken and byRefreshToken are mutually exclusive");
+          'byAccessToken and byRefreshToken are mutually exclusive');
     }
 
     if (existing == null) {
@@ -328,8 +328,8 @@ class DefaultPersistentStore extends PersistentStore {
 
   @override
   Future<T?> transaction<T>(ManagedContext transactionContext,
-          Future<T?> transactionBlock(ManagedContext transaction)) async =>
-      throw Exception("Transaciton not supported on mock");
+          Future<T?> Function(ManagedContext transaction) transactionBlock) async =>
+      throw Exception('Transaciton not supported on mock');
 
   @override
   List<String> createTable(SchemaTable table, {bool isTemporary = false}) => [];
@@ -423,41 +423,41 @@ class _MockQuery<InstanceType extends ManagedObject> extends Object
 
   @override
   Future<InstanceType> insert() async {
-    throw Exception("insert() in _MockQuery");
+    throw Exception('insert() in _MockQuery');
   }
 
   @override
   Future<List<InstanceType>> insertMany(List<InstanceType?> objects) async {
-    throw Exception("insertMany(...) in _MockQuery");
+    throw Exception('insertMany(...) in _MockQuery');
   }
 
   @override
   Future<List<InstanceType>> update() async {
-    throw Exception("update() in _MockQuery");
+    throw Exception('update() in _MockQuery');
   }
 
   @override
   Future<InstanceType> updateOne() async {
-    throw Exception("updateOne() in _MockQuery");
+    throw Exception('updateOne() in _MockQuery');
   }
 
   @override
   Future<int> delete() async {
-    throw Exception("delete() in _MockQuery");
+    throw Exception('delete() in _MockQuery');
   }
 
   @override
   Future<List<InstanceType>> fetch() async {
-    throw Exception("fetch() in _MockQuery");
+    throw Exception('fetch() in _MockQuery');
   }
 
   @override
   Future<InstanceType> fetchOne() async {
-    throw Exception("fetchOne() in _MockQuery");
+    throw Exception('fetchOne() in _MockQuery');
   }
 
   @override
   QueryReduceOperation<InstanceType> get reduce {
-    throw Exception("fold in _MockQuery");
+    throw Exception('fold in _MockQuery');
   }
 }

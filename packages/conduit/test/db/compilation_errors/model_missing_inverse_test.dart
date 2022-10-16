@@ -18,7 +18,7 @@ class _MissingInverseAbsent {
 }
 
 void main() {
-  test("Managed objects with missing inverses fail compilation", () {
+  test('Managed objects with missing inverses fail compilation', () {
     try {
       ManagedDataModel([MissingInverse2, MissingInverseAbsent]);
       expect(true, false);

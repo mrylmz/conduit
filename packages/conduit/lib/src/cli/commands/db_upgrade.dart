@@ -19,7 +19,7 @@ class CLIDatabaseUpgrade extends CLICommand
     final migrations = projectMigrations;
 
     if (migrations.isEmpty) {
-      displayInfo("No migration files.");
+      displayInfo('No migration files.');
       displayProgress("Run 'conduit db generate' first.");
       return 0;
     }
@@ -34,29 +34,33 @@ class CLIDatabaseUpgrade extends CLICommand
           .toList();
       if (migrationsToExecute.isEmpty) {
         displayInfo(
-            "Database version is already current (version: $currentVersion).");
+            'Database version is already current (version: $currentVersion).');
         return 0;
       }
 
       if (currentVersion == 0) {
         displayInfo(
-            "Updating to version ${migrationsToExecute.last.versionNumber} on new database...");
+            'Updating to version ${migrationsToExecute.last.versionNumber} on new database...');
       } else {
         displayInfo(
-            "Updating to version ${migrationsToExecute.last.versionNumber} from version $currentVersion...");
+            'Updating to version ${migrationsToExecute.last.versionNumber} from version $currentVersion...');
       }
 
       final currentSchema =
           await schemaByApplyingMigrationSources(appliedMigrations);
 
       await executeMigrations(
-          migrationsToExecute, currentSchema, currentVersion);
+        migrationsToExecute,
+        currentSchema,
+        currentVersion,
+      );
     } on QueryException catch (e) {
       if (e.event == QueryExceptionEvent.transport) {
         final databaseUrl =
-            "${connectedDatabase.username}:${connectedDatabase.password}@${connectedDatabase.host}:${connectedDatabase.port}/${connectedDatabase.databaseName}";
+            '${connectedDatabase.username}:${connectedDatabase.password}@${connectedDatabase.host}:${connectedDatabase.port}/${connectedDatabase.databaseName}';
         throw CLIException(
-            "There was an error connecting to the database '$databaseUrl'. Reason: ${e.message}.");
+          "There was an error connecting to the database '$databaseUrl'. Reason: ${e.message}.",
+        );
       }
 
       rethrow;
@@ -66,27 +70,35 @@ class CLIDatabaseUpgrade extends CLICommand
 
   @override
   String get name {
-    return "upgrade";
+    return 'upgrade';
   }
 
   @override
   String get description {
-    return "Executes migration files against a database.";
+    return 'Executes migration files against a database.';
   }
 
-  Future<Schema> executeMigrations(List<MigrationSource> migrations,
-      Schema fromSchema, int fromVersion) async {
+  Future<Schema> executeMigrations(
+    List<MigrationSource> migrations,
+    Schema fromSchema,
+    int fromVersion,
+  ) async {
     final schemaMap = await IsolateExecutor.run(
-        RunUpgradeExecutable.input(
-            fromSchema, _storeConnectionInfo!, migrations, fromVersion),
-        packageConfigURI: packageConfigUri,
-        imports: RunUpgradeExecutable.imports,
-        additionalContents: MigrationSource.combine(migrations),
-        additionalTypes: [DBInfo],
-        logHandler: displayProgress);
+      RunUpgradeExecutable.input(
+        fromSchema,
+        _storeConnectionInfo!,
+        migrations,
+        fromVersion,
+      ),
+      packageConfigURI: packageConfigUri,
+      imports: RunUpgradeExecutable.imports,
+      additionalContents: MigrationSource.combine(migrations),
+      additionalTypes: [DBInfo],
+      logHandler: displayProgress,
+    );
 
-    if (schemaMap.containsKey("error")) {
-      throw CLIException(schemaMap["error"] as String?);
+    if (schemaMap.containsKey('error')) {
+      throw CLIException(schemaMap['error'] as String?);
     }
 
     return Schema.fromMap(schemaMap);
@@ -95,7 +107,7 @@ class CLIDatabaseUpgrade extends CLICommand
   DBInfo? get _storeConnectionInfo {
     var s = persistentStore;
     if (s is PostgreSQLPersistentStore) {
-      return DBInfo("postgres", s.username, s.password, s.host, s.port,
+      return DBInfo('postgres', s.username, s.password, s.host, s.port,
           s.databaseName, s.timeZone,
           useSSL: s.isSSLConnection);
     }

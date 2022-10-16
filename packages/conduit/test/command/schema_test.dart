@@ -1,5 +1,5 @@
 // ignore: unnecessary_const
-@Tags(["cli"])
+@Tags(['cli'])
 import 'package:fs_test_agent/dart_project_agent.dart';
 import 'package:fs_test_agent/working_directory_agent.dart';
 import 'package:test/test.dart';
@@ -16,7 +16,7 @@ void main() {
       WorkingDirectoryAgent(DartProjectAgent.projectsDirectory),
     ).createTestProject();
     await cli.agent.getDependencies(offline: true);
-    cli.agent.addOrReplaceFile("lib/application_test.dart", """
+    cli.agent.addOrReplaceFile('lib/application_test.dart', """
 import 'package:conduit/conduit.dart';
 
 class TestObject extends ManagedObject<_TestObject> {}
@@ -32,9 +32,9 @@ class _TestObject {
 
   tearDown(DartProjectAgent.tearDownAll);
 
-  test("Ensure migration directory will get created on generation", () async {
-    var res = await cli.run("db", ["schema"]);
+  test('Ensure migration directory will get created on generation', () async {
+    var res = await cli.run('db', ['schema']);
     expect(res, 0);
-    expect(cli.output, contains("_TestObject"));
+    expect(cli.output, contains('_TestObject'));
   });
 }

@@ -12,13 +12,13 @@ class _FLEN {
 }
 
 void main() {
-  test("Non-string Validate.length", () {
+  test('Non-string Validate.length', () {
     try {
       ManagedDataModel([FailingLength]);
       expect(true, false);
     } on ManagedDataModelError catch (e) {
       expect(e.toString(), contains("is only valid for 'String'"));
-      expect(e.toString(), contains("_FLEN.d"));
+      expect(e.toString(), contains('_FLEN.d'));
     }
   });
 }

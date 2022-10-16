@@ -55,7 +55,7 @@ class DbSettings {
     print('$keyPostgresUsername = ${env[keyPostgresUsername]}');
     print('$keyPostgresPassword = ${env[keyPostgresPassword]}');
     print('$keyPSQLDbName = ${env[keyPSQLDbName]}');
-    print('$keyUseContainer = ${useContainer}');
+    print('$keyUseContainer = $useContainer');
 
     print('');
   }

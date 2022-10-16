@@ -2,12 +2,12 @@ import 'package:conduit/conduit.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test("Can override property in partial and modify attrs/validators", () {
+  test('Can override property in partial and modify attrs/validators', () {
     var dataModel =
         ManagedDataModel([OverriddenTotalModel, PartialReferenceModel]);
 
     var entity = dataModel.entityForType(OverriddenTotalModel);
-    var field = entity.attributes["field"]!;
+    var field = entity.attributes['field']!;
     expect(field.isUnique, true);
     expect(field.validators.length, 1);
   });
@@ -19,7 +19,7 @@ class OverriddenTotalModel extends ManagedObject<_OverriddenTotalModel>
 class _OverriddenTotalModel extends PartialModel {
   @override
   @Column(indexed: true, unique: true)
-  @Validate.oneOf(["a", "b"])
+  @Validate.oneOf(['a', 'b'])
   String? field;
 }
 
@@ -33,7 +33,7 @@ class PartialModel {
   ManagedSet<PartialReferenceModel>? hasManyRelationship;
 
   static String tableName() {
-    return "predefined";
+    return 'predefined';
   }
 }
 

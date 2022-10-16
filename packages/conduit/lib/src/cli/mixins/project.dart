@@ -10,11 +10,11 @@ import 'package:pub_semver/pub_semver.dart';
 import 'package:yaml/yaml.dart';
 
 abstract class CLIProject implements CLICommand {
-  @Option("directory",
-      abbr: "d", help: "Project directory to execute command in")
+  @Option('directory',
+      abbr: 'd', help: 'Project directory to execute command in')
   Directory? get projectDirectory {
     if (_projectDirectory == null) {
-      String? dir = decodeOptional("directory");
+      String? dir = decodeOptional('directory');
       if (dir == null) {
         _projectDirectory = Directory.current.absolute;
       } else {
@@ -40,26 +40,26 @@ abstract class CLIProject implements CLICommand {
   }
 
   File get projectSpecificationFile =>
-      File.fromUri(projectDirectory!.uri.resolve("pubspec.yaml"));
+      File.fromUri(projectDirectory!.uri.resolve('pubspec.yaml'));
 
   Uri get packageConfigUri =>
-      projectDirectory!.uri.resolve(".dart_tool/package_config.json");
+      projectDirectory!.uri.resolve('.dart_tool/package_config.json');
 
   String? get libraryName => packageName;
 
-  String? get packageName => projectSpecification!["name"] as String?;
+  String? get packageName => projectSpecification!['name'] as String?;
 
   Version? get projectVersion {
     if (_projectVersion == null) {
       var lockFile =
-          File.fromUri(projectDirectory!.uri.resolve("pubspec.lock"));
+          File.fromUri(projectDirectory!.uri.resolve('pubspec.lock'));
       if (!lockFile.existsSync()) {
-        throw CLIException("No pubspec.lock file. Run `pub get`.");
+        throw CLIException('No pubspec.lock file. Run `pub get`.');
       }
 
       final lockFileContents = loadYaml(lockFile.readAsStringSync()) as Map;
       final projectVersion =
-          lockFileContents["packages"]["conduit"]["version"] as String;
+          lockFileContents['packages']['conduit']['version'] as String;
       _projectVersion = Version.parse(projectVersion);
     }
 
@@ -86,14 +86,14 @@ abstract class CLIProject implements CLICommand {
   void preProcess() {
     try {
       if (!isMachineOutput) {
-        displayInfo("Conduit project version: $projectVersion");
+        displayInfo('Conduit project version: $projectVersion');
       }
 
       if (projectVersion?.major != toolVersion!.major) {
         throw CLIException(
-            "CLI version is incompatible with project conduit version.",
+            'CLI version is incompatible with project conduit version.',
             instructions: [
-              "Install conduit@${projectVersion?.toString()} or upgrade your project to conduit${toolVersion.toString()}."
+              'Install conduit@${projectVersion?.toString()} or upgrade your project to conduit${toolVersion.toString()}.'
             ]);
       }
     } on CLIException {
@@ -110,7 +110,7 @@ abstract class CLIProject implements CLICommand {
       return name;
     } on StateError catch (e) {
       throw CLIException(
-          "No ApplicationChannel subclass found in $packageName/$libraryName : ${e.message}");
+          'No ApplicationChannel subclass found in $packageName/$libraryName : ${e.message}');
     }
   }
 }

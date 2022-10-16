@@ -12,6 +12,7 @@ dependencies:
   conduit: ^3.1.2
 
 dev_dependencies:
+  lints: ^2.0.0
   conduit_common_test:
     path: ../common_test
     

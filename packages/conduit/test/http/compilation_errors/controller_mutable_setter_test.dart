@@ -6,14 +6,14 @@ import 'package:test/test.dart';
 
 void main() {
   test(
-    "A controller that is not Recyclable, but declares a setter throws a runtime error",
+    'A controller that is not Recyclable, but declares a setter throws a runtime error',
     () {
       try {
         // ignore: unnecessary_statements
         RuntimeContext.current;
         fail('unreachable');
       } on StateError catch (e) {
-        expect(e.toString(), contains("MutableSetterController"));
+        expect(e.toString(), contains('MutableSetterController'));
       }
     },
   );

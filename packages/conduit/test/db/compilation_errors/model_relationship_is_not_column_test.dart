@@ -2,13 +2,13 @@ import 'package:conduit/conduit.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test("Model with Relationship and Column fails compilation", () {
+  test('Model with Relationship and Column fails compilation', () {
     try {
       ManagedDataModel([InvalidMetadata, InvalidMetadata1]);
       expect(true, false);
     } on ManagedDataModelError catch (e) {
-      expect(e.message, contains("cannot both have"));
-      expect(e.message, contains("InvalidMetadata"));
+      expect(e.message, contains('cannot both have'));
+      expect(e.message, contains('InvalidMetadata'));
       expect(e.message, contains("'bar'"));
     }
   });

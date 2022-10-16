@@ -112,8 +112,9 @@ abstract class ManagedObject<T> extends Serializable {
 
   /// Removes multiple properties from [backing].
   void removePropertiesFromBackingMap(List<String> propertyNames) {
-    propertyNames
-        .forEach((propertyName) => backing.removeProperty(propertyName));
+    for (var propertyName in propertyNames) {
+      backing.removeProperty(propertyName);
+    }
   }
 
   /// Checks whether or not a property has been set in this instances' [backing].
@@ -271,5 +272,5 @@ abstract class ManagedObject<T> extends Serializable {
       entity.document(context);
 
   static bool _isPropertyPrivate(String propertyName) =>
-      propertyName.startsWith("_");
+      propertyName.startsWith('_');
 }

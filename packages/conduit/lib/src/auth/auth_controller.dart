@@ -28,7 +28,7 @@ class AuthController extends ResourceController {
   /// [authServer] is the isRequired authorization server that grants tokens.
   AuthController(this.authServer) {
     acceptedContentTypes = [
-      ContentType("application", "x-www-form-urlencoded")
+      ContentType('application', 'x-www-form-urlencoded')
     ];
   }
 
@@ -62,12 +62,12 @@ class AuthController extends ResourceController {
   /// include a valid Client ID and Secret in the Basic authorization scheme format.
   @Operation.post()
   Future<Response> grant(
-      {@Bind.query("username") String? username,
-      @Bind.query("password") String? password,
-      @Bind.query("refresh_token") String? refreshToken,
-      @Bind.query("code") String? authCode,
-      @Bind.query("grant_type") String? grantType,
-      @Bind.query("scope") String? scope}) async {
+      {@Bind.query('username') String? username,
+      @Bind.query('password') String? password,
+      @Bind.query('refresh_token') String? refreshToken,
+      @Bind.query('code') String? authCode,
+      @Bind.query('grant_type') String? grantType,
+      @Bind.query('scope') String? scope}) async {
     AuthBasicCredentials basicRecord;
     try {
       basicRecord = _parser.parse(authHeader);
@@ -76,21 +76,21 @@ class AuthController extends ResourceController {
     }
 
     try {
-      final scopes = scope?.split(" ").map((s) => AuthScope(s)).toList();
+      final scopes = scope?.split(' ').map((s) => AuthScope(s)).toList();
 
-      if (grantType == "password") {
+      if (grantType == 'password') {
         final token = await authServer!.authenticate(
             username, password, basicRecord.username, basicRecord.password,
             requestedScopes: scopes);
 
         return AuthController.tokenResponse(token);
-      } else if (grantType == "refresh_token") {
+      } else if (grantType == 'refresh_token') {
         final token = await authServer!.refresh(
             refreshToken, basicRecord.username, basicRecord.password,
             requestedScopes: scopes);
 
         return AuthController.tokenResponse(token);
-      } else if (grantType == "authorization_code") {
+      } else if (grantType == 'authorization_code') {
         if (scope != null) {
           return _responseForError(AuthRequestError.invalidRequest);
         }
@@ -115,7 +115,7 @@ class AuthController extends ResourceController {
   /// as the HTTP response body.
   static Response tokenResponse(AuthToken token) {
     return Response(HttpStatus.ok,
-        {"Cache-Control": "no-store", "Pragma": "no-cache"}, token.asMap());
+        {'Cache-Control': 'no-store', 'Pragma': 'no-cache'}, token.asMap());
   }
 
   @override
@@ -125,11 +125,11 @@ class AuthController extends ResourceController {
       // were in the request, which violates oauth2 spec. It just adjusts the error message.
       // This could be hardened some.
       final body = response.body;
-      if (body != null && body["error"] is String) {
-        final errorMessage = body["error"] as String;
-        if (errorMessage.startsWith("multiple values")) {
+      if (body != null && body['error'] is String) {
+        final errorMessage = body['error'] as String;
+        if (errorMessage.startsWith('multiple values')) {
           response.body = {
-            "error":
+            'error':
                 AuthServerException.errorString(AuthRequestError.invalidRequest)
           };
         }
@@ -149,11 +149,11 @@ class AuthController extends ResourceController {
   APIRequestBody documentOperationRequestBody(
       APIDocumentContext context, Operation? operation) {
     final body = super.documentOperationRequestBody(context, operation)!;
-    body.content!["application/x-www-form-urlencoded"]!.schema!.isRequired = [
-      "grant_type"
+    body.content!['application/x-www-form-urlencoded']!.schema!.isRequired = [
+      'grant_type'
     ];
-    body.content!["application/x-www-form-urlencoded"]!.schema!
-        .properties!["password"]!.format = "password";
+    body.content!['application/x-www-form-urlencoded']!.schema!
+        .properties!['password']!.format = 'password';
     return body;
   }
 
@@ -164,7 +164,7 @@ class AuthController extends ResourceController {
 
     operations.forEach((_, op) {
       op.security = [
-        APISecurityRequirement({"oauth2-client-authentication": []})
+        APISecurityRequirement({'oauth2-client-authentication': []})
       ];
     });
 
@@ -182,24 +182,24 @@ class AuthController extends ResourceController {
   Map<String, APIResponse> documentOperationResponses(
       APIDocumentContext context, Operation? operation) {
     return {
-      "200": APIResponse.schema(
-          "Successfully exchanged credentials for token",
+      '200': APIResponse.schema(
+          'Successfully exchanged credentials for token',
           APISchemaObject.object({
-            "access_token": APISchemaObject.string(),
-            "token_type": APISchemaObject.string(),
-            "expires_in": APISchemaObject.integer(),
-            "refresh_token": APISchemaObject.string(),
-            "scope": APISchemaObject.string()
+            'access_token': APISchemaObject.string(),
+            'token_type': APISchemaObject.string(),
+            'expires_in': APISchemaObject.integer(),
+            'refresh_token': APISchemaObject.string(),
+            'scope': APISchemaObject.string()
           }),
-          contentTypes: ["application/json"]),
-      "400": APIResponse.schema("Invalid credentials or missing parameters.",
-          APISchemaObject.object({"error": APISchemaObject.string()}),
-          contentTypes: ["application/json"])
+          contentTypes: ['application/json']),
+      '400': APIResponse.schema('Invalid credentials or missing parameters.',
+          APISchemaObject.object({'error': APISchemaObject.string()}),
+          contentTypes: ['application/json'])
     };
   }
 
   Response _responseForError(AuthRequestError error) {
     return Response.badRequest(
-        body: {"error": AuthServerException.errorString(error)});
+        body: {'error': AuthServerException.errorString(error)});
   }
 }

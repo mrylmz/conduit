@@ -60,7 +60,7 @@ class ManagedObjectController<InstanceType extends ManagedObject>
   ///
   /// Returns the string "/$name/[:id]", to be used as a route pattern in a [Router] for instances of [ResourceController] and subclasses.
   static String routePattern(String name) {
-    return "/$name/[:id]";
+    return '/$name/[:id]';
   }
 
   Query<InstanceType>? _query;
@@ -91,8 +91,8 @@ class ManagedObjectController<InstanceType extends ManagedObject>
     return Response.notFound();
   }
 
-  @Operation.get("id")
-  Future<Response> getObject(@Bind.path("id") String id) async {
+  @Operation.get('id')
+  Future<Response> getObject(@Bind.path('id') String id) async {
     var primaryKey = _query!.entity.primaryKey;
     final parsedIdentifier =
         _getIdentifierFromPath(id, _query!.entity.properties[primaryKey]);
@@ -162,8 +162,8 @@ class ManagedObjectController<InstanceType extends ManagedObject>
     return Response.notFound();
   }
 
-  @Operation.delete("id")
-  Future<Response> deleteObject(@Bind.path("id") String id) async {
+  @Operation.delete('id')
+  Future<Response> deleteObject(@Bind.path('id') String id) async {
     var primaryKey = _query!.entity.primaryKey;
     final parsedIdentifier =
         _getIdentifierFromPath(id, _query!.entity.properties[primaryKey]);
@@ -204,8 +204,8 @@ class ManagedObjectController<InstanceType extends ManagedObject>
     return Response.notFound();
   }
 
-  @Operation.put("id")
-  Future<Response> updateObject(@Bind.path("id") String id) async {
+  @Operation.put('id')
+  Future<Response> updateObject(@Bind.path('id') String id) async {
     var primaryKey = _query!.entity.primaryKey;
     final parsedIdentifier =
         _getIdentifierFromPath(id, _query!.entity.properties[primaryKey]);
@@ -247,20 +247,20 @@ class ManagedObjectController<InstanceType extends ManagedObject>
       {
 
       /// Limits the number of objects returned.
-      @Bind.query("count") int count = 0,
+      @Bind.query('count') int count = 0,
 
       /// An integer offset into an ordered list of objects.
       ///
       /// Use with count.
       ///
       /// See pageBy for an alternative form of offsetting.
-      @Bind.query("offset") int offset = 0,
+      @Bind.query('offset') int offset = 0,
 
       /// The property of this object to page by.
       ///
       /// Must be a key in the object type being fetched. Must
       /// provide either pageAfter or pagePrior. Use with count.
-      @Bind.query("pageBy") String? pageBy,
+      @Bind.query('pageBy') String? pageBy,
 
       /// A value-based offset into an ordered list of objects.
       ///
@@ -268,7 +268,7 @@ class ManagedObjectController<InstanceType extends ManagedObject>
       /// value for the property named by pageBy is greater than
       /// the value of pageAfter. Must provide pageBy, and the type
       /// of the property designated by pageBy must be the same as pageAfter.
-      @Bind.query("pageAfter") String? pageAfter,
+      @Bind.query('pageAfter') String? pageAfter,
 
       /// A value-based offset into an ordered list of objects.
       ///
@@ -276,13 +276,13 @@ class ManagedObjectController<InstanceType extends ManagedObject>
       /// value for the property named by pageBy is less than
       /// the value of pageAfter. Must provide pageBy, and the type
       /// of the property designated by pageBy must be the same as pageAfter.
-      @Bind.query("pagePrior") String? pagePrior,
+      @Bind.query('pagePrior') String? pagePrior,
 
       /// Designates a sorting strategy for the returned objects.
       ///
       /// This value must take the form 'name,asc' or 'name,desc', where name
       /// is the property of the returned objects to sort on.
-      @Bind.query("sortBy") List<String>? sortBy}) async {
+      @Bind.query('sortBy') List<String>? sortBy}) async {
     _query!.fetchLimit = count;
     _query!.offset = offset;
 
@@ -297,45 +297,45 @@ class ManagedObjectController<InstanceType extends ManagedObject>
         pageValue = pagePrior;
       } else {
         return Response.badRequest(body: {
-          "error":
+          'error':
               "missing required parameter 'pageAfter' or 'pagePrior' when 'pageBy' is given"
         });
       }
 
       var pageByProperty = _query!.entity.properties[pageBy];
       if (pageByProperty == null) {
-        throw Response.badRequest(body: {"error": "cannot page by '$pageBy'"});
+        throw Response.badRequest(body: {'error': "cannot page by '$pageBy'"});
       }
 
       dynamic parsed = _parseValueForProperty(pageValue, pageByProperty);
       _query!.pageBy((t) => t[pageBy], direction,
-          boundingValue: parsed == "null" ? null : parsed);
+          boundingValue: parsed == 'null' ? null : parsed);
     }
 
     if (sortBy != null) {
-      sortBy.forEach((sort) {
-        var split = sort.split(",").map((str) => str.trim()).toList();
+      for (var sort in sortBy) {
+        var split = sort.split(',').map((str) => str.trim()).toList();
         if (split.length != 2) {
           throw Response.badRequest(body: {
-            "error":
+            'error':
                 "invalid 'sortyBy' format. syntax: 'name,asc' or 'name,desc'."
           });
         }
         if (_query!.entity.properties[split.first] == null) {
           throw Response.badRequest(
-              body: {"error": "cannot sort by '$sortBy'"});
+              body: {'error': "cannot sort by '$sortBy'"});
         }
-        if (split.last != "asc" && split.last != "desc") {
+        if (split.last != 'asc' && split.last != 'desc') {
           throw Response.badRequest(body: {
-            "error":
+            'error':
                 "invalid 'sortBy' format. syntax: 'name,asc' or 'name,desc'."
           });
         }
-        var sortOrder = split.last == "asc"
+        var sortOrder = split.last == 'asc'
             ? QuerySortOrder.ascending
             : QuerySortOrder.descending;
         _query!.sortBy((t) => t[split.first], sortOrder);
-      });
+      }
     }
 
     _query = await willFindObjectsWithQuery(_query);
@@ -348,10 +348,10 @@ class ManagedObjectController<InstanceType extends ManagedObject>
   @override
   APIRequestBody? documentOperationRequestBody(
       APIDocumentContext context, Operation? operation) {
-    if (operation!.method == "POST" || operation.method == "PUT") {
+    if (operation!.method == 'POST' || operation.method == 'PUT') {
       return APIRequestBody.schema(
         context.schema.getObjectWithType(InstanceType),
-        contentTypes: ["application/json"],
+        contentTypes: ['application/json'],
         isRequired: true,
       );
     }
@@ -363,46 +363,46 @@ class ManagedObjectController<InstanceType extends ManagedObject>
   Map<String, APIResponse> documentOperationResponses(
       APIDocumentContext context, Operation? operation) {
     switch (operation!.method) {
-      case "GET":
+      case 'GET':
         if (operation.pathVariables.isEmpty) {
           return {
-            "200": APIResponse.schema(
-                "Returns a list of objects.",
+            '200': APIResponse.schema(
+                'Returns a list of objects.',
                 APISchemaObject.array(
                     ofSchema: context.schema.getObjectWithType(InstanceType))),
-            "400": APIResponse.schema("Invalid request.",
-                APISchemaObject.object({"error": APISchemaObject.string()}))
+            '400': APIResponse.schema('Invalid request.',
+                APISchemaObject.object({'error': APISchemaObject.string()}))
           };
         }
 
         return {
-          "200": APIResponse.schema("Returns a single object.",
+          '200': APIResponse.schema('Returns a single object.',
               context.schema.getObjectWithType(InstanceType)),
-          "404": APIResponse("No object found.")
+          '404': APIResponse('No object found.')
         };
-      case "PUT":
+      case 'PUT':
         return {
-          "200": APIResponse.schema("Returns updated object.",
+          '200': APIResponse.schema('Returns updated object.',
               context.schema.getObjectWithType(InstanceType)),
-          "404": APIResponse("No object found."),
-          "400": APIResponse.schema("Invalid request.",
-              APISchemaObject.object({"error": APISchemaObject.string()})),
-          "409": APIResponse.schema("Object already exists",
-              APISchemaObject.object({"error": APISchemaObject.string()})),
+          '404': APIResponse('No object found.'),
+          '400': APIResponse.schema('Invalid request.',
+              APISchemaObject.object({'error': APISchemaObject.string()})),
+          '409': APIResponse.schema('Object already exists',
+              APISchemaObject.object({'error': APISchemaObject.string()})),
         };
-      case "POST":
+      case 'POST':
         return {
-          "200": APIResponse.schema("Returns created object.",
+          '200': APIResponse.schema('Returns created object.',
               context.schema.getObjectWithType(InstanceType)),
-          "400": APIResponse.schema("Invalid request.",
-              APISchemaObject.object({"error": APISchemaObject.string()})),
-          "409": APIResponse.schema("Object already exists",
-              APISchemaObject.object({"error": APISchemaObject.string()}))
+          '400': APIResponse.schema('Invalid request.',
+              APISchemaObject.object({'error': APISchemaObject.string()})),
+          '409': APIResponse.schema('Object already exists',
+              APISchemaObject.object({'error': APISchemaObject.string()}))
         };
-      case "DELETE":
+      case 'DELETE':
         return {
-          "200": APIResponse("Object successfully deleted."),
-          "404": APIResponse("No object found."),
+          '200': APIResponse('Object successfully deleted.'),
+          '404': APIResponse('No object found.'),
         };
     }
 
@@ -419,12 +419,12 @@ class ManagedObjectController<InstanceType extends ManagedObject>
     if (path.parameters
         .where((p) => p!.location == APIParameterLocation.path)
         .isNotEmpty) {
-      ops["get"]!.id = "get$entityName";
-      ops["put"]!.id = "update$entityName";
-      ops["delete"]!.id = "delete$entityName";
+      ops['get']!.id = 'get$entityName';
+      ops['put']!.id = 'update$entityName';
+      ops['delete']!.id = 'delete$entityName';
     } else {
-      ops["get"]!.id = "get${entityName}s";
-      ops["post"]!.id = "create$entityName";
+      ops['get']!.id = 'get${entityName}s';
+      ops['post']!.id = 'create$entityName';
     }
 
     return ops;
@@ -437,7 +437,7 @@ class ManagedObjectController<InstanceType extends ManagedObject>
 
   dynamic _parseValueForProperty(String value, ManagedPropertyDescription? desc,
       {Response? onError}) {
-    if (value == "null") {
+    if (value == 'null') {
       return null;
     }
 
@@ -454,7 +454,7 @@ class ManagedObjectController<InstanceType extends ManagedObject>
         case ManagedPropertyType.doublePrecision:
           return double.parse(value);
         case ManagedPropertyType.boolean:
-          return value == "true";
+          return value == 'true';
         case ManagedPropertyType.list:
           return null;
         case ManagedPropertyType.map:

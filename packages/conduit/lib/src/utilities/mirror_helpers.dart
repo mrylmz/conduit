@@ -26,5 +26,5 @@ List<T> allMetadataOfType<T>(DeclarationMirror dm) {
 }
 
 String getMethodAndClassName(VariableMirror mirror) {
-  return "${MirrorSystem.getName(mirror.owner!.owner!.simpleName)}.${MirrorSystem.getName(mirror.owner!.simpleName)}";
+  return '${MirrorSystem.getName(mirror.owner!.owner!.simpleName)}.${MirrorSystem.getName(mirror.owner!.simpleName)}';
 }

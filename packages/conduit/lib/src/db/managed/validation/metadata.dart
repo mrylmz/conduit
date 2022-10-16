@@ -36,9 +36,9 @@ class ValidationContext {
     final p = property;
     if (p is ManagedRelationshipDescription) {
       errors.add(
-          "${p.entity.name}.${p.name}.${p.destinationEntity.primaryKey}: $reason");
+          '${p.entity.name}.${p.name}.${p.destinationEntity.primaryKey}: $reason');
     } else {
-      errors.add("${p!.entity.name}.${p.name}: $reason");
+      errors.add('${p!.entity.name}.${p.name}: $reason');
     }
   }
 
@@ -365,14 +365,16 @@ class Validate {
       case ValidateType.comparison:
         {
           final expressions = context.state as List<ValidationExpression>;
-          expressions.forEach((expr) => expr.compare(context, input));
+          for (var expr in expressions) {
+            expr.compare(context, input);
+          }
         }
         break;
       case ValidateType.regex:
         {
           final regex = context.state as RegExp;
           if (!regex.hasMatch(input as String)) {
-            context.addError("does not match pattern ${regex.pattern}");
+            context.addError('does not match pattern ${regex.pattern}');
           }
         }
         break;
@@ -388,8 +390,9 @@ class Validate {
       case ValidateType.length:
         {
           final expressions = context.state as List<ValidationExpression>;
-          expressions.forEach(
-              (expr) => expr.compare(context, (input as String).length));
+          for (var expr in expressions) {
+            expr.compare(context, (input as String).length);
+          }
         }
         break;
     }
@@ -464,7 +467,7 @@ class Validate {
       {Type? relationshipInverseType}) {
     if (_value is! List) {
       throw ValidateCompilationError(
-          "Validate.oneOf value must be a List<T>, where T is the type of the property being validated.");
+          'Validate.oneOf value must be a List<T>, where T is the type of the property being validated.');
     }
 
     final options = _value as List;
@@ -476,17 +479,17 @@ class Validate {
     if (!supportedOneOfTypes.contains(typeBeingValidated.kind) ||
         relationshipInverseType != null) {
       throw ValidateCompilationError(
-          "Validate.oneOf is only valid for String or int types.");
+          'Validate.oneOf is only valid for String or int types.');
     }
 
     if (options.any((v) => !typeBeingValidated.isAssignableWith(v))) {
       throw ValidateCompilationError(
-          "Validate.oneOf value must be a List<T>, where T is the type of the property being validated.");
+          'Validate.oneOf value must be a List<T>, where T is the type of the property being validated.');
     }
 
     if (options.isEmpty) {
       throw ValidateCompilationError(
-          "Validate.oneOf must have at least one element.");
+          'Validate.oneOf must have at least one element.');
     }
 
     return options;
@@ -521,10 +524,10 @@ class Validate {
   dynamic _comparisonCompiler(ManagedType? typeBeingValidated,
       {Type? relationshipInverseType}) {
     final exprs = _expressions;
-    exprs.forEach((expr) {
+    for (var expr in exprs) {
       expr.value = _parseComparisonValue(expr.value, typeBeingValidated,
           relationshipInverseType: relationshipInverseType);
-    });
+    }
     return exprs;
   }
 

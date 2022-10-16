@@ -158,44 +158,44 @@ class TestCLICommand extends CLICommand {
   @override
   String get name => throw UnimplementedError();
 
-  @Option("connect",
-      abbr: "c",
+  @Option('connect',
+      abbr: 'c',
       help:
-          "A database connection URI string. If this option is set, database-config is ignored.",
-      valueHelp: "postgres://user:password@localhost:port/databaseName")
-  String? get databaseConnectionString => decode("connect");
+          'A database connection URI string. If this option is set, database-config is ignored.',
+      valueHelp: 'postgres://user:password@localhost:port/databaseName')
+  String? get databaseConnectionString => decode('connect');
 
-  @Option("flavor",
-      abbr: "f",
-      help: "The database driver flavor to use.",
-      defaultsTo: "postgres",
-      allowed: ["postgres"])
-  String get databaseFlavor => decode("flavor");
+  @Option('flavor',
+      abbr: 'f',
+      help: 'The database driver flavor to use.',
+      defaultsTo: 'postgres',
+      allowed: ['postgres'])
+  String get databaseFlavor => decode('flavor');
 
-  @Option("count", abbr: "o", help: "The no. of things.")
-  int get count => decode("count");
+  @Option('count', abbr: 'o', help: 'The no. of things.')
+  int get count => decode('count');
 
-  @Option("people", abbr: "p", help: "The no. of people.")
-  int? get people => decodeOptional("people");
+  @Option('people', abbr: 'p', help: 'The no. of people.')
+  int? get people => decodeOptional('people');
 
-  @Option("guaranteed", abbr: "g", help: "The no. of guaranteed people.")
-  int get guaranteed => decodeOptional("guaranteed", orElse: () => 1)!;
+  @Option('guaranteed', abbr: 'g', help: 'The no. of guaranteed people.')
+  int get guaranteed => decodeOptional('guaranteed', orElse: () => 1)!;
 
-  @Flag("useSSL", abbr: "u", help: "UseSSL.", negatable: true)
-  bool get useSSl => decode("useSSL");
+  @Flag('useSSL', abbr: 'u', help: 'UseSSL.', negatable: true)
+  bool get useSSl => decode('useSSL');
 
-  @Flag("useSSLWithDefault", abbr: "d", help: "useSSlWithDefault.")
-  bool get useSSlWithDefault => decode("useSSlWithDefault");
+  @Flag('useSSLWithDefault', abbr: 'd', help: 'useSSlWithDefault.')
+  bool get useSSlWithDefault => decode('useSSlWithDefault');
 
-  @Option("scopes",
+  @Option('scopes',
       help:
-          "A space-delimited list of allowed scopes. Omit if application does not support scopes.",
-      defaultsTo: "")
+          'A space-delimited list of allowed scopes. Omit if application does not support scopes.',
+      defaultsTo: '')
   List<String>? get scopes {
-    String? v = decode("scopes");
+    String? v = decode('scopes');
     if (v.isEmpty) {
       return null;
     }
-    return v.split(" ").toList();
+    return v.split(' ').toList();
   }
 }

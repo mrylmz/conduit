@@ -2,13 +2,13 @@ import 'package:conduit/conduit.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test("Cannot have only named constructor", () {
+  test('Cannot have only named constructor', () {
     try {
       ManagedDataModel([HasNoDefaultConstructor]);
       fail('unreachable');
     } on ManagedDataModelError catch (e) {
-      expect(e.toString(), contains("HasNoDefaultConstructor"));
-      expect(e.toString(), contains("default, unnamed constructor"));
+      expect(e.toString(), contains('HasNoDefaultConstructor'));
+      expect(e.toString(), contains('default, unnamed constructor'));
     }
   });
 }

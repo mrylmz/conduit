@@ -11,7 +11,7 @@ class CLIDatabaseValidate extends CLICommand
   Future<int> handle() async {
     var migrations = projectMigrations;
     if (migrations.isEmpty) {
-      displayError("No migration files found in ${migrationDirectory!.path}.");
+      displayError('No migration files found in ${migrationDirectory!.path}.');
       return 1;
     }
 
@@ -22,21 +22,21 @@ class CLIDatabaseValidate extends CLICommand
     var differences = currentSchema.differenceFrom(schemaFromMigrationFiles);
 
     if (differences.hasDifferences) {
-      displayError("Validation failed");
+      displayError('Validation failed');
       differences.errorMessages.forEach(displayProgress);
 
       return 1;
     }
 
-    displayInfo("Validation OK", color: CLIColor.boldGreen);
-    displayProgress("Latest version is ${migrations.last.versionNumber}.");
+    displayInfo('Validation OK', color: CLIColor.boldGreen);
+    displayProgress('Latest version is ${migrations.last.versionNumber}.');
 
     return 0;
   }
 
   @override
   String get name {
-    return "validate";
+    return 'validate';
   }
 
   @override

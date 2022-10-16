@@ -28,11 +28,11 @@ class Runner extends CLICommand {
 
   @override
   String get name {
-    return "conduit";
+    return 'conduit';
   }
 
   @override
   String get description {
-    return "Conduit is a tool for managing Conduit applications.";
+    return 'Conduit is a tool for managing Conduit applications.';
   }
 }

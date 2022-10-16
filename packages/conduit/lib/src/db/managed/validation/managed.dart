@@ -19,16 +19,16 @@ class ManagedValidator {
       {Validating event = Validating.insert}) {
     final context = ValidationContext();
 
-    object.entity.validators.forEach((validator) {
+    for (var validator in object.entity.validators) {
       context.property = validator!.property;
       context.event = event;
       context.state = validator.state;
       if (!validator.definition.runOnInsert && event == Validating.insert) {
-        return;
+        continue;
       }
 
       if (!validator.definition.runOnUpdate && event == Validating.update) {
-        return;
+        continue;
       }
 
       var contents = object.backing.contents;
@@ -40,29 +40,29 @@ class ManagedValidator {
           if (inner == null ||
               !inner.backing.contents!.containsKey(inner.entity.primaryKey)) {
             context.addError("key '${validator.property!.name}' is required"
-                "for ${_getEventName(event)}s.");
+                'for ${_getEventName(event)}s.');
           }
         } else if (!contents!.containsKey(key)) {
           context.addError("key '${validator.property!.name}' is required"
-              "for ${_getEventName(event)}s.");
+              'for ${_getEventName(event)}s.');
         }
       } else if (validator.definition.type == ValidateType.absent) {
         if (validator.property is ManagedRelationshipDescription) {
           final inner = object[validator.property!.name] as ManagedObject?;
           if (inner != null) {
             context.addError("key '${validator.property!.name}' is not allowed "
-                "for ${_getEventName(event)}s.");
+                'for ${_getEventName(event)}s.');
           }
         } else if (contents!.containsKey(key)) {
           context.addError("key '${validator.property!.name}' is not allowed "
-              "for ${_getEventName(event)}s.");
+              'for ${_getEventName(event)}s.');
         }
       } else {
         if (validator.property is ManagedRelationshipDescription) {
           final inner = object[validator.property!.name] as ManagedObject?;
           if (inner == null ||
               inner.backing.contents![inner.entity.primaryKey] == null) {
-            return;
+            continue;
           }
           contents = inner.backing.contents;
           key = inner.entity.primaryKey;
@@ -73,7 +73,7 @@ class ManagedValidator {
           validator.validate(context, value);
         }
       }
-    });
+    }
 
     return context;
   }
@@ -93,11 +93,11 @@ class ManagedValidator {
   static String _getEventName(Validating op) {
     switch (op) {
       case Validating.insert:
-        return "insert";
+        return 'insert';
       case Validating.update:
-        return "update";
+        return 'update';
       default:
-        return "unknown";
+        return 'unknown';
     }
   }
 }

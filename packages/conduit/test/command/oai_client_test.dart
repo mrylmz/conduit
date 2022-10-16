@@ -1,5 +1,5 @@
 // ignore: unnecessary_const
-@Tags(["cli"])
+@Tags(['cli'])
 import 'package:fs_test_agent/dart_project_agent.dart';
 import 'package:fs_test_agent/working_directory_agent.dart';
 import 'package:test/test.dart';
@@ -14,12 +14,12 @@ void main() {
     await CLIClient.activateCLI();
     final t =
         CLIClient(WorkingDirectoryAgent(DartProjectAgent.projectsDirectory));
-    templateCli = await t.createTestProject(template: "db_and_auth");
+    templateCli = await t.createTestProject(template: 'db_and_auth');
     await templateCli.agent.getDependencies(offline: true);
   });
 
   setUp(() {
-    projectUnderTestCli = templateCli.replicate(Uri.parse("replica/"));
+    projectUnderTestCli = templateCli.replicate(Uri.parse('replica/'));
   });
 
   tearDownAll(() async {
@@ -28,12 +28,12 @@ void main() {
   });
 
   test(
-      "command with default args creates client page from current project dir pointing at localhost:8888",
+      'command with default args creates client page from current project dir pointing at localhost:8888',
       () async {
-    await projectUnderTestCli.run("document", ["client"]);
+    await projectUnderTestCli.run('document', ['client']);
 
     final clientContents =
-        projectUnderTestCli.agent.getFile("client.html")?.readAsStringSync();
+        projectUnderTestCli.agent.getFile('client.html')?.readAsStringSync();
     expect(clientContents, contains('spec: {"openapi":"3.0.0"'));
     expect(
       clientContents,
@@ -57,12 +57,12 @@ void main() {
     );
   });
 
-  test("Replace relative urls with provided server", () async {
+  test('Replace relative urls with provided server', () async {
     await projectUnderTestCli
-        .run("document", ["client", "--host", "https://server.com/v1/"]);
+        .run('document', ['client', '--host', 'https://server.com/v1/']);
 
     final clientContents =
-        projectUnderTestCli.agent.getFile("client.html")?.readAsStringSync();
+        projectUnderTestCli.agent.getFile('client.html')?.readAsStringSync();
     expect(clientContents, contains('spec: {"openapi":"3.0.0"'));
     expect(
       clientContents,

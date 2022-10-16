@@ -68,12 +68,12 @@ class ColumnBuilder extends Returnable {
   };
 
   static Map<PredicateOperator, String> symbolTable = {
-    PredicateOperator.lessThan: "<",
-    PredicateOperator.greaterThan: ">",
-    PredicateOperator.notEqual: "!=",
-    PredicateOperator.lessThanEqualTo: "<=",
-    PredicateOperator.greaterThanEqualTo: ">=",
-    PredicateOperator.equalTo: "="
+    PredicateOperator.lessThan: '<',
+    PredicateOperator.greaterThan: '>',
+    PredicateOperator.notEqual: '!=',
+    PredicateOperator.lessThanEqualTo: '<=',
+    PredicateOperator.greaterThanEqualTo: '>=',
+    PredicateOperator.equalTo: '='
   };
 
   final TableBuilder? table;
@@ -88,7 +88,7 @@ class ColumnBuilder extends Returnable {
     if (property is ManagedAttributeDescription) {
       final p = property as ManagedAttributeDescription;
       if (p.isEnumeratedValue) {
-        return value.toString().split(".").last;
+        return value.toString().split('.').last;
       } else if (p.type!.kind == ManagedPropertyType.document) {
         if (value is Document) {
           return value.data;
@@ -128,10 +128,10 @@ class ColumnBuilder extends Returnable {
     var type = PostgreSQLFormat.dataTypeStringForDataType(
         typeMap[property!.type!.kind]);
     if (type != null) {
-      return ":$type";
+      return ':$type';
     }
 
-    return "";
+    return '';
   }
 
   String sqlColumnName(
@@ -144,21 +144,21 @@ class ColumnBuilder extends Returnable {
       var relatedPrimaryKey = (property as ManagedRelationshipDescription)
           .destinationEntity
           .primaryKey;
-      name = "${name}_$relatedPrimaryKey";
+      name = '${name}_$relatedPrimaryKey';
     } else if (documentKeyPath != null) {
       final keys =
-          documentKeyPath!.map((k) => k is String ? "'$k'" : k).join("->");
-      name = "$name->$keys";
+          documentKeyPath!.map((k) => k is String ? "'$k'" : k).join('->');
+      name = '$name->$keys';
     }
 
     if (withTypeSuffix) {
-      name = "$name$sqlTypeSuffix";
+      name = '$name$sqlTypeSuffix';
     }
 
     if (withTableNamespace) {
-      return "${table!.sqlTableReference}.$name";
+      return '${table!.sqlTableReference}.$name';
     } else if (withPrefix != null) {
-      return "$withPrefix$name";
+      return '$withPrefix$name';
     }
 
     return name;

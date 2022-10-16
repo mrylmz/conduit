@@ -12,14 +12,14 @@ import 'package:conduit/src/http/http.dart';
 
 /// Used internally.
 class CLIDocumentServe extends CLICommand with CLIProject, CLIDocumentOptions {
-  @Option("port", abbr: "p", help: "Port to listen on", defaultsTo: "8111")
-  int get port => decode<int>("port");
+  @Option('port', abbr: 'p', help: 'Port to listen on', defaultsTo: '8111')
+  int get port => decode<int>('port');
 
   @override
   StoppableProcess? runningProcess;
 
   Directory get _hostedDirectory =>
-      Directory.fromUri(projectDirectory!.uri.resolve(".conduit_spec"));
+      Directory.fromUri(projectDirectory!.uri.resolve('.conduit_spec'));
 
   @override
   Future<int> handle() async {
@@ -42,9 +42,9 @@ class CLIDocumentServe extends CLICommand with CLIProject, CLIDocumentOptions {
     final fileController = FileController(
         _hostedDirectory.uri.toFilePath(windows: Platform.isWindows))
       ..addCachePolicy(const CachePolicy(requireConditionalRequest: true),
-          (p) => p.endsWith(".html"))
+          (p) => p.endsWith('.html'))
       ..addCachePolicy(const CachePolicy(requireConditionalRequest: true),
-          (p) => p.endsWith(".json"))
+          (p) => p.endsWith('.json'))
       ..addCachePolicy(
           const CachePolicy(expirationFromNow: Duration(days: 300)),
           (p) => true)
@@ -53,21 +53,21 @@ class CLIDocumentServe extends CLICommand with CLIProject, CLIDocumentOptions {
       });
 
     final router = Router();
-    router.route("/*").link(() => fileController);
+    router.route('/*').link(() => fileController);
     router.didAddToChannel();
 
     server.map((req) => Request(req)).listen(router.receive);
 
     displayInfo(
-        "Document server listening on http://${server.address.host}:${server.port}/.",
+        'Document server listening on http://${server.address.host}:${server.port}/.',
         color: CLIColor.boldGreen);
-    displayProgress("Use Ctrl-C (SIGINT) to stop running the server.");
+    displayProgress('Use Ctrl-C (SIGINT) to stop running the server.');
 
     return StoppableProcess((reason) async {
-      displayInfo("Shutting down.");
-      displayProgress("Reason: $reason");
+      displayInfo('Shutting down.');
+      displayProgress('Reason: $reason');
       await server.close();
-      displayProgress("Graceful shutdown complete.");
+      displayProgress('Graceful shutdown complete.');
     });
   }
 
@@ -77,10 +77,10 @@ class CLIDocumentServe extends CLICommand with CLIProject, CLIDocumentOptions {
     final documentJSON = json.encode(await documentProject(this, this));
 
     final jsonSpecFile =
-        File.fromUri(_hostedDirectory.uri.resolve("openapi.json"));
+        File.fromUri(_hostedDirectory.uri.resolve('openapi.json'));
     jsonSpecFile.writeAsStringSync(documentJSON);
 
-    var htmlFile = File.fromUri(_hostedDirectory.uri.resolve("index.html"));
+    var htmlFile = File.fromUri(_hostedDirectory.uri.resolve('index.html'));
     htmlFile.writeAsStringSync(_htmlSource);
   }
 
@@ -115,16 +115,16 @@ class CLIDocumentServe extends CLICommand with CLIProject, CLIDocumentOptions {
 
   @override
   String get name {
-    return "serve";
+    return 'serve';
   }
 
   @override
   String get description {
-    return "Serves an OpenAPI specification web page.";
+    return 'Serves an OpenAPI specification web page.';
   }
 
   @override
   String get detailedDescription {
-    return "This tool will start an HTTP server that serves an API reference web page. See `conduit document --help` for configuration options.";
+    return 'This tool will start an HTTP server that serves an API reference web page. See `conduit document --help` for configuration options.';
   }
 }

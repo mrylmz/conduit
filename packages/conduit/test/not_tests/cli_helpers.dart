@@ -18,7 +18,7 @@ class CLIClient {
       return agent as DartProjectAgent;
     }
 
-    throw StateError("is not a project terminal");
+    throw StateError('is not a project terminal');
   }
 
   List<String>? defaultArgs;
@@ -27,26 +27,26 @@ class CLIClient {
     return _output.toString();
   }
 
-  StringBuffer _output = StringBuffer();
+  final StringBuffer _output = StringBuffer();
 
-  static Future activateCLI({String path = "."}) {
-    const String cmd = "dart";
+  static Future activateCLI({String path = '.'}) {
+    const String cmd = 'dart';
 
-    return Process.run(cmd, ["pub", "global", "activate", "-spath", path]);
+    return Process.run(cmd, ['pub', 'global', 'activate', '-spath', path]);
   }
 
   static Future deactivateCLI() {
-    const String cmd = "dart";
+    const String cmd = 'dart';
 
-    return Process.run(cmd, ["pub", "global", "deactivate", "conduit"]);
+    return Process.run(cmd, ['pub', 'global', 'deactivate', 'conduit']);
   }
 
   Directory get defaultMigrationDirectory {
-    return Directory.fromUri(agent.workingDirectory.uri.resolve("migrations/"));
+    return Directory.fromUri(agent.workingDirectory.uri.resolve('migrations/'));
   }
 
   Directory get libraryDirectory {
-    return Directory.fromUri(agent.workingDirectory.uri.resolve("lib/"));
+    return Directory.fromUri(agent.workingDirectory.uri.resolve('lib/'));
   }
 
   void delete() {
@@ -74,31 +74,31 @@ class CLIClient {
   }
 
   Future<CLIClient> createTestProject(
-      {String name = "application_test",
+      {String name = 'application_test',
       String? template,
       bool offline = true}) async {
     final project = normalize(absolute(join('.')));
     if (template == null) {
       final client = CLIClient(DartProjectAgent(name, dependencies: {
-        "conduit": {"path": project}
+        'conduit': {'path': project}
       }, devDependencies: {
-        "test": "^1.6.7"
+        'test': '^1.6.7'
       }, dependencyOverrides: {
-        'conduit_runtime': {'path': '${join(project, '..', 'runtime')}'},
+        'conduit_runtime': {'path': join(project, '..', 'runtime')},
         'conduit_isolate_exec': {
-          'path': '${join(project, '..', 'isolate_exec')}'
+          'path': join(project, '..', 'isolate_exec')
         },
         'conduit_password_hash': {
-          'path': '${join(project, '..', 'password_hash')}'
+          'path': join(project, '..', 'password_hash')
         },
-        'conduit_open_api': {'path': '${join(project, '..', 'open_api')}'},
-        'conduit_codable': {'path': '${join(project, '..', 'codable')}'},
-        'conduit_config': {'path': '${join(project, '..', 'config')}'},
-        'conduit_common': {'path': '${join(project, '..', 'common')}'},
-        'fs_test_agent': {'path': '${join(project, '..', 'fs_test_agent')}'}
+        'conduit_open_api': {'path': join(project, '..', 'open_api')},
+        'conduit_codable': {'path': join(project, '..', 'codable')},
+        'conduit_config': {'path': join(project, '..', 'config')},
+        'conduit_common': {'path': join(project, '..', 'common')},
+        'fs_test_agent': {'path': join(project, '..', 'fs_test_agent')}
       }));
 
-      client.projectAgent.addLibraryFile("channel", """
+      client.projectAgent.addLibraryFile('channel', """
 import 'dart:async';
 
 import 'package:conduit/conduit.dart';
@@ -127,26 +127,26 @@ class TestChannel extends ApplicationChannel {
     } catch (_) {}
 
     final args = <String>[];
-    args.addAll(["-t", template]);
+    args.addAll(['-t', template]);
 
     if (offline) {
-      args.add("--offline");
+      args.add('--offline');
     }
 
     args.add(name);
 
-    await run("create", args);
-    print("$output");
+    await run('create', args);
+    print(output);
 
     return CLIClient(DartProjectAgent.existing(
-        DartProjectAgent.projectsDirectory.uri.resolve("$name/")));
+        DartProjectAgent.projectsDirectory.uri.resolve('$name/')));
   }
 
   Future<int> executeMigrations({String? connectString}) async {
     connectString ??= PostgresTestConfig().connectionUrl;
-    final res = await run("db", ["upgrade", "--connect", connectString]);
+    final res = await run('db', ['upgrade', '--connect', connectString]);
     if (res != 0) {
-      print("executeMigrations failed: $output");
+      print('executeMigrations failed: $output');
     }
     return res;
   }
@@ -165,7 +165,7 @@ class TestChannel extends ApplicationChannel {
 
     final exitCode = await cmd.process(results);
     if (exitCode != 0) {
-      print("command failed: ${output}");
+      print('command failed: $output');
     }
 
     Directory.current = saved;
@@ -199,22 +199,22 @@ class TestChannel extends ApplicationChannel {
           Directory.current = saved;
           t.cancel();
           task._processStarted
-              .completeError(TimeoutException("Timed out after 30 seconds"));
+              .completeError(TimeoutException('Timed out after 30 seconds'));
         }
       }
     });
 
     cmd.process(results).then((exitCode) {
       if (!task._processStarted.isCompleted) {
-        print("Command failed to start with exit code: $exitCode");
-        print("Message: $output");
+        print('Command failed to start with exit code: $exitCode');
+        print('Message: $output');
         timer.cancel();
         Directory.current = saved;
         task._processStarted.completeError(false);
         task._processFinished.complete(exitCode);
       } else {
-        print("Command completed with exit code: $exitCode");
-        print("Output: $output");
+        print('Command completed with exit code: $exitCode');
+        print('Output: $output');
         task._processFinished.complete(exitCode);
       }
     });
@@ -237,6 +237,6 @@ class CLITask {
 
   Future<int> get exitCode => _processFinished.future;
 
-  Completer<int> _processFinished = Completer<int>();
-  Completer<bool> _processStarted = Completer<bool>();
+  final Completer<int> _processFinished = Completer<int>();
+  final Completer<bool> _processStarted = Completer<bool>();
 }

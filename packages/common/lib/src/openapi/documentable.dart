@@ -107,31 +107,31 @@ class APIDocumentContext {
   /// Creates a new context.
   APIDocumentContext(this.document)
       : schema = APIComponentCollection<APISchemaObject>._(
-          "schemas",
+          'schemas',
           document.components!.schemas,
         ),
         responses = APIComponentCollection<APIResponse>._(
-          "responses",
+          'responses',
           document.components!.responses,
         ),
         parameters = APIComponentCollection<APIParameter>._(
-          "parameters",
+          'parameters',
           document.components!.parameters,
         ),
         requestBodies = APIComponentCollection<APIRequestBody>._(
-          "requestBodies",
+          'requestBodies',
           document.components!.requestBodies,
         ),
         headers = APIComponentCollection<APIHeader>._(
-          "headers",
+          'headers',
           document.components!.headers,
         ),
         securitySchemes = APIComponentCollection<APISecurityScheme>._(
-          "securitySchemes",
+          'securitySchemes',
           document.components!.securitySchemes,
         ),
         callbacks = APIComponentCollection<APICallback>._(
-          "callbacks",
+          'callbacks',
           document.components!.callbacks,
         );
 
@@ -189,7 +189,7 @@ class APIDocumentContext {
           for (final flow in scheme.flows!.values) {
             for (final scope in scopes) {
               if (!flow!.scopes!.containsKey(scope)) {
-                flow.scopes![scope] = "";
+                flow.scopes![scope] = '';
               }
             }
           }
@@ -257,7 +257,7 @@ class APIComponentCollection<T extends APIObject?> {
   /// has been registered for [name], an error is thrown.
   T getObject(String name) {
     final obj = _getInstanceOf()!;
-    obj.referenceURI = Uri(path: "/components/$_typeName/$name");
+    obj.referenceURI = Uri(path: '/components/$_typeName/$name');
     return obj;
   }
 
@@ -272,7 +272,7 @@ class APIComponentCollection<T extends APIObject?> {
   T getObjectWithType(Type type) {
     final obj = _getInstanceOf()!;
     obj.referenceURI =
-        Uri(path: "/components/$_typeName/conduit-typeref:$type");
+        Uri(path: '/components/$_typeName/conduit-typeref:$type');
 
     if (_typeReferenceMap.containsKey(type)) {
       obj.referenceURI = _typeReferenceMap[type]!.referenceURI;
@@ -306,7 +306,7 @@ class APIComponentCollection<T extends APIObject?> {
         return APICallback.empty() as T;
     }
 
-    throw StateError("cannot reference API object of type $T");
+    throw StateError('cannot reference API object of type $T');
   }
 
   /// Whether or not [type] has been registered with [register].

@@ -1,5 +1,5 @@
 // ignore: unnecessary_const
-@Tags(["cli"])
+@Tags(['cli'])
 import 'dart:io';
 
 import 'package:fs_test_agent/dart_project_agent.dart';
@@ -27,24 +27,24 @@ void main() {
   });
 
   setUp(() async {
-    projectUnderTestCli = templateCli.replicate(Uri.parse("replica/"));
+    projectUnderTestCli = templateCli.replicate(Uri.parse('replica/'));
   });
 
   tearDown(() {
     projectUnderTestCli.agent.workingDirectory.deleteSync(recursive: true);
   });
 
-  test("Can get API reference", () async {
-    final task = projectUnderTestCli.start("document", ["serve"]);
+  test('Can get API reference', () async {
+    final task = projectUnderTestCli.start('document', ['serve']);
     await task.hasStarted;
 
     expect(
         Directory.fromUri(projectUnderTestCli.agent.workingDirectory.uri
-                .resolve(".conduit_spec/"))
+                .resolve('.conduit_spec/'))
             .existsSync(),
         true);
 
-    var response = await http.get(Uri.parse("http://localhost:8111"));
+    var response = await http.get(Uri.parse('http://localhost:8111'));
     expect(response.body, contains("redoc spec-url='openapi.json'"));
 
     // ignore: unawaited_futures
@@ -52,7 +52,7 @@ void main() {
     expect(await task.exitCode, 0);
     expect(
         Directory.fromUri(projectUnderTestCli.agent.workingDirectory.uri
-                .resolve(".conduit_spec/"))
+                .resolve('.conduit_spec/'))
             .existsSync(),
         false);
   });

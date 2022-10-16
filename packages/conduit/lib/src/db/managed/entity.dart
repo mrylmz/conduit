@@ -153,7 +153,7 @@ class ManagedEntity implements APIComponentDocumenter {
     return _tableName;
   }
 
-  String? _tableName;
+  final String? _tableName;
   List<String>? _defaultProperties;
 
   /// Derived from this' [tableName].
@@ -183,23 +183,23 @@ class ManagedEntity implements APIComponentDocumenter {
   /// Invokes [identifyProperties] with [propertyIdentifier], and ensures that a single attribute
   /// on this entity was selected. Returns that attribute.
   ManagedAttributeDescription identifyAttribute<T, U extends ManagedObject>(
-      T propertyIdentifier(U x)) {
+      T Function(U x) propertyIdentifier) {
     final keyPaths = identifyProperties(propertyIdentifier);
     if (keyPaths.length != 1) {
       throw ArgumentError(
-          "Invalid property selector. Cannot access more than one property for this operation.");
+          'Invalid property selector. Cannot access more than one property for this operation.');
     }
 
     final firstKeyPath = keyPaths.first;
     if (firstKeyPath.dynamicElements != null) {
       throw ArgumentError(
-          "Invalid property selector. Cannot access subdocuments for this operation.");
+          'Invalid property selector. Cannot access subdocuments for this operation.');
     }
 
     final elements = firstKeyPath.path;
     if (elements.length > 1) {
       throw ArgumentError(
-          "Invalid property selector. Cannot use relationships for this operation.");
+          'Invalid property selector. Cannot use relationships for this operation.');
     }
 
     final propertyName = elements.first!.name;
@@ -209,7 +209,7 @@ class ManagedEntity implements APIComponentDocumenter {
         throw ArgumentError(
             "Invalid property selection. Property '$propertyName' on "
             "'$name' "
-            "is a relationship and cannot be selected for this operation.");
+            'is a relationship and cannot be selected for this operation.');
       } else {
         throw ArgumentError(
             "Invalid property selection. Column '$propertyName' does not "
@@ -226,23 +226,23 @@ class ManagedEntity implements APIComponentDocumenter {
   /// on this entity was selected. Returns that relationship.
   ManagedRelationshipDescription
       identifyRelationship<T, U extends ManagedObject>(
-          T propertyIdentifier(U x)) {
+          T Function(U x) propertyIdentifier) {
     final keyPaths = identifyProperties(propertyIdentifier);
     if (keyPaths.length != 1) {
       throw ArgumentError(
-          "Invalid property selector. Cannot access more than one property for this operation.");
+          'Invalid property selector. Cannot access more than one property for this operation.');
     }
 
     final firstKeyPath = keyPaths.first;
     if (firstKeyPath.dynamicElements != null) {
       throw ArgumentError(
-          "Invalid property selector. Cannot access subdocuments for this operation.");
+          'Invalid property selector. Cannot access subdocuments for this operation.');
     }
 
     final elements = firstKeyPath.path;
     if (elements.length > 1) {
       throw ArgumentError(
-          "Invalid property selector. Cannot identify a nested relationship for this operation.");
+          'Invalid property selector. Cannot identify a nested relationship for this operation.');
     }
 
     final propertyName = elements.first!.name;
@@ -260,11 +260,11 @@ class ManagedEntity implements APIComponentDocumenter {
   /// Invokes [identifyProperties] with [propertyIdentifier], and ensures that a single property
   /// on this entity was selected. Returns that property.
   KeyPath identifyProperty<T, U extends ManagedObject>(
-      T propertyIdentifier(U? x)) {
+      T Function(U? x) propertyIdentifier) {
     final properties = identifyProperties(propertyIdentifier);
     if (properties.length != 1) {
       throw ArgumentError(
-          "Invalid property selector. Must reference a single property only.");
+          'Invalid property selector. Must reference a single property only.');
     }
 
     return properties.first;
@@ -275,7 +275,7 @@ class ManagedEntity implements APIComponentDocumenter {
   /// Each selected property in [propertiesIdentifier] is returned in a [KeyPath] object that fully identifies the
   /// property relative to this entity.
   List<KeyPath> identifyProperties<T, U extends ManagedObject>(
-      T propertiesIdentifier(U x)) {
+      T Function(U x) propertiesIdentifier) {
     final tracker = ManagedAccessTrackingBacking();
     var obj = instanceOf<U>(backing: tracker);
     propertiesIdentifier(obj);
@@ -285,14 +285,14 @@ class ManagedEntity implements APIComponentDocumenter {
 
   APISchemaObject document(APIDocumentContext context) {
     final schemaProperties = <String, APISchemaObject>{};
-    final obj = APISchemaObject.object(schemaProperties)..title = "$name";
+    final obj = APISchemaObject.object(schemaProperties)..title = name;
 
     final buffer = StringBuffer();
     if (uniquePropertySet != null) {
       final propString =
-          uniquePropertySet!.map((s) => "'${s!.name}'").join(", ");
+          uniquePropertySet!.map((s) => "'${s!.name}'").join(', ');
       buffer.writeln(
-          "No two objects may have the same value for all of: $propString.");
+          'No two objects may have the same value for all of: $propString.');
     }
 
     obj.description = buffer.toString();
@@ -320,16 +320,16 @@ class ManagedEntity implements APIComponentDocumenter {
   @override
   String toString() {
     final buf = StringBuffer();
-    buf.writeln("Entity: $tableName");
+    buf.writeln('Entity: $tableName');
 
-    buf.writeln("Attributes:");
+    buf.writeln('Attributes:');
     attributes.forEach((name, attr) {
-      buf.writeln("\t$attr");
+      buf.writeln('\t$attr');
     });
 
-    buf.writeln("Relationships:");
+    buf.writeln('Relationships:');
     relationships!.forEach((name, rel) {
-      buf.writeln("\t$rel");
+      buf.writeln('\t$rel');
     });
 
     return buf.toString();

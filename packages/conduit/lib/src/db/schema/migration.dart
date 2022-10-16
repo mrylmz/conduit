@@ -61,8 +61,8 @@ abstract class Migration {
     final source =
         SchemaBuilder.fromDifference(null, diff, changeList: changeList)
             .commands
-            .map((line) => "\t\t$line")
-            .join("\n");
+            .map((line) => '\t\t$line')
+            .join('\n');
 
     return """
 import 'dart:async';

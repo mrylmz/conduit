@@ -40,7 +40,7 @@ Future main(List<String> args) async {
   final failingFiles = <File>[];
   for (var f in testFiles) {
     final currentTime = DateTime.now();
-    final makePrompt = () =>
+    makePrompt() =>
         '(Pass: ${passingFiles.length} Fail: ${failingFiles.length} Remain: $remainingCounter)';
 
     print('Running tests derived from ${f.path}...');
@@ -96,10 +96,10 @@ Future main(List<String> args) async {
     return components.join('/');
   }
 
-  passingFiles.forEach((f) {
+  for (var f in passingFiles) {
     print('  ${stripParentDir(f.uri)}: success');
-  });
-  failingFiles.forEach((f) {
+  }
+  for (var f in failingFiles) {
     print('  ${stripParentDir(f.uri)}: FAILURE');
-  });
+  }
 }

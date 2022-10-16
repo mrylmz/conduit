@@ -4,10 +4,10 @@ import 'package:conduit/src/db/query/query.dart';
 
 class ColumnSortBuilder extends ColumnBuilder {
   ColumnSortBuilder(TableBuilder table, String? key, QuerySortOrder order)
-      : order = order == QuerySortOrder.ascending ? "ASC" : "DESC",
+      : order = order == QuerySortOrder.ascending ? 'ASC' : 'DESC',
         super(table, table.entity.properties[key]);
 
   final String order;
 
-  String get sqlOrderBy => "${sqlColumnName(withTableNamespace: true)} $order";
+  String get sqlOrderBy => '${sqlColumnName(withTableNamespace: true)} $order';
 }

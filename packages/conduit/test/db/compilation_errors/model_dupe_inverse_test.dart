@@ -2,14 +2,14 @@ import 'package:conduit/conduit.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test("Duplicate inverse properties fail compilation", () {
+  test('Duplicate inverse properties fail compilation', () {
     try {
       ManagedDataModel([DupInverse, DupInverseHas]);
       expect(true, false);
     } on ManagedDataModelError catch (e) {
-      expect(e.message, contains("has multiple relationship properties"));
+      expect(e.message, contains('has multiple relationship properties'));
       expect(e.message, contains("'inverse'"));
-      expect(e.message, contains("foo, bar"));
+      expect(e.message, contains('foo, bar'));
     }
   });
 }

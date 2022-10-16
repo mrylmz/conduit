@@ -12,14 +12,14 @@ class _InvalidModel {
 }
 
 void main() {
-  test("Model with unsupported property type fails on compilation", () {
+  test('Model with unsupported property type fails on compilation', () {
     try {
       ManagedDataModel([InvalidModel]);
       expect(true, false);
     } on ManagedDataModelError catch (e) {
       expect(e.message, contains("'_InvalidModel'"));
       expect(e.message, contains("'uri'"));
-      expect(e.message, contains("unsupported type"));
+      expect(e.message, contains('unsupported type'));
     }
   });
 }

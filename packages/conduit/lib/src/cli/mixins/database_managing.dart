@@ -10,12 +10,12 @@ import 'package:conduit/src/db/schema/schema.dart';
 import 'package:conduit_isolate_exec/conduit_isolate_exec.dart';
 
 abstract class CLIDatabaseManagingCommand implements CLICommand, CLIProject {
-  @Option("migration-directory",
+  @Option('migration-directory',
       help:
-          "The directory where migration files are stored. Relative paths are relative to the application-directory.",
-      defaultsTo: "migrations")
+          'The directory where migration files are stored. Relative paths are relative to the application-directory.',
+      defaultsTo: 'migrations')
   Directory? get migrationDirectory {
-    final dir = Directory(decode("migration-directory")).absolute;
+    final dir = Directory(decode('migration-directory')).absolute;
 
     if (!dir.existsSync()) {
       dir.createSync();
@@ -25,7 +25,7 @@ abstract class CLIDatabaseManagingCommand implements CLICommand, CLIProject {
 
   List<MigrationSource> get projectMigrations {
     try {
-      final pattern = RegExp(r"^[0-9]+[_a-zA-Z0-9]*\.migration\.dart$");
+      final pattern = RegExp(r'^[0-9]+[_a-zA-Z0-9]*\.migration\.dart$');
       final sources = migrationDirectory!
           .listSync()
           .where((fse) =>
@@ -57,8 +57,8 @@ abstract class CLIDatabaseManagingCommand implements CLICommand, CLIProject {
         additionalContents: MigrationSource.combine(sources),
         logHandler: displayProgress);
 
-    if (schemaMap.containsKey("error")) {
-      throw CLIException(schemaMap["error"] as String?);
+    if (schemaMap.containsKey('error')) {
+      throw CLIException(schemaMap['error'] as String?);
     }
 
     return Schema.fromMap(schemaMap);

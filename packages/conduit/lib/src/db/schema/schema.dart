@@ -38,7 +38,7 @@ class Schema {
   ///
   /// [map] is typically created from [asMap].
   Schema.fromMap(Map<String, dynamic> map) {
-    _tables = (map["tables"] as List<Map<String, dynamic>>)
+    _tables = (map['tables'] as List<Map<String, dynamic>>)
         .map((t) => SchemaTable.fromMap(t))
         .toList();
   }
@@ -59,7 +59,9 @@ class Schema {
   // ignore: avoid_setters_without_getters
   set _tables(List<SchemaTable> tables) {
     _tableStorage = tables;
-    _tableStorage!.forEach((t) => t.schema = this);
+    for (var t in _tableStorage!) {
+      t.schema = this;
+    }
   }
 
   /// Gets a table from [tables] by that table's name.
@@ -81,7 +83,7 @@ class Schema {
   void addTable(SchemaTable table) {
     if (this[table.name!] != null) {
       throw SchemaException(
-          "Table ${table.name} already exists and cannot be added.");
+          'Table ${table.name} already exists and cannot be added.');
     }
 
     _tableStorage!.add(table);
@@ -91,7 +93,7 @@ class Schema {
   void replaceTable(SchemaTable existingTable, SchemaTable newTable) {
     if (!_tableStorage!.contains(existingTable)) {
       throw SchemaException(
-          "Table ${existingTable.name} does not exist and cannot be replaced.");
+          'Table ${existingTable.name} does not exist and cannot be replaced.');
     }
 
     var index = _tableStorage!.indexOf(existingTable);
@@ -101,7 +103,7 @@ class Schema {
   }
 
   void renameTable(SchemaTable table, String newName) {
-    throw SchemaException("Renaming a table not yet implemented!");
+    throw SchemaException('Renaming a table not yet implemented!');
 //
 //    if (tableForName(newName) != null) {
 //      throw new SchemaException("Table ${newName} already exist.");
@@ -121,7 +123,7 @@ class Schema {
   /// Sets [table]'s [SchemaTable.schema] to null.
   void removeTable(SchemaTable table) {
     if (!tables.contains(table)) {
-      throw SchemaException("Table ${table.name} does not exist in schema.");
+      throw SchemaException('Table ${table.name} does not exist in schema.');
     }
     table.schema = null;
     _tableStorage!.remove(table);
@@ -143,7 +145,7 @@ class Schema {
 
   /// Emits this instance as a transportable [Map].
   Map<String, dynamic> asMap() {
-    return {"tables": tables.map((t) => t.asMap()).toList()};
+    return {'tables': tables.map((t) => t.asMap()).toList()};
   }
 }
 
@@ -213,7 +215,7 @@ class SchemaDifference {
         .toList();
   }
 
-  List<SchemaTableDifference> _differingTables = [];
+  final List<SchemaTableDifference> _differingTables = [];
 }
 
 /// Thrown when a [Schema] encounters an error.
@@ -223,5 +225,5 @@ class SchemaException implements Exception {
   String message;
 
   @override
-  String toString() => "Invalid schema. $message";
+  String toString() => 'Invalid schema. $message';
 }

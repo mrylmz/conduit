@@ -38,11 +38,11 @@ class QueryException<T> implements HandlerException {
   static Map<String, String> _getBody(
       String? message, List<String>? offendingItems) {
     var body = {
-      "error": message ?? "query failed",
+      'error': message ?? 'query failed',
     };
 
     if (offendingItems != null && offendingItems.isNotEmpty) {
-      body["detail"] = "Offending Items: ${offendingItems.join(", ")}";
+      body['detail'] = "Offending Items: ${offendingItems.join(", ")}";
     }
 
     return body;
@@ -60,7 +60,7 @@ class QueryException<T> implements HandlerException {
   }
 
   @override
-  String toString() => "Query failed: $message. Reason: $underlyingException";
+  String toString() => 'Query failed: $message. Reason: $underlyingException';
 }
 
 /// Categorizations of query failures for [QueryException].

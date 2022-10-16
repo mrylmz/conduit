@@ -11,41 +11,41 @@ void main() {
     context = null;
   });
 
-  test("Deleting an object works", () async {
+  test('Deleting an object works', () async {
     context =
         await PostgresTestConfig().contextWithModels([TestModel, RefModel]);
 
     var m = TestModel()
-      ..email = "a@a.com"
-      ..name = "joe";
+      ..email = 'a@a.com'
+      ..name = 'joe';
     var req = Query<TestModel>(context!)..values = m;
 
     var inserted = await req.insert();
     expect(inserted.id, greaterThan(0));
 
     req = Query<TestModel>(context!)
-      ..predicate = QueryPredicate("id = @id", {"id": inserted.id});
+      ..predicate = QueryPredicate('id = @id', {'id': inserted.id});
 
     var count = await req.delete();
     expect(count, 1);
 
     req = Query<TestModel>(context!)
-      ..predicate = QueryPredicate("id = @id", {"id": inserted.id});
+      ..predicate = QueryPredicate('id = @id', {'id': inserted.id});
 
     var result = await req.fetch();
 
     expect(result.length, 0);
   });
 
-  test("Deleting an object when there are many only deletes that object",
+  test('Deleting an object when there are many only deletes that object',
       () async {
     context =
         await PostgresTestConfig().contextWithModels([TestModel, RefModel]);
 
     for (int i = 0; i < 10; i++) {
       var m = TestModel()
-        ..email = "$i@a.com"
-        ..name = "joe";
+        ..email = '$i@a.com'
+        ..name = 'joe';
 
       var req = Query<TestModel>(context!)..values = m;
 
@@ -57,7 +57,7 @@ void main() {
     expect(result.length, 10);
 
     req = Query<TestModel>(context!)
-      ..predicate = QueryPredicate("id = @id", {"id": 1});
+      ..predicate = QueryPredicate('id = @id', {'id': 1});
     var count = await req.delete();
     expect(count, 1);
 
@@ -66,15 +66,15 @@ void main() {
     expect(result.length, 9);
   });
 
-  test("Deleting all objects works, as long as you specify the magic",
+  test('Deleting all objects works, as long as you specify the magic',
       () async {
     context =
         await PostgresTestConfig().contextWithModels([TestModel, RefModel]);
 
     for (int i = 0; i < 10; i++) {
       var m = TestModel()
-        ..email = "$i@a.com"
-        ..name = "joe";
+        ..email = '$i@a.com'
+        ..name = 'joe';
 
       var req = Query<TestModel>(context!)..values = m;
 
@@ -94,15 +94,15 @@ void main() {
     expect(result.length, 0);
   });
 
-  test("Trying to delete all objects without specifying the magic fails",
+  test('Trying to delete all objects without specifying the magic fails',
       () async {
     context =
         await PostgresTestConfig().contextWithModels([TestModel, RefModel]);
 
     for (int i = 0; i < 10; i++) {
       var m = TestModel()
-        ..email = "$i@a.com"
-        ..name = "joe";
+        ..email = '$i@a.com'
+        ..name = 'joe';
 
       var req = Query<TestModel>(context!)..values = m;
 
@@ -125,11 +125,11 @@ void main() {
     expect(result.length, 10);
   });
 
-  test("Deleting a related object w/nullify sets property to null", () async {
+  test('Deleting a related object w/nullify sets property to null', () async {
     context =
         await PostgresTestConfig().contextWithModels([TestModel, RefModel]);
 
-    var testModelObject = TestModel()..name = "a";
+    var testModelObject = TestModel()..name = 'a';
     var testModelReq = Query<TestModel>(context!)..values = testModelObject;
     var testObj = await testModelReq.insert();
 
@@ -147,11 +147,11 @@ void main() {
     expect(refObj.test, null);
   });
 
-  test("Deleting a related object w/restrict fails", () async {
+  test('Deleting a related object w/restrict fails', () async {
     context = await PostgresTestConfig()
         .contextWithModels([GRestrict, GRestrictInverse]);
 
-    var griObject = GRestrictInverse()..name = "a";
+    var griObject = GRestrictInverse()..name = 'a';
     var griReq = Query<GRestrictInverse>(context!)..values = griObject;
     var testObj = await griReq.insert();
 
@@ -166,16 +166,16 @@ void main() {
       successful = true;
     } on QueryException catch (e) {
       expect(e.event, QueryExceptionEvent.input);
-      expect((e.underlyingException as PostgreSQLException).code, "23503");
+      expect((e.underlyingException as PostgreSQLException).code, '23503');
     }
     expect(successful, false);
   });
 
-  test("Deleting cascade object deletes other object", () async {
+  test('Deleting cascade object deletes other object', () async {
     context = await PostgresTestConfig()
         .contextWithModels([GCascade, GCascadeInverse]);
 
-    var obj = GCascadeInverse()..name = "a";
+    var obj = GCascadeInverse()..name = 'a';
     var req = Query<GCascadeInverse>(context!)..values = obj;
     var testObj = await req.insert();
 
@@ -195,7 +195,7 @@ void main() {
 
 class TestModel extends ManagedObject<_TestModel> implements _TestModel {}
 
-@Table(name: "simple")
+@Table(name: 'simple')
 class _TestModel {
   @primaryKey
   int? id;
@@ -209,7 +209,7 @@ class _TestModel {
 
   @override
   String toString() {
-    return "TestModel: $id $name $email";
+    return 'TestModel: $id $name $email';
   }
 }
 

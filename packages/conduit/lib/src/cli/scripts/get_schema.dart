@@ -16,16 +16,16 @@ class GetSchemaExecutable extends Executable<Map<String, dynamic>> {
       var schema = Schema.fromDataModel(dataModel);
       return schema.asMap();
     } on SchemaException catch (e) {
-      return {"error": e.message};
+      return {'error': e.message};
     } on ManagedDataModelError catch (e) {
-      return {"error": e.message};
+      return {'error': e.message};
     }
   }
 
   static List<String> importsForPackage(String? packageName) => [
-        "package:conduit/conduit.dart",
-        "package:$packageName/$packageName.dart",
-        "package:conduit_runtime/runtime.dart"
+        'package:conduit/conduit.dart',
+        'package:$packageName/$packageName.dart',
+        'package:conduit_runtime/runtime.dart'
       ];
 }
 
@@ -35,8 +35,8 @@ Future<Schema> getProjectSchema(CLIProject project) async {
       packageConfigURI: project.packageConfigUri,
       logHandler: project.displayProgress);
 
-  if (response.containsKey("error")) {
-    throw CLIException(response["error"] as String?);
+  if (response.containsKey('error')) {
+    throw CLIException(response['error'] as String?);
   }
 
   return Schema.fromMap(response);

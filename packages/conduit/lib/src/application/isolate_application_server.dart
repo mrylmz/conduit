@@ -20,7 +20,7 @@ class ApplicationIsolateServer extends ApplicationServer {
     supervisingReceivePort.listen(listener);
 
     logger
-        .fine("ApplicationIsolateServer($identifier) listening, sending port");
+        .fine('ApplicationIsolateServer($identifier) listening, sending port');
     supervisingApplicationPort.send(supervisingReceivePort.sendPort);
   }
 
@@ -31,7 +31,7 @@ class ApplicationIsolateServer extends ApplicationServer {
   Future start({bool shareHttpServer = false}) async {
     final result = await super.start(shareHttpServer: shareHttpServer);
     logger.fine(
-        "ApplicationIsolateServer($identifier) started, sending listen message");
+        'ApplicationIsolateServer($identifier) started, sending listen message');
     supervisingApplicationPort
         .send(ApplicationIsolateSupervisor.messageKeyListening);
 
@@ -57,13 +57,13 @@ class ApplicationIsolateServer extends ApplicationServer {
 
   Future stop() async {
     supervisingReceivePort.close();
-    logger.fine("ApplicationIsolateServer($identifier) closing server");
+    logger.fine('ApplicationIsolateServer($identifier) closing server');
     await close();
-    logger.fine("ApplicationIsolateServer($identifier) did close server");
+    logger.fine('ApplicationIsolateServer($identifier) did close server');
     await ServiceRegistry.defaultInstance.close();
     logger.clearListeners();
     logger.fine(
-        "ApplicationIsolateServer($identifier) sending stop acknowledgement");
+        'ApplicationIsolateServer($identifier) sending stop acknowledgement');
     supervisingApplicationPort
         .send(ApplicationIsolateSupervisor.messageKeyStop);
   }

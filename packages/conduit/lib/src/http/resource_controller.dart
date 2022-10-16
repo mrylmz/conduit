@@ -66,7 +66,7 @@ import 'http.dart';
 ///
 /// To access the request directly, use [request]. Note that the [Request.body] of [request] will be decoded prior to invoking an operation method.
 abstract class ResourceController extends Controller
-    implements Recyclable<Null> {
+    implements Recyclable<void> {
   ResourceController() {
     _runtime =
         (RuntimeContext.current.runtimes[runtimeType] as ControllerRuntime?)
@@ -74,7 +74,7 @@ abstract class ResourceController extends Controller
   }
 
   @override
-  Null get recycledState => null;
+  void get recycledState => null;
 
   ResourceControllerRuntime? _runtime;
 
@@ -130,7 +130,7 @@ abstract class ResourceController extends Controller
   void didDecodeRequestBody(RequestBody body) {}
 
   @override
-  void restore(Null state) {
+  void restore(void state) {
     /* no op - fetched from static cache in Runtime */
   }
 
@@ -198,7 +198,7 @@ abstract class ResourceController extends Controller
   /// is an [APIResponse] object.
   Map<String, APIResponse> documentOperationResponses(
       APIDocumentContext context, Operation operation) {
-    return {"200": APIResponse("Successful response.")};
+    return {'200': APIResponse('Successful response.')};
   }
 
   /// Returns a list of tags for [operation].
@@ -209,7 +209,7 @@ abstract class ResourceController extends Controller
   /// the controller grouping tag.
   List<String> documentOperationTags(
       APIDocumentContext context, Operation? operation) {
-    final tag = "$runtimeType".replaceAll("Controller", "");
+    final tag = '$runtimeType'.replaceAll('Controller', '');
     return [tag];
   }
 
@@ -254,9 +254,9 @@ abstract class ResourceController extends Controller
       throw Response(
           405,
           {
-            "Allow":
+            'Allow':
                 _allowedMethodsForPathVariables(request!.path.variables.keys)
-                    .join(", ")
+                    .join(', ')
           },
           null);
     }
@@ -264,16 +264,16 @@ abstract class ResourceController extends Controller
     if (operation.scopes != null) {
       if (request!.authorization == null) {
         // todo: this should be done compile-time
-        Logger("conduit").warning(
-            "'${runtimeType}' must be linked to channel that contains an 'Authorizer', because "
+        Logger('conduit').warning(
+            "'$runtimeType' must be linked to channel that contains an 'Authorizer', because "
             "it uses 'Scope' annotation for one or more of its operation methods.");
         throw Response.serverError();
       }
 
       if (!AuthScope.verify(operation.scopes, request!.authorization!.scopes)) {
         throw Response.forbidden(body: {
-          "error": "insufficient_scope",
-          "scope": operation.scopes!.map((s) => s.toString()).join(" ")
+          'error': 'insufficient_scope',
+          'scope': operation.scopes!.map((s) => s.toString()).join(' ')
         });
       }
     }
@@ -287,7 +287,7 @@ abstract class ResourceController extends Controller
     /* Begin decoding bindings */
     final args = ResourceControllerOperationInvocationArgs();
     final errors = <String>[];
-    final errorCatchWrapper = (ResourceControllerParameter p, f) {
+    errorCatchWrapper(ResourceControllerParameter p, f) {
       try {
         return f();
       } on ArgumentError catch (e) {
@@ -295,18 +295,17 @@ abstract class ResourceController extends Controller
             "${e.message ?? 'ArgumentError'} for ${p.locationName} value '${p.name}'");
       }
       return null;
-    };
-    final checkIfMissingRequiredAndEmitErrorIfSo =
-        (ResourceControllerParameter p, dynamic v) {
+    }
+    checkIfMissingRequiredAndEmitErrorIfSo(ResourceControllerParameter p, dynamic v) {
       if (v == null && p.isRequired) {
         if (p.location == BindingType.body) {
-          errors.add("missing required ${p.locationName}");
+          errors.add('missing required ${p.locationName}');
         } else {
           errors.add("missing required ${p.locationName} '${p.name ?? ""}'");
         }
         return null;
       }
-    };
+    }
 
     args.positionalArguments = operation.positionalParameters
         .map((p) {
@@ -355,7 +354,7 @@ abstract class ResourceController extends Controller
     /* finished decoding bindings, checking for errors */
 
     if (errors.isNotEmpty) {
-      return Response.badRequest(body: {"error": errors.join(", ")});
+      return Response.badRequest(body: {'error': errors.join(', ')});
     }
 
     /* bind and invoke */

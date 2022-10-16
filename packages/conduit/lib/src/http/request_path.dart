@@ -21,7 +21,7 @@ class RequestPath {
 
     for (var segment in spec.segments) {
       if (!requestIterator.moveNext()) {
-        remainingPath = "";
+        remainingPath = '';
         return;
       }
       final requestSegment = requestIterator.current;
@@ -35,7 +35,7 @@ class RequestPath {
         while (requestIterator.moveNext()) {
           remaining.add(requestIterator.current);
         }
-        remainingPath = remaining.join("/");
+        remainingPath = remaining.join('/');
         return;
       }
     }

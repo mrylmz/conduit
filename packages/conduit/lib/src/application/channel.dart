@@ -56,7 +56,7 @@ abstract class ApplicationChannel implements APIComponentDocumenter {
   /// The logger that this object will write messages to.
   ///
   /// This logger's name appears as 'conduit'.
-  Logger get logger => Logger("conduit");
+  Logger get logger => Logger('conduit');
 
   /// The [ApplicationServer] that sends HTTP requests to this object.
   ApplicationServer get server => _server;
@@ -141,7 +141,7 @@ abstract class ApplicationChannel implements APIComponentDocumenter {
   @mustCallSuper
   Future close() async {
     logger.fine(
-        "ApplicationChannel(${server.identifier}).close: closing messageHub");
+        'ApplicationChannel(${server.identifier}).close: closing messageHub');
     await messageHub.close();
   }
 
@@ -172,8 +172,8 @@ abstract class ApplicationChannel implements APIComponentDocumenter {
     doc.paths = root.documentPaths(context);
 
     doc.info = APIInfo(
-        projectSpec["name"] as String?, projectSpec["version"] as String?,
-        description: projectSpec["description"] as String?);
+        projectSpec['name'] as String?, projectSpec['version'] as String?,
+        description: projectSpec['description'] as String?);
 
     await context.finalize();
 
@@ -217,7 +217,7 @@ abstract class ApplicationChannel implements APIComponentDocumenter {
 ///           }
 ///         });
 class ApplicationMessageHub extends Stream<dynamic> implements Sink<dynamic> {
-  final Logger _logger = Logger("conduit");
+  final Logger _logger = Logger('conduit');
   final StreamController<dynamic> _outboundController =
       StreamController<dynamic>();
   final StreamController<dynamic> _inboundController =
@@ -231,12 +231,16 @@ class ApplicationMessageHub extends Stream<dynamic> implements Sink<dynamic> {
   /// [onError], if provided, will be invoked when this isolate tries to [add] invalid data. Only the isolate
   /// that failed to send the data will receive [onError] events.
   @override
-  StreamSubscription<dynamic> listen(void onData(dynamic event)?,
-          {Function? onError, void onDone()?, bool? cancelOnError = false}) =>
+  StreamSubscription<dynamic> listen(
+    void Function(dynamic event)? onData, {
+    Function? onError,
+    void Function()? onDone,
+    bool? cancelOnError = false,
+  }) =>
       _inboundController.stream.listen(onData,
           onError: onError ??
               ((err, StackTrace st) =>
-                  _logger.severe("ApplicationMessageHub error", err, st)),
+                  _logger.severe('ApplicationMessageHub error', err, st)),
           onDone: onDone,
           cancelOnError: cancelOnError);
 

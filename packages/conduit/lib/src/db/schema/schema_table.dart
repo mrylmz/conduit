@@ -46,11 +46,11 @@ class SchemaTable {
   ///
   /// This [map] is typically generated from [asMap];
   SchemaTable.fromMap(Map<String, dynamic> map) {
-    name = map["name"] as String?;
-    _columns = (map["columns"] as List<Map<String, dynamic>>)
+    name = map['name'] as String?;
+    _columns = (map['columns'] as List<Map<String, dynamic>>)
         .map((c) => SchemaColumn.fromMap(c))
         .toList();
-    uniqueColumnSet = (map["unique"] as List?)?.cast();
+    uniqueColumnSet = (map['unique'] as List?)?.cast();
   }
 
   /// The [Schema] this table belongs to.
@@ -89,7 +89,9 @@ class SchemaTable {
   // ignore: avoid_setters_without_getters
   set _columns(List<SchemaColumn> columns) {
     _columnStorage = columns;
-    _columnStorage!.forEach((c) => c.table = this);
+    for (var c in _columnStorage!) {
+      c.table = this;
+    }
   }
 
   /// Returns a [SchemaColumn] in this instance by its name.
@@ -107,7 +109,7 @@ class SchemaTable {
   /// Sets [column]'s [SchemaColumn.table] to this instance.
   void addColumn(SchemaColumn column) {
     if (this[column.name] != null) {
-      throw SchemaException("Column ${column.name} already exists.");
+      throw SchemaException('Column ${column.name} already exists.');
     }
 
     _columnStorage!.add(column);
@@ -115,7 +117,7 @@ class SchemaTable {
   }
 
   void renameColumn(SchemaColumn column, String? newName) {
-    throw SchemaException("Renaming a column not yet implemented!");
+    throw SchemaException('Renaming a column not yet implemented!');
 
 //    if (!columns.contains(column)) {
 //      throw new SchemaException("Column ${column.name} does not exist on ${name}.");
@@ -139,7 +141,7 @@ class SchemaTable {
   /// Sets [column]'s [SchemaColumn.table] to null.
   void removeColumn(SchemaColumn column) {
     if (!columns.contains(column)) {
-      throw SchemaException("Column ${column.name} does not exist on $name.");
+      throw SchemaException('Column ${column.name} does not exist on $name.');
     }
 
     _columnStorage!.remove(column);
@@ -150,7 +152,7 @@ class SchemaTable {
   void replaceColumn(SchemaColumn existingColumn, SchemaColumn newColumn) {
     if (!columns.contains(existingColumn)) {
       throw SchemaException(
-          "Column ${existingColumn.name} does not exist on $name.");
+          'Column ${existingColumn.name} does not exist on $name.');
     }
 
     var index = _columnStorage!.indexOf(existingColumn);
@@ -172,9 +174,9 @@ class SchemaTable {
   /// Returns portable representation of this table.
   Map<String, dynamic> asMap() {
     return {
-      "name": name,
-      "columns": columns.map((c) => c.asMap()).toList(),
-      "unique": uniqueColumnSet
+      'name': name,
+      'columns': columns.map((c) => c.asMap()).toList(),
+      'unique': uniqueColumnSet
     };
   }
 
@@ -280,7 +282,7 @@ class SchemaTableDifference {
         .toList();
   }
 
-  List<SchemaColumnDifference> _differingColumns = [];
+  final List<SchemaColumnDifference> _differingColumns = [];
 }
 
 /// Difference between two [SchemaTable.uniqueColumnSet]s.
@@ -313,22 +315,22 @@ class SchemaTableUniqueSetDifference {
     if (expectedColumnNames.isEmpty && actualColumnNames.isNotEmpty) {
       return [
         "Multi-column unique constraint on table '$_tableName' "
-            "should NOT exist, but is created by migration files."
+            'should NOT exist, but is created by migration files.'
       ];
     } else if (expectedColumnNames.isNotEmpty && actualColumnNames.isEmpty) {
       return [
         "Multi-column unique constraint on table '$_tableName' "
-            "should exist, but it is NOT created by migration files."
+            'should exist, but it is NOT created by migration files.'
       ];
     }
 
     if (hasDifferences) {
-      var expectedColumns = expectedColumnNames.map((c) => "'$c'").join(", ");
-      var actualColumns = actualColumnNames.map((c) => "'$c'").join(", ");
+      var expectedColumns = expectedColumnNames.map((c) => "'$c'").join(', ');
+      var actualColumns = actualColumnNames.map((c) => "'$c'").join(', ');
 
       return [
         "Multi-column unique constraint on table '$_tableName' "
-            "is expected to be for properties $expectedColumns, but is actually $actualColumns"
+            'is expected to be for properties $expectedColumns, but is actually $actualColumns'
       ];
     }
 

@@ -8,12 +8,12 @@ import 'package:conduit_isolate_exec/conduit_isolate_exec.dart';
 class MigrationBuilderExecutable extends Executable<Map<String, dynamic>> {
   MigrationBuilderExecutable(Map<String, dynamic> message)
       : inputSchema =
-            Schema.fromMap(message["inputSchema"] as Map<String, dynamic>),
-        versionTag = message["versionTag"] as int?,
+            Schema.fromMap(message['inputSchema'] as Map<String, dynamic>),
+        versionTag = message['versionTag'] as int?,
         super(message);
 
   MigrationBuilderExecutable.input(this.inputSchema, this.versionTag)
-      : super({"inputSchema": inputSchema.asMap(), "versionTag": versionTag});
+      : super({'inputSchema': inputSchema.asMap(), 'versionTag': versionTag});
 
   final int? versionTag;
   final Schema inputSchema;
@@ -29,29 +29,29 @@ class MigrationBuilderExecutable extends Executable<Map<String, dynamic>> {
           inputSchema, schema, versionTag,
           changeList: changeList);
       return {
-        "source": source,
-        "tablesEvaluated": dataModel.entities.map((e) => e.name).toList(),
-        "changeList": changeList
+        'source': source,
+        'tablesEvaluated': dataModel.entities.map((e) => e.name).toList(),
+        'changeList': changeList
       };
     } on SchemaException catch (e) {
-      return {"error": e.message};
+      return {'error': e.message};
     } on ManagedDataModelError catch (e) {
-      return {"error": e.message};
+      return {'error': e.message};
     }
   }
 
   static List<String> importsForPackage(String? packageName) => [
-        "package:conduit/conduit.dart",
-        "package:$packageName/$packageName.dart",
-        "package:conduit_runtime/runtime.dart"
+        'package:conduit/conduit.dart',
+        'package:$packageName/$packageName.dart',
+        'package:conduit_runtime/runtime.dart'
       ];
 }
 
 class MigrationBuilderResult {
   MigrationBuilderResult.fromMap(Map<String, dynamic> result)
-      : source = result["source"] as String?,
-        tablesEvaluated = result["tablesEvaluated"] as List<String>?,
-        changeList = result["changeList"] as List<String>?;
+      : source = result['source'] as String?,
+        tablesEvaluated = result['tablesEvaluated'] as List<String>?,
+        changeList = result['changeList'] as List<String>?;
 
   final String? source;
   final List<String>? tablesEvaluated;
@@ -67,8 +67,8 @@ Future<MigrationBuilderResult> generateMigrationFileForProject(
           MigrationBuilderExecutable.importsForPackage(project.packageName),
       logHandler: project.displayProgress);
 
-  if (resultMap.containsKey("error")) {
-    throw CLIException(resultMap["error"] as String?);
+  if (resultMap.containsKey('error')) {
+    throw CLIException(resultMap['error'] as String?);
   }
 
   return MigrationBuilderResult.fromMap(resultMap);

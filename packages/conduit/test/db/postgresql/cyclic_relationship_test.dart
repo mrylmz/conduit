@@ -10,22 +10,22 @@ void main() {
     context = null;
   });
 
-  group("Self-reference", () {
+  group('Self-reference', () {
     setUp(() async {
       context = await PostgresTestConfig().contextWithModels([SelfRef]);
     });
 
-    test("Insert an object that references an existing object", () async {
+    test('Insert an object that references an existing object', () async {
       final parent =
-          await Query.insertObject(context!, SelfRef()..name = "parent");
+          await Query.insertObject(context!, SelfRef()..name = 'parent');
 
       var q = Query<SelfRef>(context!)
-        ..values.name = "child"
+        ..values.name = 'child'
         ..values.parent = parent;
       final child = await q.insert();
 
-      expect(parent.name, "parent");
-      expect(child.name, "child");
+      expect(parent.name, 'parent');
+      expect(child.name, 'child');
       expect(child.parent!.id, parent.id);
 
       q = Query<SelfRef>(context!);
@@ -33,9 +33,9 @@ void main() {
       expect(all.length, 2);
     });
 
-    test("Update an object to reference itself", () async {
+    test('Update an object to reference itself', () async {
       final parent =
-          await Query.insertObject(context!, SelfRef()..name = "self");
+          await Query.insertObject(context!, SelfRef()..name = 'self');
 
       var q = Query<SelfRef>(context!)
         ..where((s) => s.id).equalTo(parent.id)
@@ -46,20 +46,20 @@ void main() {
       final all = await q.fetch();
       expect(all.map((s) => s.asMap()).toList(), [
         {
-          "id": parent.id,
-          "name": "self",
-          "parent": {"id": parent.id}
+          'id': parent.id,
+          'name': 'self',
+          'parent': {'id': parent.id}
         }
       ]);
     });
 
-    test("Join from table without foreign key", () async {
-      var q = Query<SelfRef>(context!)..values.name = "parent";
+    test('Join from table without foreign key', () async {
+      var q = Query<SelfRef>(context!)..values.name = 'parent';
       final parent = await q.insert();
 
       await Query.insertObjects(
           context!,
-          ["a", "b", "c"].map((n) {
+          ['a', 'b', 'c'].map((n) {
             return SelfRef()
               ..name = n
               ..parent = parent;
@@ -72,37 +72,37 @@ void main() {
       final all = await q.fetch();
       expect(all.map((s) => s.asMap()).toList(), [
         {
-          "id": parent.id,
-          "name": "parent",
-          "parent": null,
-          "children": [
+          'id': parent.id,
+          'name': 'parent',
+          'parent': null,
+          'children': [
             {
-              "id": isNotNull,
-              "name": "a",
-              "parent": {"id": parent.id}
+              'id': isNotNull,
+              'name': 'a',
+              'parent': {'id': parent.id}
             },
             {
-              "id": isNotNull,
-              "name": "b",
-              "parent": {"id": parent.id}
+              'id': isNotNull,
+              'name': 'b',
+              'parent': {'id': parent.id}
             },
             {
-              "id": isNotNull,
-              "name": "c",
-              "parent": {"id": parent.id}
+              'id': isNotNull,
+              'name': 'c',
+              'parent': {'id': parent.id}
             },
           ]
         }
       ]);
     });
 
-    test("Join from table with foreign key", () async {
-      var q = Query<SelfRef>(context!)..values.name = "parent";
+    test('Join from table with foreign key', () async {
+      var q = Query<SelfRef>(context!)..values.name = 'parent';
       final parent = await q.insert();
 
       final objs = await Query.insertObjects(
           context!,
-          ["a", "b", "c"].map((n) {
+          ['a', 'b', 'c'].map((n) {
             return SelfRef()
               ..name = n
               ..parent = parent;
@@ -114,20 +114,20 @@ void main() {
       final all = await q.fetch();
       expect(all.map((s) => s.asMap()).toList(), [
         {
-          "id": objs.first.id,
-          "name": "a",
-          "parent": {"id": parent.id, "name": "parent", "parent": null},
+          'id': objs.first.id,
+          'name': 'a',
+          'parent': {'id': parent.id, 'name': 'parent', 'parent': null},
         }
       ]);
     });
 
-    test("Join multiple times", () async {
-      var q = Query<SelfRef>(context!)..values.name = "parent";
+    test('Join multiple times', () async {
+      var q = Query<SelfRef>(context!)..values.name = 'parent';
       final parent = await q.insert();
 
       final objs = await Query.insertObjects(
           context!,
-          ["a", "b", "c"].map((n) {
+          ['a', 'b', 'c'].map((n) {
             return SelfRef()
               ..name = n
               ..parent = parent;
@@ -136,7 +136,7 @@ void main() {
       await Query.insertObject(
           context!,
           SelfRef()
-            ..name = "x"
+            ..name = 'x'
             ..parent = objs.first);
 
       q = Query<SelfRef>(context!)
@@ -148,73 +148,73 @@ void main() {
       final all = await q.fetch();
       expect(all.map((s) => s.asMap()).toList(), [
         {
-          "id": isNotNull,
-          "name": "a",
-          "parent": {"id": parent.id},
-          "children": [
+          'id': isNotNull,
+          'name': 'a',
+          'parent': {'id': parent.id},
+          'children': [
             {
-              "id": isNotNull,
-              "name": "x",
-              "parent": {"id": isNotNull},
-              "children": []
+              'id': isNotNull,
+              'name': 'x',
+              'parent': {'id': isNotNull},
+              'children': []
             }
           ]
         },
         {
-          "id": isNotNull,
-          "name": "b",
-          "parent": {"id": parent.id},
-          "children": []
+          'id': isNotNull,
+          'name': 'b',
+          'parent': {'id': parent.id},
+          'children': []
         },
         {
-          "id": isNotNull,
-          "name": "c",
-          "parent": {"id": parent.id},
-          "children": []
+          'id': isNotNull,
+          'name': 'c',
+          'parent': {'id': parent.id},
+          'children': []
         },
         {
-          "id": parent.id,
-          "name": "parent",
-          "parent": null,
-          "children": [
+          'id': parent.id,
+          'name': 'parent',
+          'parent': null,
+          'children': [
             {
-              "id": isNotNull,
-              "name": "a",
-              "parent": {"id": parent.id},
-              "children": [
-                {"id": isNotNull, "name": "x", "parent": isNotNull}
+              'id': isNotNull,
+              'name': 'a',
+              'parent': {'id': parent.id},
+              'children': [
+                {'id': isNotNull, 'name': 'x', 'parent': isNotNull}
               ]
             },
             {
-              "id": isNotNull,
-              "name": "b",
-              "parent": {"id": parent.id},
-              "children": []
+              'id': isNotNull,
+              'name': 'b',
+              'parent': {'id': parent.id},
+              'children': []
             },
             {
-              "id": isNotNull,
-              "name": "c",
-              "parent": {"id": parent.id},
-              "children": []
+              'id': isNotNull,
+              'name': 'c',
+              'parent': {'id': parent.id},
+              'children': []
             },
           ]
         },
         {
-          "id": isNotNull,
-          "name": "x",
-          "parent": {"id": isNotNull},
-          "children": []
+          'id': isNotNull,
+          'name': 'x',
+          'parent': {'id': isNotNull},
+          'children': []
         }
       ]);
     });
 
-    test("Join with a where clause on the primary table", () async {
-      var q = Query<SelfRef>(context!)..values.name = "parent";
+    test('Join with a where clause on the primary table', () async {
+      var q = Query<SelfRef>(context!)..values.name = 'parent';
       final parent = await q.insert();
 
       final objs = await Query.insertObjects(
           context!,
-          ["a", "b", "c"].map((n) {
+          ['a', 'b', 'c'].map((n) {
             return SelfRef()
               ..name = n
               ..parent = parent;
@@ -223,7 +223,7 @@ void main() {
       await Query.insertObject(
           context!,
           SelfRef()
-            ..name = "x"
+            ..name = 'x'
             ..parent = objs.first);
 
       q = Query<SelfRef>(context!)..where((s) => s.id).equalTo(parent.id);
@@ -234,37 +234,37 @@ void main() {
       final all = await q.fetch();
       expect(all.map((s) => s.asMap()).toList(), [
         {
-          "id": parent.id,
-          "name": "parent",
-          "parent": null,
-          "children": [
+          'id': parent.id,
+          'name': 'parent',
+          'parent': null,
+          'children': [
             {
-              "id": isNotNull,
-              "name": "a",
-              "parent": {"id": parent.id},
+              'id': isNotNull,
+              'name': 'a',
+              'parent': {'id': parent.id},
             },
             {
-              "id": isNotNull,
-              "name": "b",
-              "parent": {"id": parent.id},
+              'id': isNotNull,
+              'name': 'b',
+              'parent': {'id': parent.id},
             },
             {
-              "id": isNotNull,
-              "name": "c",
-              "parent": {"id": parent.id},
+              'id': isNotNull,
+              'name': 'c',
+              'parent': {'id': parent.id},
             },
           ]
         }
       ]);
     });
 
-    test("Join with a where clause on the joined table", () async {
-      var q = Query<SelfRef>(context!)..values.name = "parent";
+    test('Join with a where clause on the joined table', () async {
+      var q = Query<SelfRef>(context!)..values.name = 'parent';
       final parent = await q.insert();
 
       final objs = await Query.insertObjects(
           context!,
-          ["a", "b", "c"].map((n) {
+          ['a', 'b', 'c'].map((n) {
             return SelfRef()
               ..name = n
               ..parent = parent;
@@ -273,12 +273,12 @@ void main() {
       await Query.insertObject(
           context!,
           SelfRef()
-            ..name = "x"
+            ..name = 'x'
             ..parent = objs.first);
 
       q = Query<SelfRef>(context!)
         ..sortBy((s) => s.name, QuerySortOrder.ascending);
-      q.join(set: (s) => s.children).where((s) => s.name).greaterThan("b");
+      q.join(set: (s) => s.children).where((s) => s.name).greaterThan('b');
 
       final all = await q.fetch();
       expect(all.map((s) => s.asMap()).toList(), [
@@ -327,14 +327,14 @@ void main() {
       ]);
     });
 
-    test("Join with where clause on both the primary and joined table",
+    test('Join with where clause on both the primary and joined table',
         () async {
-      var q = Query<SelfRef>(context!)..values.name = "parent";
+      var q = Query<SelfRef>(context!)..values.name = 'parent';
       final parent = await q.insert();
 
       final objs = await Query.insertObjects(
           context!,
-          ["a", "b", "c"].map((n) {
+          ['a', 'b', 'c'].map((n) {
             return SelfRef()
               ..name = n
               ..parent = parent;
@@ -343,11 +343,11 @@ void main() {
       await Query.insertObject(
           context!,
           SelfRef()
-            ..name = "x"
+            ..name = 'x'
             ..parent = objs.first);
 
-      q = Query<SelfRef>(context!)..where((s) => s.name).greaterThan("o");
-      q.join(set: (s) => s.children).where((s) => s.name).greaterThan("b");
+      q = Query<SelfRef>(context!)..where((s) => s.name).greaterThan('o');
+      q.join(set: (s) => s.children).where((s) => s.name).greaterThan('b');
 
       final all = await q.fetch();
       expect(all.map((s) => s.asMap()).toList(), [
@@ -364,39 +364,39 @@ void main() {
           ]
         },
         {
-          "id": 5,
-          "name": "x",
-          "parent": {"id": 2},
-          "children": []
+          'id': 5,
+          'name': 'x',
+          'parent': {'id': 2},
+          'children': []
         }
       ]);
     });
   });
 
-  group("Reference to one another", () {
+  group('Reference to one another', () {
     setUp(() async {
       context = await PostgresTestConfig().contextWithModels([Left, Right]);
     });
 
-    test("Insert an object that references an existing object", () async {
-      final l = await Query.insertObject(context!, Left()..name = "l1");
+    test('Insert an object that references an existing object', () async {
+      final l = await Query.insertObject(context!, Left()..name = 'l1');
 
       var q = Query<Right>(context!)
-        ..values.name = "r1"
+        ..values.name = 'r1'
         ..values.belongsToLeft = l;
       final r = await q.insert();
 
-      expect(l.name, "l1");
-      expect(r.name, "r1");
+      expect(l.name, 'l1');
+      expect(r.name, 'r1');
       expect(r.belongsToLeft.id, l.id);
     });
 
-    test("Updating and joining across tables", () async {
-      final r1 = await Query.insertObject(context!, Right()..name = "r1");
+    test('Updating and joining across tables', () async {
+      final r1 = await Query.insertObject(context!, Right()..name = 'r1');
       final l1 = await Query.insertObject(
           context!,
           Left()
-            ..name = "l1"
+            ..name = 'l1'
             ..belongsToRight = r1);
       final updateQuery = Query<Right>(context!)
         ..where((r) => r.id).equalTo(r1.id)
@@ -408,18 +408,18 @@ void main() {
       final all = await q.fetch();
       expect(all.map((s) => s.asMap()).toList(), [
         {
-          "id": l1.id,
-          "name": "l1",
-          "belongsToRight": {"id": r1.id},
-          "right": {
-            "id": r1.id,
-            "name": "r1",
-            "left": {
-              "id": l1.id,
-              "name": "l1",
-              "belongsToRight": {"id": r1.id},
+          'id': l1.id,
+          'name': 'l1',
+          'belongsToRight': {'id': r1.id},
+          'right': {
+            'id': r1.id,
+            'name': 'r1',
+            'left': {
+              'id': l1.id,
+              'name': 'l1',
+              'belongsToRight': {'id': r1.id},
             },
-            "belongsToLeft": {"id": r1.id}
+            'belongsToLeft': {'id': r1.id}
           }
         }
       ]);

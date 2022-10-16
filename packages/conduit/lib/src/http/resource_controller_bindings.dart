@@ -31,7 +31,7 @@ class Operation {
       String? pathVariable2,
       String? pathVariable3,
       String? pathVariable4])
-      : method = "GET",
+      : method = 'GET',
         _pathVariable1 = pathVariable1,
         _pathVariable2 = pathVariable2,
         _pathVariable3 = pathVariable3,
@@ -42,7 +42,7 @@ class Operation {
       String? pathVariable2,
       String? pathVariable3,
       String? pathVariable4])
-      : method = "PUT",
+      : method = 'PUT',
         _pathVariable1 = pathVariable1,
         _pathVariable2 = pathVariable2,
         _pathVariable3 = pathVariable3,
@@ -53,7 +53,7 @@ class Operation {
       String? pathVariable2,
       String? pathVariable3,
       String? pathVariable4])
-      : method = "POST",
+      : method = 'POST',
         _pathVariable1 = pathVariable1,
         _pathVariable2 = pathVariable2,
         _pathVariable3 = pathVariable3,
@@ -64,7 +64,7 @@ class Operation {
       String? pathVariable2,
       String? pathVariable3,
       String? pathVariable4])
-      : method = "DELETE",
+      : method = 'DELETE',
         _pathVariable1 = pathVariable1,
         _pathVariable2 = pathVariable2,
         _pathVariable3 = pathVariable3,
