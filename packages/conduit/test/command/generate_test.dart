@@ -1,9 +1,11 @@
 // ignore: unnecessary_const
 @Tags(["cli"])
 import 'dart:io';
+
 import 'package:fs_test_agent/dart_project_agent.dart';
 import 'package:fs_test_agent/working_directory_agent.dart';
 import 'package:test/test.dart';
+
 import '../not_tests/cli_helpers.dart';
 
 void main() {
@@ -44,7 +46,8 @@ class _TestObject {
       projectUnderTestCli.agent.workingDirectory.uri.resolve("pubspec.lock"),
     ).deleteSync();
     File.fromUri(
-      projectUnderTestCli.agent.workingDirectory.uri.resolve(".packages"),
+      projectUnderTestCli.agent.workingDirectory.uri
+          .resolve(".dart_tool/package_config.json"),
     ).deleteSync();
 
     var res = await projectUnderTestCli.run("db", ["generate"]);

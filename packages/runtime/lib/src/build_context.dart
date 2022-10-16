@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'dart:mirrors';
-import 'package:path/path.dart';
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:pubspec/pubspec.dart';
 import 'package:conduit_runtime/src/analyzer.dart';
 import 'package:conduit_runtime/src/context.dart';
 import 'package:conduit_runtime/src/file_system.dart';
 import 'package:conduit_runtime/src/mirror_context.dart';
+import 'package:path/path.dart';
+import 'package:pubspec/pubspec.dart';
 import 'package:yaml/yaml.dart';
 
 /// Configuration and context values used during [Build.execute].
@@ -99,11 +99,12 @@ class BuildContext {
       buildPackagesDirectory.uri.resolve("${sourceApplicationPubspec.name}/"));
 
   /// Gets dependency package location relative to [sourceApplicationDirectory].
-  Map<String, Uri> get resolvedPackages {
-    return getResolvedPackageUris(
-        sourceApplicationDirectory.uri.resolve(".packages"),
-        relativeTo: sourceApplicationDirectory.uri);
-  }
+  Future<Map<String, Uri>> get resolvedPackages => getResolvedPackageUris(
+        sourceApplicationDirectory.uri.resolve(
+          '.dart_tool/package_config.json',
+        ),
+        relativeTo: sourceApplicationDirectory.uri,
+      );
 
   /// Returns a [Directory] at [uri], creates it recursively if it doesn't exist.
   Directory getDirectory(Uri uri) {
@@ -124,14 +125,14 @@ class BuildContext {
     return file;
   }
 
-  Uri? resolveUri(Uri? uri) {
+  Future<Uri?> resolveUri(Uri? uri) async {
     if (uri == null) {
       return null;
     }
     var outputUri = uri;
     if (outputUri.scheme == "package") {
       final segments = outputUri.pathSegments;
-      outputUri = resolvedPackages[segments.first]!.resolve("lib/");
+      outputUri = (await resolvedPackages)[segments.first]!.resolve("lib/");
       for (var i = 1; i < segments.length; i++) {
         if (i < segments.length - 1) {
           outputUri = outputUri.resolve("${segments[i]}/");
@@ -146,11 +147,11 @@ class BuildContext {
     return outputUri;
   }
 
-  List<String> getImportDirectives({
+  Future<List<String>> getImportDirectives({
     Uri? uri,
     String? source,
     bool alsoImportOriginalFile = false,
-  }) {
+  }) async {
     if (uri != null && source != null) {
       throw ArgumentError(
           "either uri or source must be non-null, but not both");
@@ -166,7 +167,7 @@ class BuildContext {
           "flag 'alsoImportOriginalFile' may only be set if 'uri' is also set");
     }
 
-    final fileUri = resolveUri(uri);
+    final fileUri = await resolveUri(uri);
     final text = source ?? File.fromUri(fileUri!).readAsStringSync();
     final importRegex = RegExp("import [\\'\\\"]([^\\'\\\"]*)[\\'\\\"];");
 
@@ -190,25 +191,28 @@ class BuildContext {
     return imports;
   }
 
-  ClassDeclaration getClassDeclarationFromType(Type type) {
+  Future<ClassDeclaration> getClassDeclarationFromType(Type type) async {
     final classMirror = reflectType(type);
     return analyzer.getClassFromFile(
       MirrorSystem.getName(classMirror.simpleName),
-      resolveUri(classMirror.location!.sourceUri)!,
+      (await resolveUri(classMirror.location!.sourceUri))!,
     );
   }
 
-  List<Annotation> getAnnotationsFromField(Type _type, String propertyName) {
+  Future<List<Annotation>> getAnnotationsFromField(
+    Type _type,
+    String propertyName,
+  ) async {
     var type = reflectClass(_type);
-    var field =
-        getClassDeclarationFromType(type.reflectedType).getField(propertyName);
+    var field = (await getClassDeclarationFromType(type.reflectedType))
+        .getProperty(propertyName);
     while (field == null) {
       type = type.superclass!;
       if (type.reflectedType == Object) {
         break;
       }
-      field = getClassDeclarationFromType(type.reflectedType)
-          .getField(propertyName);
+      field = (await getClassDeclarationFromType(type.reflectedType))
+          .getProperty(propertyName);
     }
 
     return (field!.parent!.parent! as FieldDeclaration).metadata.toList();

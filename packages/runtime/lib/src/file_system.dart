@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:package_config/package_config.dart';
+
 /// Recursively copies the contents of the directory at [src] to [dst].
 ///
 /// Creates directory at [dst] recursively if it doesn't exist.
@@ -24,40 +26,37 @@ void copyDirectory({required Uri src, required Uri dst}) {
   });
 }
 
-/// Reads .packages file from [packagesFileUri] and returns map of package name to its location on disk.
+/// Reads .dart_tool/package_config.json file from [packagesFileUri] and returns map of package name to its location on disk.
 ///
 /// If locations on disk are relative Uris, they are resolved by [relativeTo]. [relativeTo] defaults
 /// to the CWD.
-Map<String, Uri> getResolvedPackageUris(
+Future<Map<String, Uri>> getResolvedPackageUris(
   Uri packagesFileUri, {
   Uri? relativeTo,
-}) {
+}) async {
   final _relativeTo = relativeTo ?? Directory.current.uri;
 
-  final packagesFile = File.fromUri(packagesFileUri);
-  if (!packagesFile.existsSync()) {
+  final packageConfig = await findPackageConfig(Directory.current);
+  if (packageConfig == null) {
     throw StateError(
-      "No .packages file found at '$packagesFileUri'. "
+      "No .dart_tool/package_config.json file found at '$packagesFileUri'. "
       "Run 'pub get' in directory '${packagesFileUri.resolve('../')}'.",
     );
   }
-  return Map.fromEntries(packagesFile
-      .readAsStringSync()
-      .split("\n")
-      .where((s) => !s.trimLeft().startsWith("#"))
-      .where((s) => s.trim().isNotEmpty)
-      .map((s) {
-    final packageName = s.substring(0, s.indexOf(":"));
-    final uri = Uri.parse(s.substring("$packageName:".length));
 
-    if (uri.isAbsolute) {
-      return MapEntry(packageName, Directory.fromUri(uri).parent.uri);
+  return Map.fromEntries(packageConfig.packages.map((package) {
+    if (package.relativeRoot) {
+      return MapEntry(
+        package.name,
+        Directory.fromUri(
+          _relativeTo.resolveUri(package.packageUriRoot).normalizePath(),
+        ).parent.uri,
+      );
     }
 
     return MapEntry(
-        packageName,
-        Directory.fromUri(_relativeTo.resolveUri(uri).normalizePath())
-            .parent
-            .uri);
+      package.name,
+      Directory.fromUri(package.packageUriRoot).parent.uri,
+    );
   }));
 }

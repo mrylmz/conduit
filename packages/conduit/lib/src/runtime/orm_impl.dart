@@ -1,8 +1,8 @@
 import 'dart:mirrors';
+
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
-
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:conduit/src/db/managed/managed.dart';
 import 'package:conduit/src/runtime/orm/entity_builder.dart';
@@ -137,7 +137,7 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
         return [annotation.toSource().substring(1)];
       } else if (isInstanceOfColumn) {
         final originatingLibrary = element.session!
-            .getParsedLibraryByElement2(element.library) as ParsedLibraryResult;
+            .getParsedLibraryByElement(element.library) as ParsedLibraryResult;
         final elementDeclaration = originatingLibrary
             .getElementDeclaration(element.variable)!
             .node as VariableDeclaration;
@@ -154,13 +154,15 @@ class ManagedEntityRuntimeImpl extends ManagedEntityRuntime
     return [];
   }
 
-  String _getValidators(
-      BuildContext context, ManagedPropertyDescription property,
-      {required List<Uri> importUris}) {
+  Future<String> _getValidators(
+    BuildContext context,
+    ManagedPropertyDescription property, {
+    required List<Uri> importUris,
+  }) async {
     // For the property we are looking at, grab all of its annotations from the analyzer.
     // We also have all of the instances created by these annotations available in some
     // way or another in the [property].
-    final fieldAnnotations = context.getAnnotationsFromField(
+    final fieldAnnotations = await context.getAnnotationsFromField(
         EntityBuilder.getTableDefinitionForType(property.entity.instanceType)
             .reflectedType,
         property.name);
@@ -389,7 +391,7 @@ return entity.symbolMap[Symbol(symbolName)];
   }
 
   @override
-  String compile(BuildContext ctx) {
+  Future<String> compile(BuildContext ctx) async {
     final importUris = <Uri>[];
 
     final className = "${MirrorSystem.getName(instanceType.simpleName)}";

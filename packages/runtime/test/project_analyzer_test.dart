@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:conduit_runtime/src/analyzer.dart';
-import 'package:test/test.dart';
 import 'package:fs_test_agent/dart_project_agent.dart';
+import 'package:test/test.dart';
 
 void main() {
   test("ProjectAnalyzer can find a specific class declaration in project",
@@ -18,7 +18,7 @@ void main() {
     final klass = p.getClassFromFile("ConsumerSubclass",
         terminal.libraryDirectory.absolute.uri.resolve("application.dart"));
     expect(klass, isNotNull);
-    expect(klass.name.name, "ConsumerSubclass");
+    expect(klass.name.lexeme, "ConsumerSubclass");
     expect(klass.extendsClause!.superclass.name.name, "Consumer");
   });
 }

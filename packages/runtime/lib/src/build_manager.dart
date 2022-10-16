@@ -41,11 +41,11 @@ class BuildManager {
     final analyzer = CodeAnalyzer(strippedScriptFile.absolute.uri);
     final analyzerContext = analyzer.contexts.contextFor(analyzer.path);
     final parsedUnit = analyzerContext.currentSession
-        .getParsedUnit2(analyzer.path) as ParsedUnitResult;
+        .getParsedUnit(analyzer.path) as ParsedUnitResult;
 
     final mainFunctions = parsedUnit.unit.declarations
         .whereType<FunctionDeclaration>()
-        .where((f) => f.name.name == "main")
+        .where((f) => f.name.lexeme == "main")
         .toList();
 
     for (final f in mainFunctions.reversed) {
@@ -55,7 +55,8 @@ class BuildManager {
     strippedScriptFile.writeAsStringSync(scriptSource);
     await IsolateExecutor.run(
       BuildExecutable(context.safeMap),
-      packageConfigURI: sourceDirectoryUri.resolve(".packages"),
+      packageConfigURI:
+          sourceDirectoryUri.resolve(".dart_tool/package_config.json"),
       imports: [
         "package:conduit_runtime/runtime.dart",
         context.targetScriptFileUri.toString()

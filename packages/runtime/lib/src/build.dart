@@ -13,8 +13,6 @@ class Build {
 
   final BuildContext context;
 
-  late final Map<String, Uri> packageMap = context.resolvedPackages;
-
   Future execute() async {
     final compilers = context.context.compilers;
 
@@ -24,18 +22,23 @@ class Build {
     };
     await Future.forEach<Uri>(
       astsToResolve,
-      (astUri) => context.analyzer.resolveUnitAt(context.resolveUri(astUri)!),
+      (astUri) async {
+        final uri = await context.resolveUri(astUri);
+        return await context.analyzer.resolveUnitAt(uri!);
+      },
     );
 
     print("Generating runtime...");
 
     final runtimeGenerator = RuntimeGenerator();
-    context.context.runtimes.map.forEach((typeName, runtime) {
-      if (runtime is SourceCompiler) {
+    for (final entry in context.context.runtimes.map.entries) {
+      if (entry.value is SourceCompiler) {
         runtimeGenerator.addRuntime(
-            name: typeName, source: runtime.compile(context));
+          name: entry.key,
+          source: await entry.value.compile(context),
+        );
       }
-    });
+    }
 
     await runtimeGenerator.writeTo(context.buildRuntimeDirectory.uri);
     print("Generated runtime at '${context.buildRuntimeDirectory.uri}'.");
@@ -50,8 +53,10 @@ class Build {
     final overrides = pubspecMap['dependency_overrides'] as Map;
     var sourcePackageIsCompiled = false;
 
+    final packageMap = await context.resolvedPackages;
+
     for (final compiler in compilers) {
-      final packageInfo = _getPackageInfoForCompiler(compiler);
+      final packageInfo = _getPackageInfoForCompiler(packageMap, compiler);
       final sourceDirUri = packageInfo.uri;
       final targetDirUri =
           context.buildPackagesDirectory.uri.resolve("${packageInfo.name}/");
@@ -159,7 +164,10 @@ class Build {
         dstUri.resolve("pubspec.yaml").toFilePath(windows: Platform.isWindows));
   }
 
-  _PackageInfo _getPackageInfoForName(String packageName) {
+  _PackageInfo _getPackageInfoForName(
+    Map<String, Uri> packageMap,
+    String packageName,
+  ) {
     final packageUri = packageMap[packageName];
     if (packageUri == null) {
       throw StateError(
@@ -169,7 +177,10 @@ class Build {
     return _PackageInfo(packageName, packageUri);
   }
 
-  _PackageInfo _getPackageInfoForCompiler(Compiler compiler) {
+  _PackageInfo _getPackageInfoForCompiler(
+    Map<String, Uri> packageMap,
+    Compiler compiler,
+  ) {
     final compilerUri = reflect(compiler).type.location!.sourceUri;
     final parser = RegExp(r"package\:([^\/]+)");
     final parsed = parser.firstMatch(compilerUri.toString());
@@ -181,7 +192,7 @@ class Build {
     }
 
     final packageName = parsed.group(1);
-    return _getPackageInfoForName(packageName!);
+    return _getPackageInfoForName(packageMap, packageName!);
   }
 }
 

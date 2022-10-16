@@ -34,8 +34,8 @@ class CodeAnalyzer {
       }
 
       final output =
-          await ctx.currentSession.getResolvedUnit2(path) as ResolvedUnitResult;
-      if (output.state == ResultState.VALID) {
+          await ctx.currentSession.getResolvedUnit(path) as ResolvedUnitResult;
+      if (output.errors.isEmpty) {
         _resolvedAsts[path] = output;
         return output;
       }
@@ -49,7 +49,7 @@ class CodeAnalyzer {
     return _getFileAstRoot(fileUri)
         .declarations
         .whereType<ClassDeclaration>()
-        .firstWhere((c) => c.name.name == className);
+        .firstWhere((c) => c.name.lexeme == className);
   }
 
   List<ClassDeclaration> getSubclassesFromFile(
@@ -64,10 +64,10 @@ class CodeAnalyzer {
   CompilationUnit _getFileAstRoot(Uri fileUri) {
     final path = getPath(fileUri);
     if (_resolvedAsts.containsKey(path)) {
-      return _resolvedAsts[path]!.unit!;
+      return _resolvedAsts[path]!.unit;
     }
 
-    final unit = contexts.contextFor(path).currentSession.getParsedUnit2(path)
+    final unit = contexts.contextFor(path).currentSession.getParsedUnit(path)
         as ParsedUnitResult;
     if (unit.errors.isNotEmpty) {
       throw StateError(

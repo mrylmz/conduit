@@ -57,6 +57,8 @@ void main() {
 
   tearDownAll(DartProjectAgent.tearDownAll);
 
+  const timeout = Timeout(Duration(seconds: 10));
+
   group("Success cases", () {
     test("Can create public client", () async {
       await cli.run("auth", ["add-client", "--id", "a.b.c"]);
@@ -69,7 +71,7 @@ void main() {
       expect(results.first.hashedSecret, isNull);
       expect(results.first.salt, isNull);
       expect(results.first.redirectURI, isNull);
-    });
+    }, timeout: timeout);
 
     test("Can create confidential client", () async {
       await cli.run("auth", ["add-client", "--id", "a.b.c", "--secret", "abc"]);
@@ -84,7 +86,7 @@ void main() {
       final salt = results.first.salt!;
       final secret = results.first.hashedSecret;
       expect(AuthUtility.generatePasswordHash("abc", salt), secret);
-    });
+    }, timeout: timeout);
 
     test("Can create confidential client with redirect uri", () async {
       await cli.run(
@@ -110,7 +112,7 @@ void main() {
       final salt = results.first.salt!;
       final secret = results.first.hashedSecret;
       expect(AuthUtility.generatePasswordHash("abc", salt), secret);
-    });
+    }, timeout: timeout);
 
     test("Can create public client with redirect uri", () async {
       await cli.run(
@@ -131,7 +133,7 @@ void main() {
       expect(results.first.allowedScope, isNull);
       expect(results.first.redirectURI, "http://xyz.com");
       expect(results.first.hashedSecret, isNull);
-    });
+    }, timeout: timeout);
 
     test("Can create client with scope", () async {
       await cli.run(
@@ -153,7 +155,7 @@ void main() {
       expect(results.first.redirectURI, isNull);
       expect(results.first.hashedSecret, isNull);
       expect(results.first.salt, isNull);
-    });
+    }, timeout: timeout);
 
     test("Can create client with multiple scopes", () async {
       await cli.run(
@@ -175,7 +177,7 @@ void main() {
       expect(results.first.redirectURI, isNull);
       expect(results.first.hashedSecret, isNull);
       expect(results.first.salt, isNull);
-    });
+    }, timeout: timeout);
 
     test("Scope gets collapsed", () async {
       await cli.run(
@@ -197,7 +199,7 @@ void main() {
       expect(results.first.redirectURI, isNull);
       expect(results.first.hashedSecret, isNull);
       expect(results.first.salt, isNull);
-    });
+    }, timeout: timeout);
 
     test("Can set scope on client", () async {
       await cli.run("auth", ["add-client", "--id", "a.b.c"]);
@@ -221,7 +223,7 @@ void main() {
       expect(results.first.hashedSecret, isNull);
       expect(results.first.salt, isNull);
     });
-  });
+  }, timeout: timeout);
 
   group("Failure cases", () {
     test("Without id fails", () async {
@@ -239,7 +241,7 @@ void main() {
 
       expect(processResult, isNot(0));
       expect(cli.output, contains("id required"));
-    });
+    }, timeout: timeout);
 
     test("Malformed scope fails", () async {
       final processResult = await cli.run(
@@ -258,13 +260,13 @@ void main() {
 
       expect(processResult, isNot(0));
       expect(cli.output, contains("Invalid authorization scope"));
-    });
+    }, timeout: timeout);
 
     test("Update scope of invalid client id fails", () async {
       final result = await cli
           .run("auth", ["set-scope", "--id", "a.b.c", "--scopes", "abc efg"]);
       expect(result, isNot(0));
       expect(cli.output, contains("does not exist"));
-    });
+    }, timeout: timeout);
   });
 }
